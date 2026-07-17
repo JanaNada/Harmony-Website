@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
-import { ImageWithFallback } from "./components/figma/ImageWithFallback";
+import { ImageWithFallback } from "@/components";
 import {      
   Instagram,
   Facebook,
