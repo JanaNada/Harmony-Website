@@ -148,88 +148,60 @@ function Nav({ current, go }: { current: Page; go: (p: Page) => void }) {
 }
 
 // ─── Home Page (single-screen) ────────────────────────────────────────────────
-
 function HomePage({ go }: { go: (p: Page) => void }) {
-  const services: { img: string; label: string; page: Page; color: string; glow: string; }[] = [
-    { img: mgmtIcon, label: "Management", page: "management", color: C_ORANGE, glow: `${C_ORANGE}35` },
-    { img: eventsIcon, label: "Events", page: "events", color: C_PINK, glow: `${C_PINK}35` },
-    { img: marketingIcon, label: "Marketing", page: "marketing", color: C_BLUE, glow: `${C_BLUE}35` },
-    { img: recruitmentIcon, label: "Recruitment", page: "recruitment", color: C_GREEN, glow: `${C_GREEN}35` },
-  ];
-
-
   return (
-    <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-[#FAF7F2] relative">
-
-      {/* Soft Colorful Ambient Backgrounds (Fixed to cover entire scroll) */}
-      <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] bg-[#F5841F]/15 blur-[120px] rounded-full mix-blend-multiply" />
-        <div className="absolute top-[20%] -right-[10%] w-[60vw] h-[60vw] bg-[#3AADE0]/10 blur-[150px] rounded-full mix-blend-multiply" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[50vw] h-[50vw] bg-[#E91E8C]/15 blur-[120px] rounded-full mix-blend-multiply" />
-      </div>
-
-
-      <div className="relative z-10 pb-32">
-        {/* ── Hero ─────────────────────────────────────────────── */}
-        <div className="flex flex-col items-center pb-20">
-          {/* Logo */}
-          <div className="w-full flex justify-center mb-12">
-            <ImageWithFallback
-              src={logoImg}
-              alt="Harmony Club House"
-              className="object-cover w-full h-auto drop-shadow-xl"
-            />
-          </div>
-
-          {/* Headline */}
-          <div className="text-center max-w-[860px] px-6">
-            <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[#1a1a1a] leading-[1.15] tracking-tight mb-8" style={{ fontSize: "30px" }}>
-              Elevating hospitality through expert <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}>management</span>, curated <span style={{ color: C_PINK }}>events</span>, strategic <span style={{ color: C_BLUE }}>marketing</span>, and top-tier <span style={{ color: C_GREEN }}>recruitment</span>.
+    <div className="flex-1 flex flex-col min-h-0 bg-[#FAF7F2] relative">
+      <div className="flex-1 flex items-center justify-center p-6 md:p-12">
+        <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Left Column: Text Content */}
+          <div className="space-y-6 text-center lg:text-left">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-[#F5841F]/10 text-[#F5841F] text-[12px] font-bold uppercase tracking-[0.2em]">
+              ESTABLISHED 2012 · CAIRO, EGYPT
+            </span>
+            <h1 className="font-['Plus_Jakarta_Sans'] text-5xl md:text-7xl font-extrabold text-[#1a1a1a] leading-[1.1] tracking-tight">
+              Where Hospitality <br />
+              <span className="text-[#E91E8C]">Meets</span> <br />
+              <span className="text-[#78BE1F]">Excellence.</span>
             </h1>
-            <p className="font-['Plus_Jakarta_Sans'] text-center text-[#1a1a1a]/60 max-w-[600px] mx-auto font-medium leading-[1.8]" style={{ fontSize: "clamp(13px, 1.5vw, 16px)" }}>
-              We bridge the gap between ambition and operational reality, transforming concepts into industry-leading destinations.
+            <p className="font-['Plus_Jakarta_Sans'] text-lg text-[#1a1a1a]/60 max-w-md mx-auto lg:mx-0 leading-[1.8] font-medium">
+              Delivering management, events, marketing, and recruitment solutions under one harmonious ecosystem — with 13 years of international experience across four continents.
             </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
+              <button 
+                onClick={() => go("services")} 
+                className="bg-[#F5841F] text-white px-8 py-4 rounded-full font-bold hover:opacity-90 transition-all shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)]"
+              >
+                Explore Services →
+              </button>
+              <button 
+                onClick={() => go("contact")} 
+                className="border border-black/10 px-8 py-4 rounded-full font-bold text-[#1a1a1a] hover:bg-black/5 transition-all"
+              >
+                Contact Us
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* ── Welcome Section ──────────────────────────────────── */}
-        <div className="max-w-[1200px] w-full mx-auto px-6 mb-32 md:mb-48">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-center">
-            <div className="relative order-2 md:order-1 group">
-               <div className="absolute inset-0 bg-gradient-to-r from-[#F5841F]/30 via-[#E91E8C]/20 to-[#3AADE0]/30 blur-[50px] rounded-[48px] opacity-30 group-hover:opacity-60 transition-opacity duration-700" />
-               <div className="relative bg-white/60 backdrop-blur-2xl rounded-[48px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-white/60 overflow-hidden">
-                <div className="aspect-[4/3] bg-black/5 w-full">
-                  <ImageWithFallback 
-                    src={welcomeImg} 
-                    alt="Hospitality Interior" 
-                    className="w-full h-full object-cover transition-transform duration-[1.5s] group-hover:scale-[1.03]"
-                  />
-                </div>
-                {/* Small circular badge */}
-                <div className="absolute bottom-4 right-4 w-24 h-24 md:w-28 md:h-28 bg-white/80 backdrop-blur-xl rounded-full p-2 shadow-xl shadow-black/5 flex items-center justify-center border border-white">
-                  <div className="w-full h-full rounded-full border border-dashed border-[#1a1a1a]/20 flex flex-col items-center justify-center font-['Plus_Jakarta_Sans'] text-[#1a1a1a]">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Est.</span>
-                    <span className="text-[16px] font-extrabold">2013</span>
-                  </div>
-                </div>
+          {/* Right Column: Interactive Quadrant Circle */}
+          <div className="flex justify-center">
+            <div className="relative w-80 h-80 rounded-full border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden">
+              {/* Central HCH Circle */}
+              <div className="absolute z-10 bg-white w-28 h-28 rounded-full flex flex-col items-center justify-center font-bold text-[14px] shadow-lg">
+                HCH <span className="text-[9px] text-gray-400 font-normal tracking-widest">HARMONY</span>
+              </div>
+              
+              {/* Quadrant Buttons */}
+              <div className="grid grid-cols-2 w-full h-full">
+                <button onClick={() => go("management")} className="bg-[#FFB343] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">MANAGEMENT</button>
+                <button onClick={() => go("events")} className="bg-[#E91E8C] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">EVENTS</button>
+                <button onClick={() => go("recruitment")} className="bg-[#3DAA68] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">RECRUITMENT</button>
+                <button onClick={() => go("marketing")} className="bg-[#2AAEDE] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">MARKETING</button>
               </div>
             </div>
-            <div className="order-1 md:order-2 text-center md:text-left">
-              <div className="inline-flex items-center gap-3 mb-6">
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Welcome</span>
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-</div>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-8 leading-[1.1] tracking-tight">
-                Welcome to Harmony Club House
-              </h2>
-              <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-[1.8] font-medium">
-                We are a premium hospitality consultancy dedicated to elevating brand experiences. With over 13 years of industry obsession, we provide hands-on leadership, strategic direction, and creative execution to hospitality businesses worldwide. Our approach is grounded in evidence, accountability, and putting people at the center of every strategy.
-              </p>
-            </div>
           </div>
-        </div>
 
+        </div>
       </div>
       <Footer />
     </div>
