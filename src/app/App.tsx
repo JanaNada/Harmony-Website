@@ -22,7 +22,7 @@ import {
   ShieldCheck, 
   Lightbulb, 
   Handshake 
-, PenTool, Utensils, TrendingUp, BarChart, ChefHat , Coffee, Briefcase, PartyPopper, Sparkles , Search, ClipboardCheck, UsersRound, Repeat, BookOpen, GraduationCap, LineChart, Palette, MonitorSmartphone, Target, Megaphone , Building2, Landmark, Music, LayoutTemplate , PieChart, Building, Monitor } from 'lucide-react';
+, Calendar, UserCheck, ChevronRight, PenTool, Utensils, TrendingUp, BarChart, ChefHat , Coffee, Briefcase, PartyPopper, Sparkles , Search, ClipboardCheck, UsersRound, Repeat, BookOpen, GraduationCap, LineChart, Palette, MonitorSmartphone, Target, Megaphone , Building2, Landmark, Music, LayoutTemplate , PieChart, Building, Monitor, Heart, Zap } from 'lucide-react';
 
 // Image paths - move images from src/imports to public/imports
 const logoImg = "/imports/image-10.png";
@@ -70,11 +70,13 @@ function Nav({ current, go }: { current: Page; go: (p: Page) => void }) {
         {/* Brand */}
         <button
           onClick={() => { go("home"); }}
-          className="font-['Plus_Jakarta_Sans'] font-extrabold text-[16px] md:text-[18px] tracking-[0.2em] uppercase flex-shrink-0 flex items-center transition-opacity hover:opacity-80"
+          className="flex-shrink-0 flex items-center gap-2.5 transition-opacity hover:opacity-80 text-left"
         >
-          <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}>
-            Harmony
-          </span>
+          <ImageWithFallback src="/imports/friend-logo.png" alt="Harmony Club House" className="h-9 w-9 object-contain rounded-full"/>
+          <div className="hidden sm:block">
+            <div className="text-[13px] font-black leading-none tracking-widest text-gray-900" style={{fontFamily:"'Montserrat',sans-serif"}}>HARMONY</div>
+            <div className="text-[8px] font-semibold tracking-[0.22em] text-gray-400 leading-none mt-0.5" style={{fontFamily:"'Montserrat',sans-serif"}}>CLUB HOUSE</div>
+          </div>
         </button>
 
         {/* Tab links — desktop */}
@@ -155,13 +157,6 @@ function HomePage({ go }: { go: (p: Page) => void }) {
     { img: recruitmentIcon, label: "Recruitment", page: "recruitment", color: C_GREEN, glow: `${C_GREEN}35` },
   ];
 
-  const socialIcons = [
-    { Icon: Instagram, label: "Instagram", color: C_PINK },
-    { Icon: Facebook, label: "Facebook", color: C_BLUE },
-    { Icon: Linkedin, label: "LinkedIn", color: C_BLUE },
-    { Icon: Twitter, label: "Twitter / X", color: C_BLUE },
-    { Icon: Youtube, label: "YouTube", color: C_ORANGE },
-  ];
 
   return (
     <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-[#FAF7F2] relative">
@@ -220,7 +215,11 @@ function HomePage({ go }: { go: (p: Page) => void }) {
               </div>
             </div>
             <div className="order-1 md:order-2 text-center md:text-left">
-              <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-8" style={{ color: C_ORANGE }}>Welcome</span>
+              <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Welcome</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
               <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-8 leading-[1.1] tracking-tight">
                 Welcome to Harmony Club House
               </h2>
@@ -231,49 +230,27 @@ function HomePage({ go }: { go: (p: Page) => void }) {
           </div>
         </div>
 
-                {/* ── Footer / Community ───────────────────────────────── */}
-        <div className="max-w-[1000px] mx-auto px-6 text-center">
-           <div className="bg-white/80 backdrop-blur-xl p-10 md:p-20 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.08)] border border-white">
-             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[28px] md:text-[40px] tracking-tight text-[#1a1a1a] mb-4">Join our community</h2>
-             <p className="font-['Plus_Jakarta_Sans'] text-[16px] text-[#1a1a1a]/60 leading-[1.8] max-w-[600px] mx-auto mb-12">
-               Follow us for hospitality insights & updates
-             </p>
-             <div className="flex items-center justify-center gap-4 mb-16">
-               {socialIcons.map(({ Icon, label, color }) => (
-                 <button
-                   key={label}
-                   aria-label={label}
-                   className="w-14 h-14 rounded-full bg-[#FAF7F2] shadow-sm border border-black/5 flex items-center justify-center text-[#1a1a1a]/40 transition-all duration-300 hover:scale-110 hover:bg-white hover:shadow-md"
-                   onMouseEnter={(e) => {
-                     const el = e.currentTarget as HTMLButtonElement;
-                     el.style.color = color;
-                   }}
-                   onMouseLeave={(e) => {
-                     const el = e.currentTarget as HTMLButtonElement;
-                     el.style.color = "";
-                   }}
-                 >
-                   <Icon size={22} />
-                 </button>
-               ))}
-             </div>
-             <p className="font-['Plus_Jakarta_Sans'] text-[12px] md:text-[13px] text-[#1a1a1a]/30 tracking-wide font-medium">
-               © 2026 Harmony Club House · Management · Events · Marketing · Recruitment
-             </p>
-           </div>
-        </div>
       </div>
+      <Footer />
     </div>
   );
 }
 
 
 function ServicesPage({ go }: { go: (p: Page) => void }) {
-  const expertiseCards: { img: string; label: string; page: Page; color: string; glow: string; }[] = [
-    { img: mgmtIcon, label: "Management", page: "management", color: C_ORANGE, glow: `${C_ORANGE}35` },
-    { img: eventsIcon, label: "Events", page: "events", color: C_PINK, glow: `${C_PINK}35` },
-    { img: marketingIcon, label: "Marketing", page: "marketing", color: C_BLUE, glow: `${C_BLUE}35` },
-    { img: recruitmentIcon, label: "Recruitment", page: "recruitment", color: C_GREEN, glow: `${C_GREEN}35` },
+  const SERVICES = [
+    { id:"management", color: C_ORANGE, dim: `${C_ORANGE}15`, label:"Management",  tagline:"Operational Excellence",   icon: Building2,
+      desc:"From concept feasibility and kitchen design to full operational restructuring. We embed with your team to build venues that perform.",
+      image:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop&auto=format" },
+    { id:"events",     color: C_PINK,      dim: `${C_PINK}15`,      label:"Events",      tagline:"Unforgettable Experiences",icon: Calendar,
+      desc:"From intimate corporate dinners to grand galas — every detail handled. Venue sourcing, catering design, logistics, and on-the-day execution.",
+      image:"https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&auto=format" },
+    { id:"marketing",  color: C_BLUE,   dim: `${C_BLUE}15`,   label:"Marketing",   tagline:"Brand & Digital Growth",  icon: Megaphone,
+      desc:"We build hospitality brands that resonate. Identity, digital strategy, influencer campaigns, and PR — all under one roof.",
+      image:"https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=600&fit=crop&auto=format" },
+    { id:"recruitment",color: C_GREEN, dim: `${C_GREEN}15`, label:"Recruitment", tagline:"Talent Acquisition",      icon: UserCheck,
+      desc:"We source, vet, and place hospitality professionals across every function. Our global network spans four continents.",
+      image:"https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=600&fit=crop&auto=format" },
   ];
 
   return (
@@ -286,32 +263,44 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
       </div>
 
       <div className="relative z-10 pt-24 pb-0">
-        <div className="max-w-[800px] mx-auto px-6 text-center mb-24">
-          <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-8" style={{ color: C_ORANGE }}>Expertise</span>
+        <div className="max-w-[1200px] mx-auto px-6 text-center mb-16 md:mb-20">
+          <div className="inline-flex items-center gap-3 mb-6">
+            <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+            <span className="font-['Plus_Jakarta_Sans'] text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/50">WHAT WE DO</span>
+            <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+          </div>
           <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[60px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
-            Our <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}>Services.</span>
+            Four Pillars of Expertise
           </h1>
         </div>
 
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
-            {expertiseCards.map((s) => (
-              <button
-                key={s.label}
-                onClick={() => go(s.page)}
-                className="group flex flex-col items-center gap-6 focus:outline-none w-[140px] md:w-[200px]"
-                aria-label={`Go to ${s.label} services`}
-              >
-                <div className="relative w-full aspect-square">
-                  <div className="absolute inset-0 rounded-[40px] blur-[30px] opacity-0 group-hover:opacity-40 transition-opacity duration-500" style={{ backgroundColor: s.color }} />
-                  <div className="relative w-full h-full bg-white/80 backdrop-blur-xl border border-white rounded-[40px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] flex items-center justify-center p-6 md:p-8 transition-transform duration-500 group-hover:-translate-y-3">
-                    <ImageWithFallback src={s.img} alt={`${s.label} Services`} className="w-full h-full object-contain drop-shadow-md transition-transform duration-500 group-hover:scale-110" />
-                  </div>
+        <div className="max-w-[1200px] mx-auto px-6 mb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            {SERVICES.map((s) => (
+              <div key={s.id} className="group flex flex-col bg-white rounded-[32px] overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2">
+                <div className="h-1.5 w-full" style={{background:s.color}}/>
+                <div className="relative h-56 overflow-hidden bg-[#FAF7F2]">
+                  <img src={s.image} alt={s.label} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent opacity-80" />
                 </div>
-                <span className="font-['Plus_Jakarta_Sans'] text-[14px] md:text-[16px] font-bold text-[#1a1a1a]/70 group-hover:text-[#1a1a1a] transition-colors duration-300">
-                  {s.label}
-                </span>
-              </button>
+                <div className="p-8 flex flex-col flex-1 bg-white relative">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-110" style={{background:s.dim}}>
+                      <s.icon size={22} style={{color:s.color}} />
+                    </div>
+                    <div>
+                      <p className="font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase tracking-widest mb-1" style={{color:s.color}}>{s.tagline}</p>
+                      <h3 className="font-['Plus_Jakarta_Sans'] text-[22px] font-extrabold text-[#1a1a1a] leading-tight">{s.label}</h3>
+                    </div>
+                  </div>
+                  <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/70 leading-[1.7] mb-8 flex-1 font-medium">
+                    {s.desc}
+                  </p>
+                  <button onClick={() => go(s.id as Page)} className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[15px] font-bold hover:gap-3 transition-all mt-auto" style={{color:s.color}}>
+                    Request Service <ChevronRight size={18}/>
+                  </button>
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -332,7 +321,11 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
               <ImageWithFallback src={divFnbImg} alt="Food & Beverage Division" className="relative w-full h-auto object-contain rounded-[32px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-white/60 transition-transform duration-700 group-hover:scale-[1.02] bg-white" />
             </div>
             <div className="order-1 lg:order-2">
-              <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-6" style={{ color: C_ORANGE }}>Division</span>
+              <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
               <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-6 leading-[1.1] tracking-tight">Food & Beverage Division</h2>
               <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-[1.8]">
                 End-to-end concept creation and execution. From innovative kitchen design and strategic equipment sourcing to comprehensive menu engineering, we build the culinary foundations for your success.
@@ -346,7 +339,11 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
           {/* Block 2: Premium Catering Services */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
             <div className="order-1 lg:order-1">
-              <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-6" style={{ color: C_PINK }}>Division</span>
+              <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
               <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-6 leading-[1.1] tracking-tight">Premium Catering Services</h2>
               <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-[1.8]">
                 Delivering culinary excellence at scale. Whether it is a corporate mega-event, a grand opening, or an exclusive gathering, our catering division ensures flawless execution, strict international hygiene standards, and memorable flavors.
@@ -379,6 +376,7 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
         </div>
 
       </div>
+      <Footer />
     </div>
   );
 }
@@ -400,7 +398,11 @@ function StoriesPage({ go }: { go: (p: Page) => void }) {
 
       <div className="relative z-10 pt-24 pb-32">
         <div className="max-w-[800px] mx-auto px-6 text-center mb-20 md:mb-32">
-          <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-8" style={{ color: "#E91E8C" }}>Portfolio</span>
+          <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Portfolio</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
           <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[60px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
             Our <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #E91E8C, #3AADE0)` }}>Stories.</span>
           </h1>
@@ -443,25 +445,212 @@ function StoriesPage({ go }: { go: (p: Page) => void }) {
            </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
 
+const C_FRIEND = {
+  management:    "#FFB343",
+  managementDim: "#FFF8EC",
+  events:        "#E91E8C",
+  eventsDim:     "#FEF0F8",
+  marketing:     "#2AAEDE",
+  marketingDim:  "#EDF8FE",
+  recruitment:   "#3DAA68",
+  recruitmentDim:"#EDF8F2",
+};
+const GRAD_FRIEND = `linear-gradient(90deg,${C_FRIEND.management},${C_FRIEND.events},${C_FRIEND.marketing},${C_FRIEND.recruitment})`;
+
+const TIMELINE_FRIEND = [
+  { year:"2012", label:"Founded",          desc:"Harmony Club House established in Cairo with a bold vision to redefine F&B consulting.", color:C_FRIEND.management },
+  { year:"2015", label:"First Expansion",  desc:"Expanded operations across MENA, partnering with Kempinski, Marriott, and Baron Hotels.", color:C_FRIEND.events },
+  { year:"2017", label:"Events Division",  desc:"Launched dedicated events arm, delivering 50+ large-scale corporate and private events.", color:C_FRIEND.marketing },
+  { year:"2019", label:"Digital & Marketing",desc:"Introduced full-stack marketing services as brands demanded stronger digital presence.", color:C_FRIEND.recruitment },
+  { year:"2021", label:"2,500 Trained",    desc:"Milestone: trained over 2,500 hospitality professionals across the region.", color:C_FRIEND.management },
+  { year:"2024", label:"4 Continents",     desc:"Active across MENA, Europe, Asia, and the Americas — 30+ projects and growing.", color:C_FRIEND.events },
+];
+
+function TimelineSection() {
+  return (
+    <section id="timeline" className="py-24 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 mb-4">
+            <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-400" style={{fontFamily:"'Plus Jakarta Sans',sans-serif"}}>Our Journey</span>
+            <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
+          </div>
+          <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a]">
+            13 Years of <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Excellence</span>
+          </h2>
+        </div>
+
+        {/* Desktop flowing SVG timeline */}
+        <div className="hidden md:block relative" style={{height:"320px"}}>
+          <svg viewBox="0 0 1100 200" className="absolute inset-0 w-full" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="tl-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stopColor={C_FRIEND.management}/>
+                <stop offset="33%"  stopColor={C_FRIEND.events}/>
+                <stop offset="66%"  stopColor={C_FRIEND.marketing}/>
+                <stop offset="100%" stopColor={C_FRIEND.recruitment}/>
+              </linearGradient>
+            </defs>
+            {/* Flowing S-curve */}
+            <path d="M 60 120 C 160 40, 260 160, 400 100 C 540 40, 640 160, 780 100 C 880 60, 960 140, 1040 100"
+              stroke="url(#tl-grad)" strokeWidth="3" fill="none" strokeLinecap="round"/>
+            {/* Milestone dots */}
+            {[
+              {x:60,  y:120},
+              {x:220, y:100},
+              {x:400, y:100},
+              {x:600, y:100},
+              {x:780, y:100},
+              {x:1040,y:100},
+            ].map(({x,y},i)=>{
+              const colors=[C_FRIEND.management,C_FRIEND.events,C_FRIEND.marketing,C_FRIEND.recruitment,C_FRIEND.management,C_FRIEND.events];
+              return (
+                <g key={i}>
+                  <circle cx={x} cy={y} r="10" fill={colors[i]} opacity="0.2"/>
+                  <circle cx={x} cy={y} r="5.5" fill={colors[i]}/>
+                  <circle cx={x} cy={y} r="2.5" fill="white"/>
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* Milestone labels */}
+          <div className="absolute inset-0 flex items-stretch">
+            {TIMELINE_FRIEND.map(({year,label,desc,color},i)=>{
+              const xPercents=[5.5,20,36.4,54.5,71,94.5];
+              const above=[true,false,true,false,true,false];
+              return (
+                <div key={year} className="absolute" style={{left:`${xPercents[i]}%`, top:above[i]?"0":"55%", width:"140px", transform:"translateX(-50%)"}}>
+                  <div className={`${above[i]?"pb-2 text-bottom":"pt-2"}`}>
+                    <div className="text-xs font-black mb-0.5" style={{color, fontFamily:"'Plus Jakarta Sans',sans-serif"}}>{year}</div>
+                    <div className="text-xs font-bold text-gray-900 mb-1" style={{fontFamily:"'Plus Jakarta Sans',sans-serif"}}>{label}</div>
+                    <div className="text-[10px] text-gray-400 leading-tight">{desc}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Mobile stacked */}
+        <div className="md:hidden space-y-0">
+          {TIMELINE_FRIEND.map(({year,label,desc,color},i)=>(
+            <div key={year} className="flex gap-4">
+              <div className="flex flex-col items-center">
+                <div className="w-3 h-3 rounded-full flex-shrink-0 mt-1" style={{background:color}}/>
+                {i<TIMELINE_FRIEND.length-1 && <div className="w-0.5 flex-1 mt-1 mb-1" style={{background:`linear-gradient(to bottom, ${color}, ${TIMELINE_FRIEND[i+1].color})`}}/>}
+              </div>
+              <div className="pb-8">
+                <div className="text-xs font-black mb-0.5" style={{color, fontFamily:"'Plus Jakarta Sans',sans-serif"}}>{year}</div>
+                <div className="text-sm font-bold text-gray-900 mb-1" style={{fontFamily:"'Plus Jakarta Sans',sans-serif"}}>{label}</div>
+                <div className="text-xs text-gray-500 leading-relaxed">{desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const PARTNERS_FRIEND = [
+  { name:"Baron Hotels & Resorts", cat:"Hospitality", domain:"baronhotels.com" },
+  { name:"Kempinski",              cat:"Hospitality", domain:"kempinski.com" },
+  { name:"Marriott",               cat:"Hospitality", domain:"marriott.com" },
+  { name:"Dunkin'",                cat:"F&B",         domain:"dunkindonuts.com" },
+  { name:"Hardee's",               cat:"F&B",         domain:"hardees.com" },
+  { name:"Krispy Kreme",           cat:"F&B",         domain:"krispykreme.com" },
+  { name:"Mori Sushi",             cat:"F&B",         domain:"mori-intl.net" },
+  { name:"Tamara",                 cat:"F&B",         domain:"tamarabistro.com" },
+  { name:"Grand Cafe",             cat:"F&B",         domain:"grandcafe-eg.com" },
+  { name:"Butcher's Burger",       cat:"F&B",         domain:"butchersburger.com" },
+  { name:"TBS",                    cat:"Retail",      domain:"tbsfresh.com" },
+  { name:"Vodafone",               cat:"Corporate",   domain:"vodafone.com" },
+  { name:"BLOM Bank",              cat:"Finance",     domain:"blombank.com" },
+  { name:"GUC Cairo",              cat:"Education",   domain:"guc.edu.eg" },
+];
+const CAT_COLOR_FRIEND: Record<string,string> = {
+  Hospitality:C_FRIEND.management, "F&B":C_FRIEND.events, Retail:C_FRIEND.marketing, Corporate:C_FRIEND.recruitment, Finance:C_FRIEND.recruitment, Education:C_FRIEND.marketing,
+};
+
+function PartnersSection() {
+  const [cat, setCat] = useState("All");
+  const cats = ["All", ...Array.from(new Set(PARTNERS_FRIEND.map(p=>p.cat)))];
+  const shown = cat==="All" ? PARTNERS_FRIEND : PARTNERS_FRIEND.filter(p=>p.cat===cat);
+  return (
+    <section id="partners" className="py-24">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 mb-4">
+            <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-400" style={{fontFamily:"'Plus Jakarta Sans',sans-serif"}}>Success Partners</span>
+            <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
+          </div>
+          <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a] mb-4">
+            Trusted by <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Industry Giants</span>
+          </h2>
+          <p className="text-gray-500 max-w-xl mx-auto font-light leading-relaxed">
+            From global hospitality leaders and banking institutions to iconic F&B brands — 14 trusted partners across the industry.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {cats.map(c=>(
+            <button key={c} onClick={()=>setCat(c)}
+              className="px-4 py-1.5 rounded-full text-xs font-bold transition-all"
+              style={{background:cat===c?"#1a1a1a":"#efefef", color:cat===c?"white":"#666", fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
+              {c}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          {shown.map(({name,cat:c, domain})=>(
+            <div key={name}
+              className="group relative overflow-hidden bg-white rounded-2xl px-4 py-5 text-center border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-default"
+            >
+              <div className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-[0.08] transition-opacity duration-300 group-hover:opacity-[0.15]" 
+                   style={{ backgroundImage: `url(https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=128)`, backgroundSize: '50%', backgroundPosition: 'center' }} />
+              <div className="relative z-10">
+                <div className="w-8 h-0.5 rounded-full mx-auto mb-3 transition-all duration-300"
+                  style={{background:"#d1d5db"}}
+                  onMouseEnter={e=>(e.currentTarget.style.background=CAT_COLOR_FRIEND[c]||C_FRIEND.management)}
+                  onMouseLeave={e=>(e.currentTarget.style.background="#d1d5db")}
+                />
+                <div className="text-sm font-bold text-gray-300 leading-tight transition-all duration-300 group-hover:text-gray-800"
+                  style={{fontFamily:"'Plus Jakarta Sans',sans-serif"}}>
+                  {name}
+                </div>
+                <div className="text-[10px] mt-1.5 font-medium text-gray-300 transition-all duration-300 group-hover:text-gray-400">{c}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function AboutPage({ go }: { go: (p: Page) => void }) {
   const whyPartnerReasons = [
-    { title: "End-to-End Expertise", text: "We expertly navigate the complexities of business setup, managing legal structures, financial planning, and facility logistics so you can focus entirely on scaling your core business.", color: "#F5841F" },
-    { title: "Data-Driven Results", text: "We identify weak spots and elevate your strengths through rigorous analysis, ensuring your business is structurally built for long-term profitability.", color: "#E91E8C" },
-    { title: "Global Standards", text: "We seamlessly blend elite international hospitality benchmarks with our deep, localized knowledge of the Egyptian market to deliver highly creative and practical solutions.", color: "#3AADE0" }
+    { title: "End-to-End Expertise", text: "We expertly navigate the complexities of business setup, managing legal structures, financial planning, and facility logistics so you can focus entirely on scaling your core business.", color: "#F5841F", bgImage: "/imports/bg_expertise.png" },
+    { title: "Data-Driven Results", text: "We identify weak spots and elevate your strengths through rigorous analysis, ensuring your business is structurally built for long-term profitability.", color: "#E91E8C", bgImage: "/imports/bg_data.png" },
+    { title: "Global Standards", text: "We seamlessly blend elite international hospitality benchmarks with our deep, localized knowledge of the Egyptian market to deliver highly creative and practical solutions.", color: "#3AADE0", bgImage: "/imports/bg_standards.png" }
   ];
 
   const coreValues = [
-    { num: "01", title: "Practical Wisdom", text: "Our consultancy goes beyond theory; it is deeply anchored in the reality of navigating the global hospitality industry.", color: "#F5841F" },
-    { num: "02", title: "Harmonious Partnership", text: "By fully understanding your brand's unique character, we act as a true extension of your team to create customized, perfectly aligned solutions.", color: "#E91E8C" },
-    { num: "03", title: "Operational Integrity", text: "We commit to absolute transparency, using data-driven precision to repair operations and ensure your business transitions to profitability.", color: "#3AADE0" },
-    { num: "04", title: "Human-Centric Growth", text: "We recognize that a business relies on its people, heavily investing in high-qualification teams through expert recruitment and rigorous training.", color: "#78BE1F" },
-    { num: "05", title: "Quality Without Compromise", text: "We strictly adhere to the highest international safety and efficiency standards across all food, kitchen, and event logistics.", color: "#F5841F" },
-    { num: "06", title: "Innovation & Agility", text: "We keep your brand relevant in a dynamic market by blending creative concept development with cutting-edge digital tools.", color: "#E91E8C" }
+    { icon: Lightbulb, title: "Practical Wisdom", text: "Our consultancy goes beyond theory; it is deeply anchored in the reality of navigating the global hospitality industry.", color: "#F5841F", bgImage: "/imports/bg_wisdom.png" },
+    { icon: Heart, title: "Harmonious Partnership", text: "By fully understanding your brand's unique character, we act as a true extension of your team to create customized, perfectly aligned solutions.", color: "#E91E8C", bgImage: "/imports/bg_partnership.png" },
+    { icon: BarChart, title: "Operational Integrity", text: "We commit to absolute transparency, using data-driven precision to repair operations and ensure your business transitions to profitability.", color: "#3AADE0", bgImage: "/imports/bg_integrity.png" },
+    { icon: Users, title: "Human-Centric Growth", text: "We recognize that a business relies on its people, heavily investing in high-qualification teams through expert recruitment and rigorous training.", color: "#78BE1F", bgImage: "/imports/bg_growth.png" },
+    { icon: ShieldCheck, title: "Quality Without Compromise", text: "We strictly adhere to the highest international safety and efficiency standards across all food, kitchen, and event logistics.", color: "#F5841F", bgImage: "/imports/bg_quality.png" },
+    { icon: Zap, title: "Innovation & Agility", text: "We keep your brand relevant in a dynamic market by blending creative concept development with cutting-edge digital tools.", color: "#E91E8C", bgImage: "/imports/bg_innovation.png" }
   ];
 
   return (
@@ -483,32 +672,56 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
         </div>
 
         {/* Who We Are */}
-        <div className="max-w-[800px] mx-auto px-6 text-center mb-32 md:mb-48">
-          <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-8" style={{ color: "#F5841F" }}>Our Story</span>
-          <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[60px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
-            Redefining the art of <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>hospitality.</span>
-          </h1>
-          <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] leading-[1.8] text-[#1a1a1a]/70 font-medium">
-            Established in 2012, Harmony Club House (HCH) stands as a premier platform for F&B development and hospitality consultancy. We are a dedicated team of passionate entrepreneurs and experts, bringing over 13 years of hands-on international experience across four continents. From initial feasibility studies and innovative kitchen design to menu engineering and complete operational restructuring, we have successfully launched over 30 projects and trained more than 2,500 professionals.
-          </p>
+        <div className="max-w-[1200px] mx-auto px-6 mb-32 md:mb-48">
+          <div className="relative overflow-hidden bg-white/80 backdrop-blur-2xl p-12 md:p-24 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.08)] border border-white text-center">
+            {/* Colorful soft glows */}
+            <div className="absolute top-[-20%] left-[-10%] w-[400px] h-[400px] bg-[#F5841F]/15 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-[#E91E8C]/15 blur-[120px] rounded-full pointer-events-none" />
+            
+            <div className="relative z-10 max-w-[900px] mx-auto">
+              <div className="inline-flex items-center gap-3 mb-6">
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+                <span className="font-['Plus_Jakarta_Sans'] text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/50">Our Story</span>
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+              </div>
+              <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[60px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
+                Redefining the art of <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>hospitality.</span>
+              </h1>
+              <p className="font-['Plus_Jakarta_Sans'] text-[18px] md:text-[22px] leading-[1.8] text-[#1a1a1a]/70 font-medium">
+                Established in 2012, Harmony Club House (HCH) stands as a premier platform for F&B development and hospitality consultancy. We are a dedicated team of passionate entrepreneurs and experts, bringing over 13 years of hands-on international experience across four continents. From initial feasibility studies and innovative kitchen design to menu engineering and complete operational restructuring, we have successfully launched over 30 projects and trained more than 2,500 professionals.
+              </p>
+            </div>
+          </div>
         </div>
+
+        <TimelineSection />
 
         {/* Why Partner With Us */}
         <div className="max-w-[1200px] mx-auto px-6 mb-32 md:mb-48">
           <div className="text-center mb-16 md:mb-24">
-            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a] mb-6">Why Partner With Us?</h2>
+            <div className="inline-flex items-center gap-2 mb-4">
+              <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-400" style={{fontFamily:"'Plus Jakarta Sans',sans-serif"}}>Why Choose Us</span>
+              <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
+            </div>
+            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a] mb-6">
+              Why Partner With <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Us?</span>
+            </h2>
             <p className="font-['Plus_Jakarta_Sans'] text-[16px] text-[#1a1a1a]/60 max-w-[600px] mx-auto leading-[1.8]">
               We believe every brand has a unique story, and we help you tell it through operational excellence anchored in first-hand experience.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             {whyPartnerReasons.map((r, i) => (
-              <div key={i} className="bg-white/80 backdrop-blur-lg p-10 md:p-12 rounded-[40px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.03)] border border-white hover:-translate-y-2 transition-transform duration-500">
-                <div className="w-14 h-14 rounded-full flex items-center justify-center mb-8" style={{ backgroundColor: `${r.color}15`, color: r.color }}>
-                  <span className="font-bold text-[18px]">0{i+1}</span>
+              <div key={i} className="relative overflow-hidden bg-white/80 backdrop-blur-lg p-10 md:p-12 rounded-[40px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.03)] border border-white hover:-translate-y-2 transition-transform duration-500 group">
+                <div className="absolute inset-0 bg-cover bg-center opacity-[0.08] transition-opacity duration-500 group-hover:opacity-[0.15]" style={{ backgroundImage: `url(${r.bgImage})` }} />
+                <div className="relative z-10">
+                  <div className="w-14 h-14 rounded-full flex items-center justify-center mb-8" style={{ backgroundColor: `${r.color}15`, color: r.color }}>
+                    <span className="font-bold text-[18px]">0{i+1}</span>
+                  </div>
+                  <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-[20px] text-[#1a1a1a] mb-4 leading-[1.3]">{r.title}</h3>
+                  <p className="font-['Plus_Jakarta_Sans'] text-[15px] leading-[1.7] text-[#1a1a1a]/60">{r.text}</p>
                 </div>
-                <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-[20px] text-[#1a1a1a] mb-4 leading-[1.3]">{r.title}</h3>
-                <p className="font-['Plus_Jakarta_Sans'] text-[15px] leading-[1.7] text-[#1a1a1a]/60">{r.text}</p>
               </div>
             ))}
           </div>
@@ -517,15 +730,23 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
         {/* Core Values */}
         <div className="max-w-[1200px] mx-auto px-6 mb-32 md:mb-48">
           <div className="text-center mb-16 md:mb-24">
-            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a]">Our Core Values</h2>
+            <div className="inline-flex items-center gap-2 mb-4">
+              <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-400" style={{fontFamily:"'Plus Jakarta Sans',sans-serif"}}>Our Principles</span>
+              <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
+            </div>
+            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a]">
+              Our Core <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Values</span>
+            </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 max-w-[1000px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-[1200px] mx-auto">
             {coreValues.map((v, i) => (
-              <div key={i} className="flex gap-6 md:gap-8 items-start group">
-                <div className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[40px] opacity-20 group-hover:opacity-100 transition-opacity duration-500" style={{ color: v.color }}>
-                  {v.num}
-                </div>
-                <div>
+              <div key={i} className="relative overflow-hidden bg-white p-8 md:p-10 rounded-[32px] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)] border border-white hover:-translate-y-2 transition-all duration-500 group">
+                <div className="absolute inset-0 bg-cover bg-center opacity-[0.08] transition-opacity duration-500 group-hover:opacity-[0.15]" style={{ backgroundImage: `url(${v.bgImage})` }} />
+                <div className="relative z-10 flex flex-col items-center text-center">
+                  <div className="w-16 h-16 rounded-[20px] flex items-center justify-center mb-6 transition-transform duration-500 group-hover:scale-110" style={{ backgroundColor: `${v.color}15`, color: v.color }}>
+                    <v.icon size={28} strokeWidth={2} />
+                  </div>
                   <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-[20px] text-[#1a1a1a] mb-3 leading-[1.3]">{v.title}</h3>
                   <p className="font-['Plus_Jakarta_Sans'] text-[15px] leading-[1.7] text-[#1a1a1a]/60">{v.text}</p>
                 </div>
@@ -535,24 +756,14 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
         </div>
 
         {/* Success Partners */}
-        <div className="max-w-[1000px] mx-auto px-6 text-center">
-           <div className="bg-white/80 backdrop-blur-xl p-10 md:p-20 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.08)] border border-white">
-             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a] mb-8">Our Success Partners</h2>
-             <p className="font-['Plus_Jakarta_Sans'] text-[16px] text-[#1a1a1a]/60 leading-[1.8] max-w-[800px] mx-auto mb-16">
-               Our reputation is defined by the trust of the industry giants we serve. Since 2012, we have proudly collaborated with a diverse portfolio of global hospitality leaders, major banks, and iconic F&B outlets who share our unwavering commitment to precision.
-             </p>
-             <div className="flex flex-col md:flex-row items-center justify-center gap-8 w-full">
-               {/* Fixed partner variable references to match what's currently active */}
-
-             </div>
-           </div>
-        </div>
+        <PartnersSection />
 
         {/* Footer / Bottom Image */}
         <div className="w-full flex justify-center mt-16 md:mt-24 mb-16 px-6">
            
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
@@ -561,11 +772,11 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
 
 function MissionPage({ go }: { go: (p: Page) => void }) {
   const pillars = [
-    { icon: Settings, title: "Operational Excellence", text: "We repair weak spots and elevate strengths through strategic planning and precise analysis.", color: "#F5841F" },
-    { icon: Users, title: "Human Capital Development", text: "We build high-performing teams through expert recruitment and hands-on training for long-term stability.", color: "#E91E8C" },
-    { icon: ShieldCheck, title: "Quality & Safety", text: "We deliver world-class F&B and facility services, strictly adhering to the highest international safety and hygiene standards.", color: "#3AADE0" },
-    { icon: Lightbulb, title: "Creative Innovation", text: "We blend concept creation with artistic execution—from menu engineering to digital marketing—to deliver memorable customer experiences.", color: "#78BE1F" },
-    { icon: Handshake, title: "Client-Centric Approach", text: "We handle the complex operations and logistics so you can focus on your core business. We build long-term partnerships by understanding your unique brand story.", color: "#F5841F" }
+    { icon: Settings, title: "Operational Excellence", text: "We repair weak spots and elevate strengths through strategic planning and precise analysis.", color: "#F5841F", image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop&auto=format" },
+    { icon: Users, title: "Human Capital Development", text: "We build high-performing teams through expert recruitment and hands-on training for long-term stability.", color: "#E91E8C", image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=600&fit=crop&auto=format" },
+    { icon: ShieldCheck, title: "Quality & Safety", text: "We deliver world-class F&B and facility services, strictly adhering to the highest international safety and hygiene standards.", color: "#3AADE0", image: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&h=600&fit=crop&auto=format" },
+    { icon: Lightbulb, title: "Creative Innovation", text: "We blend concept creation with artistic execution—from menu engineering to digital marketing—to deliver memorable customer experiences.", color: "#78BE1F", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop&auto=format" },
+    { icon: Handshake, title: "Client-Centric Approach", text: "We handle the complex operations and logistics so you can focus on your core business. We build long-term partnerships by understanding your unique brand story.", color: "#F5841F", image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=600&fit=crop&auto=format" }
   ];
 
   return (
@@ -590,14 +801,26 @@ function MissionPage({ go }: { go: (p: Page) => void }) {
         </div>
 
         {/* Section 1: Our Mission */}
-        <div className="max-w-[800px] mx-auto px-6 mb-16 text-center">
-          <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-8" style={{ color: "#F5841F" }}>Mission</span>
-          <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[56px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
-            Our <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Mission.</span>
-          </h1>
-          <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] leading-[1.8] text-[#1a1a1a]/70 font-medium">
-            Our mission is to bridge the gap between operational excellence and sustainable growth. We offer end-to-end, integrated solutions tailored to your unique brand.
-          </p>
+        <div className="max-w-[1200px] mx-auto px-6 mb-16">
+          <div className="relative overflow-hidden bg-white/80 backdrop-blur-2xl p-12 md:p-24 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.08)] border border-white text-center">
+            {/* Colorful soft glows */}
+            <div className="absolute top-[-20%] left-[-10%] w-[400px] h-[400px] bg-[#F5841F]/15 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-[#E91E8C]/15 blur-[120px] rounded-full pointer-events-none" />
+            
+            <div className="relative z-10 max-w-[900px] mx-auto">
+              <div className="inline-flex items-center gap-3 mb-6">
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+                <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Mission</span>
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+              </div>
+              <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[56px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
+                Our <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Mission.</span>
+              </h1>
+              <p className="font-['Plus_Jakarta_Sans'] text-[18px] md:text-[22px] leading-[1.8] text-[#1a1a1a]/70 font-medium">
+                Our mission is to bridge the gap between operational excellence and sustainable growth. We offer end-to-end, integrated solutions tailored to your unique brand.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Section 2: Our Commitments (The 5 Pillars) */}
@@ -608,30 +831,43 @@ function MissionPage({ go }: { go: (p: Page) => void }) {
           {/* Centering a 5-card grid by using flex wrap or custom grid col spans */}
           <div className="flex flex-wrap justify-center gap-6 md:gap-8">
             {pillars.map((p, i) => (
-              <div key={p.title} className="w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white/60 backdrop-blur-xl p-8 md:p-10 rounded-[40px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.03)] border border-white hover:-translate-y-2 transition-transform duration-500">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: `${p.color}15`, color: p.color }}>
-                  <p.icon size={24} />
+              <div key={p.title} className="relative group w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] bg-white/60 backdrop-blur-xl rounded-[40px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.03)] border border-white hover:-translate-y-2 transition-transform duration-500 overflow-hidden">
+                {/* Faded Background Image */}
+                <div className="absolute inset-0 z-0 opacity-[0.12] transition-opacity duration-500 group-hover:opacity-20">
+                  <img src={p.image} alt={p.title} className="w-full h-full object-cover mix-blend-luminosity" />
                 </div>
-                <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-[20px] text-[#1a1a1a] mb-3 leading-[1.3]">{p.title}</h3>
-                <p className="font-['Plus_Jakarta_Sans'] text-[15px] leading-[1.7] text-[#1a1a1a]/60">{p.text}</p>
+                {/* Gradient overlay to ensure text legibility */}
+                <div className="absolute inset-0 z-0 bg-gradient-to-br from-white/90 to-white/40 pointer-events-none" />
+                
+                <div className="relative z-10 p-8 md:p-10">
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6" style={{ backgroundColor: `${p.color}15`, color: p.color }}>
+                    <p.icon size={24} />
+                  </div>
+                  <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-[20px] text-[#1a1a1a] mb-3 leading-[1.3]">{p.title}</h3>
+                  <p className="font-['Plus_Jakarta_Sans'] text-[15px] leading-[1.7] text-[#1a1a1a]/60">{p.text}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Section 3: Our Vision */}
-        <div className="w-full px-0">
-          <div className="w-full bg-[#111111] py-16 px-6 md:px-12 relative overflow-hidden">
-            {/* Premium dark glows */}
-            <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#3AADE0]/20 blur-[120px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-[#E91E8C]/20 blur-[120px] rounded-full pointer-events-none" />
+        <div className="max-w-[1200px] mx-auto px-6 mb-24">
+          <div className="relative overflow-hidden bg-white/80 backdrop-blur-2xl p-12 md:p-24 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.08)] border border-white text-center">
+            {/* Colorful soft glows */}
+            <div className="absolute top-[-20%] right-[-10%] w-[400px] h-[400px] bg-[#E91E8C]/15 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-20%] left-[-10%] w-[400px] h-[400px] bg-[#3AADE0]/15 blur-[120px] rounded-full pointer-events-none" />
             
-            <div className="relative z-10 max-w-[900px] mx-auto text-center">
-              <span className="inline-block py-2 px-6 rounded-full bg-white/10 text-white backdrop-blur-md border border-white/10 text-[11px] font-bold uppercase tracking-[0.2em] mb-8">Vision</span>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[64px] tracking-tight text-white mb-8">
-                Our Vision
+            <div className="relative z-10 max-w-[900px] mx-auto">
+              <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Vision</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[56px] tracking-tight text-[#1a1a1a] mb-8">
+                Our <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #3AADE0, #E91E8C)` }}>Vision.</span>
               </h2>
-              <p className="font-['Plus_Jakarta_Sans'] text-[18px] md:text-[22px] text-white/70 leading-[1.7] font-medium">
+              <p className="font-['Plus_Jakarta_Sans'] text-[18px] md:text-[22px] text-[#1a1a1a]/70 leading-[1.8] font-medium">
                 To become a leading force in the hospitality industry by providing services beyond expectations. We implement flawless operational and event experiences that exceed client goals and unlock every project's highest potential.
               </p>
             </div>
@@ -639,6 +875,7 @@ function MissionPage({ go }: { go: (p: Page) => void }) {
         </div>
 
       </div>
+      <Footer />
     </div>
   );
 }
@@ -675,7 +912,11 @@ function FnbPage({ go }: { go: (p: Page) => void }) {
           </div>
           
           <div className="relative z-10 bg-white/10 backdrop-blur-md max-w-[900px] w-[90%] p-10 md:p-16 rounded-[40px] text-center border border-white/20 mt-16 shadow-[0_20px_40px_rgba(0,0,0,0.2)]">
-            <span className="inline-block py-2 px-6 rounded-full bg-white/20 text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-8 border border-white/10 shadow-sm">Specialized Division</span>
+            <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Specialized Division</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
             <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[56px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
               Food & Beverage Division
             </h1>
@@ -688,7 +929,11 @@ function FnbPage({ go }: { go: (p: Page) => void }) {
         {/* Section 2: Our Approach (The 4-Step Methodology) */}
         <div className="max-w-[1200px] mx-auto mb-32">
           <div className="text-center mb-16 md:mb-24">
-            <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-6 text-[#1a1a1a]/50">Methodology</span>
+            <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Methodology</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a]">From Concept to Profitability</h2>
           </div>
           
@@ -717,7 +962,11 @@ function FnbPage({ go }: { go: (p: Page) => void }) {
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-20 items-center">
               {/* Text Side */}
               <div className="lg:col-span-7">
-                <span className="inline-block py-2 px-6 rounded-full bg-white/20 text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-8 border border-white/20 backdrop-blur-md shadow-sm">Why Choose HCH?</span>
+                <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Why Choose HCH?</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
                 <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[56px] text-white mb-12 leading-[1.1] tracking-tight">Your Strategic Partner</h2>
                 
                 {/* 3-Column Text Layout for the paragraph */}
@@ -760,6 +1009,7 @@ function FnbPage({ go }: { go: (p: Page) => void }) {
         </div>
       </div>
 
+      <Footer />
     </div>
   );
 }
@@ -802,7 +1052,11 @@ function CateringPage({ go }: { go: (p: Page) => void }) {
           </div>
           
           <div className="relative z-10 bg-white/80 backdrop-blur-2xl max-w-[900px] w-[90%] p-10 md:p-16 rounded-[40px] text-center border border-white/40 shadow-[0_20px_40px_rgba(0,0,0,0.1)] mt-8">
-            <span className="inline-block py-2 px-6 rounded-full bg-white text-[#1a1a1a] text-[11px] font-bold uppercase tracking-[0.2em] mb-8 border border-black/5 shadow-sm" style={{ color: C_PINK }}>Specialized Service</span>
+            <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Specialized Service</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
             <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[52px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
               Catering Services:<br/>Culinary Excellence, Delivered
             </h1>
@@ -815,7 +1069,11 @@ function CateringPage({ go }: { go: (p: Page) => void }) {
         {/* Section 2: What We Offer (The 4 Pillars) */}
         <div className="max-w-[1200px] mx-auto mb-32">
           <div className="text-center mb-16 md:mb-20">
-            <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-6 text-[#1a1a1a]/50">Solutions</span>
+            <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Solutions</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a]">Tailored Catering Solutions</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
@@ -838,7 +1096,11 @@ function CateringPage({ go }: { go: (p: Page) => void }) {
             
             <div className="relative z-10">
               <div className="text-center mb-16">
-                <span className="inline-block py-2 px-6 rounded-full bg-white/20 text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-6 backdrop-blur-md border border-white/20 shadow-sm">The HCH Advantage</span>
+                <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">The HCH Advantage</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
                 <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[48px] text-white leading-[1.1] tracking-tight">Why Choose HCH?</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
@@ -868,6 +1130,7 @@ function CateringPage({ go }: { go: (p: Page) => void }) {
         </div>
 
       </div>
+      <Footer />
     </div>
   );
 }
@@ -907,7 +1170,11 @@ function RecruitmentPage({ go }: { go: (p: Page) => void }) {
               </div>
             </div>
             <div className="order-1 lg:order-2">
-              <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-6" style={{ color: C_GREEN }}>Department</span>
+              <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Department</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
               <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[56px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
                 Training & Recruitment Solutions
               </h1>
@@ -1006,6 +1273,7 @@ function RecruitmentPage({ go }: { go: (p: Page) => void }) {
         </div>
 
       </div>
+      <Footer />
     </div>
   );
 }
@@ -1043,7 +1311,11 @@ function MarketingPage({ go }: { go: (p: Page) => void }) {
             </div>
             
             <div className="relative z-10 bg-white/90 backdrop-blur-2xl max-w-[900px] w-[90%] p-10 md:p-16 rounded-[40px] text-center border border-white/40 shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
-              <span className="inline-block py-2 px-6 rounded-full bg-white text-[#1a1a1a] text-[11px] font-bold uppercase tracking-[0.2em] mb-8 border border-black/5 shadow-sm" style={{ color: C_BLUE }}>Division</span>
+              <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
               <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[52px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
                 Marketing & Branding Solutions
               </h1>
@@ -1076,7 +1348,11 @@ function MarketingPage({ go }: { go: (p: Page) => void }) {
         {/* Section 3: The HCH Advantage */}
         <div className="max-w-[1200px] mx-auto px-6 mb-32 flex flex-col gap-20 md:gap-32">
           <div className="text-center">
-             <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-6 text-[#1a1a1a]/50">Advantage</span>
+             <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Advantage</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a]">Why Partner With Us?</h2>
           </div>
           
@@ -1139,6 +1415,7 @@ function MarketingPage({ go }: { go: (p: Page) => void }) {
         </div>
 
       </div>
+      <Footer />
     </div>
   );
 }
@@ -1179,7 +1456,11 @@ function EventsPage({ go }: { go: (p: Page) => void }) {
             </div>
             
             <div className="relative z-10 bg-white/90 backdrop-blur-2xl max-w-[900px] w-[90%] p-10 md:p-16 rounded-[40px] text-center border border-white/40 shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
-              <span className="inline-block py-2 px-6 rounded-full bg-white text-[#1a1a1a] text-[11px] font-bold uppercase tracking-[0.2em] mb-8 border border-black/5 shadow-sm" style={{ color: C_PINK }}>Specialized Division</span>
+              <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Specialized Division</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
               <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[52px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
                 Event Management Division:<br/>Crafting Unforgettable Experiences
               </h1>
@@ -1217,7 +1498,11 @@ function EventsPage({ go }: { go: (p: Page) => void }) {
 
             <div className="relative z-10">
               <div className="text-center mb-16">
-                <span className="inline-block py-2 px-6 rounded-full bg-white/50 text-[#E91E8C] text-[11px] font-bold uppercase tracking-[0.2em] mb-6 backdrop-blur-md border border-white/40 shadow-sm">Advantage</span>
+                <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Advantage</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
                 <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[48px] text-[#1a1a1a] leading-[1.1] tracking-tight">The HCH Advantage</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
@@ -1256,6 +1541,7 @@ function EventsPage({ go }: { go: (p: Page) => void }) {
           </div>
         </div>
 </div>
+      <Footer />
     </div>
   );
 }
@@ -1290,7 +1576,11 @@ function ManagementPage({ go }: { go: (p: Page) => void }) {
             </div>
             
             <div className="relative z-10 bg-white/90 backdrop-blur-2xl max-w-[900px] w-[90%] p-10 md:p-16 rounded-[40px] text-center border border-white/40 shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
-              <span className="inline-block py-2 px-6 rounded-full bg-white text-[#1a1a1a] text-[11px] font-bold uppercase tracking-[0.2em] mb-8 border border-black/5 shadow-sm" style={{ color: C_ORANGE }}>Specialized Division</span>
+              <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Specialized Division</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
               <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[52px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
                 Management & Consultancy:<br/>Driving Operational Excellence
               </h1>
@@ -1304,7 +1594,11 @@ function ManagementPage({ go }: { go: (p: Page) => void }) {
         {/* Section 2: Strategic Core Competencies (The 5 Pillars) */}
         <div className="max-w-[1200px] mx-auto mb-32 px-6">
           <div className="text-center mb-16 md:mb-20">
-            <span className="inline-block py-2 px-6 rounded-full bg-white shadow-sm text-[11px] font-bold uppercase tracking-[0.2em] mb-6 text-[#1a1a1a]/50">Competencies</span>
+            <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Competencies</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a]">Strategic Core Competencies</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -1330,7 +1624,11 @@ function ManagementPage({ go }: { go: (p: Page) => void }) {
           <div className="absolute bottom-[-50%] right-[-10%] w-[500px] h-[500px] bg-[#E91E8C]/15 blur-[150px] rounded-full pointer-events-none" />
           
           <div className="relative z-10 max-w-[800px] mx-auto text-center">
-            <span className="inline-block py-2 px-6 rounded-full bg-white/10 text-white text-[11px] font-bold uppercase tracking-[0.2em] mb-8 border border-white/10 shadow-sm">Why Partner With Us?</span>
+            <div className="inline-flex items-center gap-3 mb-6">
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-white/70">Why Partner With Us?</span>
+  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+</div>
             <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[56px] text-white mb-6 tracking-tight leading-[1.1]">
               Practical, Sustainable, and Scalable Solutions
             </h2>
@@ -1344,6 +1642,7 @@ function ManagementPage({ go }: { go: (p: Page) => void }) {
         </div>
 
       </div>
+      <Footer />
     </div>
   );
 }
@@ -1420,11 +1719,85 @@ function ContactPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
+
+
+const FOOTER_SOCIAL_ICONS = [
+  { Icon: Instagram, label: "Instagram", color: C_PINK },
+  { Icon: Facebook, label: "Facebook", color: C_BLUE },
+  { Icon: Linkedin, label: "LinkedIn", color: C_BLUE },
+  { Icon: Twitter, label: "Twitter / X", color: C_BLUE },
+  { Icon: Youtube, label: "YouTube", color: C_ORANGE },
+];
+
+const FOOTER_SERVICES = [
+  { id: "management", color: "#F5841F", label: "Management", features: ["Pre-opening planning & setup", "Operations audit & restructuring", "Menu engineering", "P&L optimization"] },
+  { id: "events", color: "#E91E8C", label: "Events", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & décor coordination", "Guest management"] },
+  { id: "marketing", color: "#3AADE0", label: "Marketing", features: ["Brand identity & positioning", "Social media strategy", "Influencer & PR campaigns", "Photography direction"] },
+  { id: "recruitment", color: "#78BE1F", label: "Recruitment", features: ["Executive placement", "Chef & culinary sourcing", "FOH & BOH recruitment", "Event & seasonal staffing"] }
+];
+
+function Footer() {
+  return (
+    <footer className="bg-white border-t border-gray-100 w-full mt-24">
+      <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg, #F5841F, #E91E8C, #3AADE0, #78BE1F)' }} />
+      <div className="max-w-[1200px] mx-auto px-6 py-16">
+        <div className="grid md:grid-cols-5 gap-12 mb-16">
+          <div className="md:col-span-2">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="h-14 w-14 flex items-center justify-center rounded-2xl bg-white border border-gray-100 p-1.5 shadow-sm">
+                <img src="/imports/friend-logo.png" alt="HCH" className="w-full h-full object-contain" />
+              </div>
+              <div>
+                <div className="font-['Plus_Jakarta_Sans'] font-extrabold text-[#1a1a1a] text-[15px] tracking-tight leading-none mb-1.5">HARMONY CLUB HOUSE</div>
+                <div className="font-['Plus_Jakarta_Sans'] text-[11px] text-[#1a1a1a]/40 font-bold uppercase tracking-wider">Est. 2012 &middot; Cairo, Egypt</div>
+              </div>
+            </div>
+            <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/60 font-medium leading-[1.8] max-w-[320px]">
+              Premier F&B development and hospitality consultancy with over 13 years of international excellence.
+            </p>
+          </div>
+          {FOOTER_SERVICES.map(s => (
+            <div key={s.id}>
+              <div className="font-['Plus_Jakarta_Sans'] text-[12px] font-extrabold mb-4 uppercase tracking-[0.1em]" style={{ color: s.color }}>{s.label}</div>
+              {s.features.map(f => (
+                <div key={f} className="font-['Plus_Jakarta_Sans'] text-[14px] text-[#1a1a1a]/50 mb-3 hover:text-[#1a1a1a] cursor-pointer transition-colors leading-relaxed font-medium">{f}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="pt-8 border-t border-black/[0.04] flex flex-col md:flex-row items-center justify-between gap-6 text-[13px] text-[#1a1a1a]/40 font-['Plus_Jakarta_Sans'] font-medium">
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <span>&copy; 2024 Harmony Club House. All rights reserved.</span>
+            <div className="flex gap-4">
+              {FOOTER_SOCIAL_ICONS.map(({ Icon, label, color }) => (
+                <button
+                  key={label}
+                  aria-label={label}
+                  className="w-10 h-10 rounded-full bg-[#FAF7F2] shadow-sm border border-black/5 flex items-center justify-center text-[#1a1a1a]/40 transition-all duration-300 hover:scale-110 hover:bg-white hover:shadow-md"
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = color; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = ""; }}
+                >
+                  <Icon size={16} />
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-8">
+            {["Privacy", "Terms", "Cookies"].map(l => (
+              <span key={l} className="hover:text-[#1a1a1a] cursor-pointer transition-colors">{l}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
 
 export default function App() {
   const [page, setPage] = useState<Page>("home");
@@ -1453,3 +1826,4 @@ export default function App() {
     </div>
   );
 }
+
