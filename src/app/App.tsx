@@ -12,7 +12,7 @@ import {
   ArrowRight,
   CheckCircle2,
   ChevronDown,
-  Mail,
+  
   Phone,
   MapPin,
   Menu,
@@ -22,7 +22,7 @@ import {
   ShieldCheck, 
   Lightbulb, 
   Handshake 
-, Calendar, UserCheck, ChevronRight, PenTool, Utensils, TrendingUp, BarChart, ChefHat , Coffee, Briefcase, PartyPopper, Sparkles , Search, ClipboardCheck, UsersRound, Repeat, BookOpen, GraduationCap, LineChart, Palette, MonitorSmartphone, Target, Megaphone , Building2, Landmark, Music, LayoutTemplate , PieChart, Building, Monitor, Heart, Zap } from 'lucide-react';
+, Calendar, UserCheck, ChevronRight, PenTool, Utensils, TrendingUp, BarChart, ChefHat , Coffee, PartyPopper, Sparkles , Search, ClipboardCheck, UsersRound, Repeat, BookOpen, GraduationCap, LineChart, Palette, MonitorSmartphone, Target, Megaphone , Building2, Landmark, Music, LayoutTemplate , PieChart, Building, Monitor, Heart, Zap, Mail, Lock, User, Briefcase } from 'lucide-react';
 
 // Image paths - move images from src/imports to public/imports
 const logoImg = "/imports/image-10.png";
@@ -48,6 +48,41 @@ const C_ORANGE = "#F5841F";
 const C_PINK = "#E91E8C";
 const C_BLUE = "#3AADE0";
 const C_GREEN = "#78BE1F";
+
+// ── Brand ───────────────────────────────────────────────────────────────────
+const C = {
+  management:    "#FFB343",
+  managementDim: "#FFF8EC",
+  events:        "#E91E8C",
+  eventsDim:     "#FEF0F8",
+  marketing:     "#2AAEDE",
+  marketingDim:  "#EDF8FE",
+  recruitment:   "#3DAA68",
+  recruitmentDim:"#EDF8F2",
+};
+const GRAD = `linear-gradient(90deg,${C.management},${C.events},${C.marketing},${C.recruitment})`;
+
+
+function HeroCircle({ go }: { go: (p: Page) => void }) {
+  return (
+    <div className="flex justify-center">
+      <div className="relative w-80 h-80 rounded-full border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden">
+        {/* Central HCH Circle */}
+        <div className="absolute z-10 bg-white w-28 h-28 rounded-full flex flex-col items-center justify-center font-bold text-[14px] shadow-lg">
+          HCH <span className="text-[9px] text-gray-400 font-normal tracking-widest">HARMONY</span>
+        </div>
+        
+        {/* Quadrant Buttons - Passing 'go' correctly to each */}
+        <div className="grid grid-cols-2 w-full h-full">
+          <button onClick={() => go("management")} className="bg-[#FFB343] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">MANAGEMENT</button>
+          <button onClick={() => go("events")} className="bg-[#E91E8C] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">EVENTS</button>
+          <button onClick={() => go("recruitment")} className="bg-[#3DAA68] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">RECRUITMENT</button>
+          <button onClick={() => go("marketing")} className="bg-[#2AAEDE] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">MARKETING</button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Nav ─────────────────────────────────────────────────────────────────────
 
@@ -102,6 +137,8 @@ function Nav({ current, go }: { current: Page; go: (p: Page) => void }) {
           ))}
         </nav>
 
+        
+
         <div className="flex-1 md:hidden" />
 
         {/* Contact CTA */}
@@ -112,6 +149,13 @@ function Nav({ current, go }: { current: Page; go: (p: Page) => void }) {
         >
           Contact Us
         </button>
+
+        <button 
+            onClick={() => go("login")} // Directs to the login page
+            className="font-['Plus_Jakarta_Sans'] text-[14px] font-bold text-[#1a1a1a] px-5 py-2.5 rounded-full hover:bg-black/5 transition-all"
+          >
+            Sign In
+          </button>
 
         {/* Mobile hamburger */}
         <button
@@ -150,64 +194,37 @@ function Nav({ current, go }: { current: Page; go: (p: Page) => void }) {
 // ─── Home Page (single-screen) ────────────────────────────────────────────────
 function HomePage({ go }: { go: (p: Page) => void }) {
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-[#FAF7F2] relative">
-      <div className="flex-1 flex items-center justify-center p-6 md:p-12">
-        <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
-          {/* Left Column: Text Content */}
-          <div className="space-y-6 text-center lg:text-left">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-[#F5841F]/10 text-[#F5841F] text-[12px] font-bold uppercase tracking-[0.2em]">
-              ESTABLISHED 2012 · CAIRO, EGYPT
-            </span>
-            <h1 className="font-['Plus_Jakarta_Sans'] text-5xl md:text-7xl font-extrabold text-[#1a1a1a] leading-[1.1] tracking-tight">
-              Where Hospitality <br />
-              <span className="text-[#E91E8C]">Meets</span> <br />
-              <span className="text-[#78BE1F]">Excellence.</span>
-            </h1>
-            <p className="font-['Plus_Jakarta_Sans'] text-lg text-[#1a1a1a]/60 max-w-md mx-auto lg:mx-0 leading-[1.8] font-medium">
-              Delivering management, events, marketing, and recruitment solutions under one harmonious ecosystem — with 13 years of international experience across four continents.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
-              <button 
-                onClick={() => go("services")} 
-                className="bg-[#F5841F] text-white px-8 py-4 rounded-full font-bold hover:opacity-90 transition-all shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)]"
-              >
-                Explore Services →
-              </button>
-              <button 
-                onClick={() => go("contact")} 
-                className="border border-black/10 px-8 py-4 rounded-full font-bold text-[#1a1a1a] hover:bg-black/5 transition-all"
-              >
-                Contact Us
-              </button>
-            </div>
+    <section id="hero" className="min-h-screen flex items-center justify-center bg-[#FAF7F2] p-6 pt-24">
+      <div className="max-w-7xl w-full grid lg:grid-cols-2 gap-16 items-center">
+        
+        {/* Left: Text Content */}
+        <div className="space-y-8 text-center lg:text-left">
+          <span className="inline-block px-4 py-1 rounded-full bg-[#F5841F]/10 text-[#F5841F] text-[11px] font-bold uppercase tracking-[0.2em]">
+            ESTABLISHED 2012 · CAIRO, EGYPT
+          </span>
+          <h1 className="text-6xl md:text-7xl font-black text-gray-900 leading-[1.05]" style={{fontFamily:"'Montserrat',sans-serif"}}>
+            Where Hospitality<br />
+            <span style={{backgroundImage:GRAD, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>Meets Excellence.</span>
+          </h1>
+          <p className="text-lg text-gray-500 font-light leading-relaxed max-w-md mx-auto lg:mx-0">
+            Delivering management, events, marketing, and recruitment solutions under one harmonious ecosystem — with 13 years of international experience across four continents.
+          </p>
+          <div className="flex gap-4 justify-center lg:justify-start">
+            <button onClick={() => go("services")} className="px-8 py-4 rounded-full font-bold text-sm text-white transition-all hover:shadow-lg" style={{background:C.management}}>
+              Explore Services
+            </button>
+            <button onClick={() => go("contact")} className="px-8 py-4 rounded-full font-bold text-sm border-2 border-gray-200 text-gray-700 hover:border-gray-800">
+              Contact Us
+            </button>
           </div>
-
-          {/* Right Column: Interactive Quadrant Circle */}
-          <div className="flex justify-center">
-            <div className="relative w-80 h-80 rounded-full border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden">
-              {/* Central HCH Circle */}
-              <div className="absolute z-10 bg-white w-28 h-28 rounded-full flex flex-col items-center justify-center font-bold text-[14px] shadow-lg">
-                HCH <span className="text-[9px] text-gray-400 font-normal tracking-widest">HARMONY</span>
-              </div>
-              
-              {/* Quadrant Buttons */}
-              <div className="grid grid-cols-2 w-full h-full">
-                <button onClick={() => go("management")} className="bg-[#FFB343] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">MANAGEMENT</button>
-                <button onClick={() => go("events")} className="bg-[#E91E8C] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">EVENTS</button>
-                <button onClick={() => go("recruitment")} className="bg-[#3DAA68] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">RECRUITMENT</button>
-                <button onClick={() => go("marketing")} className="bg-[#2AAEDE] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">MARKETING</button>
-              </div>
-            </div>
-          </div>
-
         </div>
+
+        {/* Right: Quadrant Circle */}
+        <HeroCircle go={go} />
       </div>
-      <Footer />
-    </div>
+    </section>
   );
 }
-
 
 function ServicesPage({ go }: { go: (p: Page) => void }) {
   const SERVICES = [
@@ -349,6 +366,115 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
 
       </div>
       <Footer />
+    </div>
+  );
+}
+
+function LoginPage({ go }: { go: (p: Page) => void }) {
+  const [mode, setMode] = useState<"login" | "signup">("login");
+
+  return (
+    <div className="flex-1 flex items-center justify-center bg-[#FAF7F2] relative p-6 min-h-screen">
+      
+      {/* Soft Colorful Ambient Backgrounds (Matches your theme) */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[10%] left-[20%] w-[40vw] h-[40vw] bg-[#F5841F]/15 blur-[120px] rounded-full mix-blend-multiply" />
+        <div className="absolute bottom-[10%] right-[20%] w-[40vw] h-[40vw] bg-[#E91E8C]/15 blur-[120px] rounded-full mix-blend-multiply" />
+      </div>
+
+      <div className="relative z-10 w-full max-w-md">
+        
+        {/* Brand Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white shadow-sm border border-gray-100 mb-4 cursor-pointer" onClick={() => go("home")}>
+             <img src="/imports/friend-logo.png" alt="HCH" className="w-8 h-8 object-contain" />
+          </div>
+          <h1 className="text-2xl font-black text-gray-900 leading-tight" style={{fontFamily:"'Montserrat',sans-serif"}}>
+            {mode === "login" ? "Welcome Back" : "Create an Account"}
+          </h1>
+          <p className="text-sm text-gray-500 mt-2 font-medium">
+            {mode === "login" ? "Sign in to access your dashboard" : "Join the Harmony ecosystem"}
+          </p>
+        </div>
+
+        {/* Auth Card */}
+        <div className="bg-white/80 backdrop-blur-2xl p-8 md:p-10 rounded-[40px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] border border-white">
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+            
+            {/* Sign Up Only: Name */}
+            {mode === "signup" && (
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>Full Name</label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><User size={16} /></div>
+                  <input type="text" placeholder="Ahmed Hassan" required
+                    className="w-full pl-11 pr-4 py-3 rounded-xl text-sm border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
+                </div>
+              </div>
+            )}
+
+            {/* Shared: Email */}
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>Email Address</label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Mail size={16} /></div>
+                <input type="email" placeholder="hello@example.com" required
+                  className="w-full pl-11 pr-4 py-3 rounded-xl text-sm border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
+              </div>
+            </div>
+
+            {/* Shared: Password */}
+            <div>
+              <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>Password</label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Lock size={16} /></div>
+                <input type="password" placeholder="••••••••" required
+                  className="w-full pl-11 pr-4 py-3 rounded-xl text-sm border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
+              </div>
+            </div>
+
+            {/* Sign Up Only: User Type */}
+            {mode === "signup" && (
+              <div>
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>I am a...</label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Briefcase size={16} /></div>
+                  <select required className="w-full pl-11 pr-10 py-3 rounded-xl text-sm border border-gray-200 outline-none transition-all text-gray-700 focus:border-[#F5841F] bg-white/50 appearance-none cursor-pointer">
+                    <option value="" disabled selected>Select your objective</option>
+                    <option value="restaurant">Restaurant / F&B Owner</option>
+                    <option value="recruiter">Recruiter / Seeking Talent</option>
+                    <option value="event">Client (Planning an Event)</option>
+                    <option value="marketing">Client (Seeking Marketing)</option>
+                  </select>
+                  <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                </div>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button type="submit" 
+              className="w-full py-3.5 mt-2 rounded-full text-sm font-black text-white transition-all hover:shadow-lg hover:-translate-y-0.5 group flex items-center justify-center gap-2"
+              style={{ background: `linear-gradient(135deg, #F5841F, #E91E8C)`, fontFamily:"'Montserrat',sans-serif" }}>
+              {mode === "login" ? "Sign In" : "Create Account"} 
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </form>
+
+          {/* Toggle Mode */}
+          <div className="mt-8 text-center pt-6 border-t border-gray-100">
+            <p className="text-sm text-gray-500 font-medium">
+              {mode === "login" ? "Don't have an account? " : "Already have an account? "}
+              <button 
+                onClick={() => setMode(mode === "login" ? "signup" : "login")} 
+                className="font-bold text-[#E91E8C] hover:text-[#F5841F] transition-colors"
+              >
+                {mode === "login" ? "Sign up" : "Log in"}
+              </button>
+            </p>
+          </div>
+        </div>
+        
+      </div>
     </div>
   );
 }
@@ -1794,6 +1920,8 @@ export default function App() {
       {page === "marketing" && <MarketingPage go={go} />}
       {page === "events" && <EventsPage go={go} />}
       {page === "management" && <ManagementPage go={go} />}
+      {page === "contact" && <ContactPage />}
+      {page === "login" && <LoginPage />}
       {page === "contact" && <ContactPage />}
     </div>
   );
