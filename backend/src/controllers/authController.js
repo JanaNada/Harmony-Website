@@ -34,8 +34,6 @@ const setTokenCookie = (res, token) => {
 
 const registerCompany = async (req, res) => {
 
-  // We need a dedicated connection because transactions must use
-  // the SAME database connection for all their queries.
   let connection;
 
   try {
@@ -180,7 +178,7 @@ const login = async (req, res) => {
       [email]
     );
 
-    if (users.length == 0) {
+    if (users.length === 0) {
       return res.status(401).json({
         success: false,
         message: "Invalid email or password",
