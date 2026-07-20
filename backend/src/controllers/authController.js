@@ -171,7 +171,7 @@ const login = async (req, res) => {
 
     const [users] = await db.query(
       `
-        SELECT id, email, password_hash, role
+        SELECT id, email, password_hash, role, is_active
         FROM users
         WHERE email = ?
       `,
@@ -187,9 +187,16 @@ const login = async (req, res) => {
 
     const user = users[0];
 
+    if (!user.is_active) {
+        return res.status(403).json({
+            success: false,
+            message: "Your account has been deactivated. Please contact Harmony Club House."
+        });
+    }
+
     const passwordMatches = await bcrypt.compare(
-      password,
-      user.password_hash
+        password,
+        user.password_hash
     );
 
     if (!passwordMatches) {
