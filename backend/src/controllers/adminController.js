@@ -2,17 +2,38 @@ const db = require("../config/db");
 
 const getDashboard = async (req, res) => {
     try {
-        const [data] = await db.query("SELECT * FROM dashboard");
+
+        const [[companies]] = await db.query(`
+            SELECT
+                COUNT(*) AS totalCompanies,
+                SUM(is_active = TRUE) AS activeCompanies,
+                SUM(is_active = FALSE) AS inactiveCompanies
+            FROM users
+            WHERE role = 'COMPANY'
+        `);
+
+        const [[services]] = await db.query(`
+            SELECT
+                COUNT(*) AS totalServices,
+                SUM(is_active = TRUE) AS activeServices,
+                SUM(is_active = FALSE) AS inactiveServices
+            FROM services
+        `);
+
         return res.status(200).json({
             success: true,
-            data
+            stats: {
+                ...companies,
+                ...services
+            }
         });
-    } 
+
+    }
     catch (error) {
-        console.error("Dashboard error:", error);
+        console.error(error);
         return res.status(500).json({
             success: false,
-            message: "Failed to get dashboard data"
+            message: "Failed to retrieve dashboard."
         });
     }
 };
@@ -174,10 +195,201 @@ const deactivateCompany = async (req, res) => {
 
 //#endregion
 
+//#region Services
+
+const getAllServices = async (req, res) => {
+    try {
+        const [services] = await db.query(`
+            SELECT *
+            FROM services
+            ORDER BY created_at DESC
+        `);
+
+        return res.status(200).json({
+            success: true,
+            services
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve services."
+        });
+    }
+};
+
+const getServiceById = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [services] = await db.query(`
+            SELECT *
+            FROM services
+            WHERE id = ?
+        `, [id]);
+
+        if (services.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Service not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            service: services[0]
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve service."
+        });
+    }
+};
+
+const createService = async (req, res) => {
+    try {
+        const { title, description } = req.body;
+
+        if (!title) {
+            return res.status(400).json({
+                success: false,
+                message: "Service title is required."
+            });
+        }
+
+        const [result] = await db.query(`
+            INSERT INTO services (title, description)
+            VALUES (?, ?)
+        `, [title, description || null]);
+
+        return res.status(201).json({
+            success: true,
+            message: "Service created successfully.",
+            serviceId: result.insertId
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to create service."
+        });
+    }
+};
+
+const updateService = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, description } = req.body;
+
+        const [result] = await db.query(`
+            UPDATE services
+            SET title = ?, description = ?
+            WHERE id = ?
+        `, [title, description, id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Service not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Service updated successfully."
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to update service."
+        });
+    }
+};
+
+const activateService = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [result] = await db.query(`
+            UPDATE services
+            SET is_active = TRUE
+            WHERE id = ?
+        `, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Service not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Service activated successfully."
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to activate service."
+        });
+    }
+};
+
+const deactivateService = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [result] = await db.query(`
+            UPDATE services
+            SET is_active = FALSE
+            WHERE id = ?
+        `, [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Service not found."
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Service deactivated successfully."
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: "Failed to deactivate service."
+        });
+    }
+};
+
+//#endregion
+
+
 module.exports = {
     getDashboard,
+
     getAllCompanies,
     getCompanyById,
     activateCompany,
-    deactivateCompany
+    deactivateCompany,
+
+    getAllServices,
+    getServiceById,
+    createService,
+    updateService,
+    activateService,
+    deactivateService   
 };
