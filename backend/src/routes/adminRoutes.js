@@ -6,15 +6,13 @@ const {
 
     getAllCompanies,
     getCompanyById,
-    activateCompany,
-    deactivateCompany,
+    updateCompanyStatus,
 
     getAllServices,
     getServiceById,
     createService,
     updateService,
-    activateService,
-    deactivateService
+    updateServiceStatus
 } = require("../controllers/adminController");
 
 const {
@@ -26,14 +24,12 @@ router.get("/dashboard", authenticate, authorize("ADMIN"), getDashboard);
 
 router.get("/companies", authenticate, authorize("ADMIN"), getAllCompanies);
 router.get("/companies/:id", authenticate, authorize("ADMIN"), getCompanyById);
-router.put("/companies/:id/activate", authenticate, authorize("ADMIN"), activateCompany);
-router.put("/companies/:id/deactivate", authenticate, authorize("ADMIN"), deactivateCompany);
+router.put("/companies/:id/status", authenticate, authorize("ADMIN"), updateCompanyStatus);
 
 router.get("/services", authenticate, authorize("ADMIN"), getAllServices);
 router.get("/services/:id", authenticate, authorize("ADMIN"), getServiceById);
 router.post("/services", authenticate, authorize("ADMIN"), createService);
 router.put("/services/:id", authenticate, authorize("ADMIN"), updateService);
-router.put("/services/:id/activate", authenticate, authorize("ADMIN"), activateService);
-router.put("/services/:id/deactivate", authenticate, authorize("ADMIN"), deactivateService);
+router.put("/services/:id/status", authenticate, authorize("ADMIN"), updateServiceStatus);
 
 module.exports = router;

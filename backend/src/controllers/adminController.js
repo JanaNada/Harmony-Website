@@ -98,7 +98,7 @@ const getCompanyById = async (req, res) => {
             JOIN users u
             ON c.user_id = u.id
 
-            WHERE u.id = ?
+            WHERE c.id = ?
             `,
             [id]
         );
@@ -125,17 +125,20 @@ const getCompanyById = async (req, res) => {
     }
 };
 
-const activateCompany = async (req, res) => {
+const updateCompanyStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const [result] = await db.query(
-            `
-            UPDATE users
-            SET is_active = TRUE
-            WHERE id = ?
-            `,
-            [id]
-        );
+        const { is_active } = req.body;
+
+        const [result] = await db.query(`
+            UPDATE users u
+            JOIN companies c
+            ON u.id = c.user_id
+
+            SET u.is_active = ?
+
+            WHERE c.id = ?
+        `, [is_active, id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({
@@ -146,49 +149,15 @@ const activateCompany = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Company activated successfully."
+            message: "Company status updated successfully.",
+            is_active
         });
     }
-
     catch (error) {
         console.error(error);
         return res.status(500).json({
             success: false,
-            message: "Failed to activate company."
-        });
-    }
-};
-
-const deactivateCompany = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const [result] = await db.query(
-            `
-            UPDATE users
-            SET is_active = FALSE
-            WHERE id = ?
-            `,
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Company not found."
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: "Company deactivated successfully."
-        });
-    }
-
-    catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to deactivate company."
+            message: "Failed to update company status."
         });
     }
 };
@@ -313,15 +282,16 @@ const updateService = async (req, res) => {
     }
 };
 
-const activateService = async (req, res) => {
+const updateServiceStatus = async (req, res) => {
     try {
         const { id } = req.params;
+        const { is_active } = req.body;
 
         const [result] = await db.query(`
             UPDATE services
-            SET is_active = TRUE
+            SET is_active = ?
             WHERE id = ?
-        `, [id]);
+        `, [is_active, id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).json({
@@ -332,45 +302,15 @@ const activateService = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Service activated successfully."
+            message: "Service status updated successfully.",
+            is_active
         });
     }
     catch (error) {
         console.error(error);
         return res.status(500).json({
             success: false,
-            message: "Failed to activate service."
-        });
-    }
-};
-
-const deactivateService = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const [result] = await db.query(`
-            UPDATE services
-            SET is_active = FALSE
-            WHERE id = ?
-        `, [id]);
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Service not found."
-            });
-        }
-
-        return res.status(200).json({
-            success: true,
-            message: "Service deactivated successfully."
-        });
-    }
-    catch (error) {
-        console.error(error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to deactivate service."
+            message: "Failed to update service status."
         });
     }
 };
@@ -383,13 +323,11 @@ module.exports = {
 
     getAllCompanies,
     getCompanyById,
-    activateCompany,
-    deactivateCompany,
+    updateCompanyStatus,
 
     getAllServices,
     getServiceById,
     createService,
     updateService,
-    activateService,
-    deactivateService   
+    updateServiceStatus
 };
