@@ -82,3 +82,80 @@ CREATE TABLE `users` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-07-20 18:12:08
+
+
+-- Table service_requests
+
+
+DROP TABLE IF EXISTS `service_requests`;
+
+CREATE TABLE `service_requests` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_id` int NOT NULL,
+
+  `service_type` enum(
+    'MANAGEMENT',
+    'EVENTS',
+    'MARKETING',
+    'RECRUITMENT',
+    'FNB',
+    'CATERING',
+    'OTHER'
+  ) NOT NULL,
+
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `preferred_date` date DEFAULT NULL,
+  `location` varchar(255) DEFAULT NULL,
+  `budget_range` varchar(100) DEFAULT NULL,
+  `notes` text DEFAULT NULL,
+
+  `status` enum(
+    'PENDING',
+    'IN_REVIEW',
+    'APPROVED',
+    'REJECTED',
+    'COMPLETED'
+  ) NOT NULL DEFAULT 'PENDING',
+
+  `admin_notes` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (`id`),
+  KEY `company_id` (`company_id`),
+
+  CONSTRAINT `service_requests_company_fk`
+    FOREIGN KEY (`company_id`)
+    REFERENCES `companies` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+
+--  table contact
+
+
+DROP TABLE IF EXISTS `contact_messages`;
+
+CREATE TABLE `contact_messages` (
+  `id` int NOT NULL AUTO_INCREMENT,
+
+  `name` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `company` varchar(255) DEFAULT NULL,
+  `service_interest` varchar(100) DEFAULT NULL,
+  `message` text NOT NULL,
+
+  `status` enum(
+    'NEW',
+    'READ',
+    'REPLIED',
+    'ARCHIVED'
+  ) NOT NULL DEFAULT 'NEW',
+
+  `admin_notes` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
