@@ -12,7 +12,7 @@ import {
   ArrowRight,
   CheckCircle2,
   ChevronDown,
-  
+  Globe, Rocket, Clock,
   Phone,
   MapPin,
   Menu,
@@ -194,35 +194,41 @@ function Nav({ current, go }: { current: Page; go: (p: Page) => void }) {
 // ─── Home Page (single-screen) ────────────────────────────────────────────────
 function HomePage({ go }: { go: (p: Page) => void }) {
   return (
-    <section id="hero" className="min-h-screen flex items-center justify-center bg-[#FAF7F2] p-6 pt-24">
-      <div className="max-w-7xl w-full grid lg:grid-cols-2 gap-16 items-center">
-        
-        {/* Left: Text Content */}
-        <div className="space-y-8 text-center lg:text-left">
-          <span className="inline-block px-4 py-1 rounded-full bg-[#F5841F]/10 text-[#F5841F] text-[11px] font-bold uppercase tracking-[0.2em]">
-            ESTABLISHED 2012 · CAIRO, EGYPT
-          </span>
-          <h1 className="text-6xl md:text-7xl font-black text-gray-900 leading-[1.05]" style={{fontFamily:"'Montserrat',sans-serif"}}>
-            Where Hospitality<br />
-            <span style={{backgroundImage:GRAD, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>Meets Excellence.</span>
-          </h1>
-          <p className="text-lg text-gray-500 font-light leading-relaxed max-w-md mx-auto lg:mx-0">
-            Delivering management, events, marketing, and recruitment solutions under one harmonious ecosystem — with 13 years of international experience across four continents.
-          </p>
-          <div className="flex gap-4 justify-center lg:justify-start">
-            <button onClick={() => go("services")} className="px-8 py-4 rounded-full font-bold text-sm text-white transition-all hover:shadow-lg" style={{background:C.management}}>
-              Explore Services
-            </button>
-            <button onClick={() => go("contact")} className="px-8 py-4 rounded-full font-bold text-sm border-2 border-gray-200 text-gray-700 hover:border-gray-800">
-              Contact Us
-            </button>
+    <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative">
+      {/* Hero Section */}
+      <section id="hero" className="min-h-screen flex items-center justify-center p-6 pt-24 relative z-10">
+        <div className="max-w-7xl w-full grid lg:grid-cols-2 gap-16 items-center">
+          
+          {/* Left: Text Content */}
+          <div className="space-y-8 text-center lg:text-left">
+            <span className="inline-block px-4 py-1 rounded-full bg-[#F5841F]/10 text-[#F5841F] text-[11px] font-bold uppercase tracking-[0.2em]">
+              ESTABLISHED 2012 · CAIRO, EGYPT
+            </span>
+            <h1 className="text-6xl md:text-7xl font-black text-gray-900 leading-[1.05]" style={{fontFamily:"'Montserrat',sans-serif"}}>
+              Where Hospitality<br />
+              <span style={{backgroundImage:GRAD, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>Meets Excellence.</span>
+            </h1>
+            <p className="text-lg text-gray-500 font-light leading-relaxed max-w-md mx-auto lg:mx-0">
+              Delivering management, events, marketing, and recruitment solutions under one harmonious ecosystem — with 13 years of international experience across four continents.
+            </p>
+            <div className="flex gap-4 justify-center lg:justify-start">
+              <button onClick={() => go("services")} className="px-8 py-4 rounded-full font-bold text-sm text-white transition-all hover:shadow-lg" style={{background:C.management}}>
+                Explore Services
+              </button>
+              <button onClick={() => go("contact")} className="px-8 py-4 rounded-full font-bold text-sm border-2 border-gray-200 text-gray-700 hover:border-gray-800">
+                Contact Us
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Right: Quadrant Circle */}
-        <HeroCircle go={go} />
-      </div>
-    </section>
+          {/* Right: Quadrant Circle */}
+          <HeroCircle go={go} />
+        </div>
+      </section>
+
+      {/* The Footer with the colorful bar */}
+      <Footer />
+    </div>
   );
 }
 
@@ -753,42 +759,111 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative">
-
-      {/* Soft Colorful Ambient Backgrounds (Fixed to cover entire scroll) */}
+      {/* Soft Colorful Ambient Backgrounds */}
       <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] bg-[#F5841F]/15 blur-[120px] rounded-full mix-blend-multiply" />
         <div className="absolute top-[20%] -right-[10%] w-[60vw] h-[60vw] bg-[#3AADE0]/10 blur-[150px] rounded-full mix-blend-multiply" />
         <div className="absolute bottom-[-10%] left-[20%] w-[50vw] h-[50vw] bg-[#E91E8C]/15 blur-[120px] rounded-full mix-blend-multiply" />
       </div>
 
-      <div className="relative z-10 pb-32">
-        {/* Intro Image */}
-        <div className="w-full mb-16 md:mb-24">
-          <div className="relative w-full">
-            <ImageWithFallback src={interactiveImg} alt="Harmony Club House" className="w-full h-auto object-cover" />
-          </div>
-        </div>
-
-        {/* Who We Are */}
-        <div className="max-w-[1200px] mx-auto px-6 mb-32 md:mb-48">
-          <div className="relative overflow-hidden bg-white/80 backdrop-blur-2xl p-12 md:p-24 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.08)] border border-white text-center">
-            {/* Colorful soft glows */}
-            <div className="absolute top-[-20%] left-[-10%] w-[400px] h-[400px] bg-[#F5841F]/15 blur-[120px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] bg-[#E91E8C]/15 blur-[120px] rounded-full pointer-events-none" />
+      <div className="relative z-10 pb-32 pt-24">
+        
+        {/* NEW DYNAMIC ABOUT HERO (Replaces image_0ef220.jpg) */}
+        <div className="max-w-[1300px] mx-auto px-6 mb-32 md:mb-48 relative">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             
-            <div className="relative z-10 max-w-[900px] mx-auto">
-              <div className="inline-flex items-center gap-3 mb-6">
-                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-                <span className="font-['Plus_Jakarta_Sans'] text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/50">Our Story</span>
-                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+            {/* Left Column: Text & Floating Stats */}
+            <div className="lg:col-span-7 space-y-10 relative z-20">
+              <div>
+                {/* <h3 className="font-['Plus_Jakarta_Sans'] text-[33px] italic font-semibold text-[#3AADE0] mb-4">
+                  Who We Are
+                </h3> */}
+                <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[42px] md:text-[56px] lg:text-[64px] leading-[1.05] tracking-tight text-[#1a1a1a]">
+                  We don't just consult,<br/>
+                  <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}>
+                    We partner.
+                  </span>
+                </h1>
               </div>
-              <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[60px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
-                Redefining the art of <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>hospitality.</span>
-              </h1>
-              <p className="font-['Plus_Jakarta_Sans'] text-[18px] md:text-[22px] leading-[1.8] text-[#1a1a1a]/70 font-medium">
-                Established in 2012, Harmony Club House (HCH) stands as a premier platform for F&B development and hospitality consultancy. We are a dedicated team of passionate entrepreneurs and experts, bringing over 13 years of hands-on international experience across four continents. From initial feasibility studies and innovative kitchen design to menu engineering and complete operational restructuring, we have successfully launched over 30 projects and trained more than 2,500 professionals.
+              
+              <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] leading-[1.8] text-[#1a1a1a]/70 font-medium max-w-[600px]">
+                Harmony Club House is a premier platform for F&B development and hospitality consultancy, empowering investors and operators to unlock the full potential of their ventures. Established in 2012, we bring over 13 years of hands-on international experience to build your success.
               </p>
+
+              {/* Glassmorphism Stats Bar */}
+              <div className="bg-white/80 backdrop-blur-2xl p-6 md:p-8 rounded-[32px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] border border-white max-w-[700px]">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-4">
+                  {[
+                    { icon: Clock, val: "13+", label: "Years Exp.", color: C_ORANGE },
+                    { icon: Globe, val: "4", label: "Continents", color: C_PINK },
+                    { icon: Rocket, val: "30+", label: "Projects", color: C_BLUE },
+                    { icon: GraduationCap, val: "2,500+", label: "Trained", color: C_GREEN }
+                  ].map((stat, i) => (
+                    <div key={i} className="flex flex-col items-center text-center group">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 transition-transform duration-300 group-hover:-translate-y-1" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
+                        <stat.icon size={22} />
+                      </div>
+                      <div className="font-['Plus_Jakarta_Sans'] font-black text-[22px] md:text-[26px] text-[#1a1a1a] leading-none mb-1">{stat.val}</div>
+                      <div className="font-['Plus_Jakarta_Sans'] text-[10px] font-bold text-[#1a1a1a]/50 uppercase tracking-widest">{stat.label}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
+
+            {/* Right Column: Modern Staggered Pillars Grid */}
+            <div className="lg:col-span-5 relative">
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#F5841F]/20 via-[#E91E8C]/20 to-[#3AADE0]/20 blur-[60px] rounded-full" />
+              
+              <div className="grid grid-cols-2 gap-4 relative z-10">
+                {/* Offset Column 1 */}
+                <div className="space-y-4 pt-12">
+                  <div className="relative h-64 rounded-[32px] overflow-hidden group shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&q=80" alt="Management" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#F5841F] via-[#F5841F]/40 to-transparent opacity-90" />
+                    <div className="absolute bottom-6 left-6 right-6 text-white">
+                      <Building2 size={24} className="mb-2 opacity-80" />
+                      <h4 className="font-['Plus_Jakarta_Sans'] font-bold text-[18px]">Management</h4>
+                    </div>
+                  </div>
+                  <div className="relative h-56 rounded-[32px] overflow-hidden group shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=500&q=80" alt="Marketing" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#3AADE0] via-[#3AADE0]/40 to-transparent opacity-90" />
+                    <div className="absolute bottom-6 left-6 right-6 text-white">
+                      <Megaphone size={24} className="mb-2 opacity-80" />
+                      <h4 className="font-['Plus_Jakarta_Sans'] font-bold text-[18px]">Marketing</h4>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Column 2 */}
+                <div className="space-y-4">
+                  <div className="relative h-56 rounded-[32px] overflow-hidden group shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=500&q=80" alt="Events" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#E91E8C] via-[#E91E8C]/40 to-transparent opacity-90" />
+                    <div className="absolute bottom-6 left-6 right-6 text-white">
+                      <Calendar size={24} className="mb-2 opacity-80" />
+                      <h4 className="font-['Plus_Jakarta_Sans'] font-bold text-[18px]">Events</h4>
+                    </div>
+                  </div>
+                  <div className="relative h-64 rounded-[32px] overflow-hidden group shadow-lg">
+                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=500&q=80" alt="Recruitment" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#78BE1F] via-[#78BE1F]/40 to-transparent opacity-90" />
+                    <div className="absolute bottom-6 left-6 right-6 text-white">
+                      <UserCheck size={24} className="mb-2 opacity-80" />
+                      <h4 className="font-['Plus_Jakarta_Sans'] font-bold text-[18px]">Recruitment</h4>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Decorative Text */}
+              <div className="absolute -bottom-12 -right-4 md:right-4 text-right">
+                 <div className="font-['Plus_Jakarta_Sans'] italic font-bold text-[16px] md:text-[20px] text-[#1a1a1a]/40">Bridging Challenges.</div>
+                 <div className="font-['Plus_Jakarta_Sans'] italic font-bold text-[16px] md:text-[20px] text-[#E91E8C]">Building Success.</div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1842,54 +1917,68 @@ const FOOTER_SERVICES = [
 
 function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-100 w-full mt-24">
-      <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg, #F5841F, #E91E8C, #3AADE0, #78BE1F)' }} />
-      <div className="max-w-[1200px] mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-5 gap-12 mb-16">
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-4 mb-6">
-              <div className="h-14 w-14 flex items-center justify-center rounded-2xl bg-white border border-gray-100 p-1.5 shadow-sm">
-                <img src="/imports/friend-logo.png" alt="HCH" className="w-full h-full object-contain" />
+    <footer className="relative bg-[#FAF7F2] border-t border-gray-100 w-full overflow-hidden">
+      
+      {/* Soft Ambient Background matching the screenshot */}
+      <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
+        <div className="absolute top-[-20%] left-[5%] w-[50vw] h-[50vw] bg-[#F5841F]/10 blur-[120px] rounded-full mix-blend-multiply" />
+        <div className="absolute bottom-[-10%] right-[10%] w-[40vw] h-[40vw] bg-[#3AADE0]/10 blur-[120px] rounded-full mix-blend-multiply" />
+        <div className="absolute top-[20%] left-[40%] w-[40vw] h-[40vw] bg-[#E91E8C]/10 blur-[120px] rounded-full mix-blend-multiply" />
+      </div>
+
+      <div className="relative z-10">
+        {/* The Colorful Bar */}
+        <div className="h-1.5 w-full" style={{ background: 'linear-gradient(90deg, #F5841F, #E91E8C, #3AADE0, #78BE1F)' }} />
+        
+        <div className="max-w-[1200px] mx-auto px-6 py-16">
+          <div className="grid md:grid-cols-5 gap-12 mb-16">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-14 w-14 flex items-center justify-center rounded-2xl bg-white border border-gray-100 p-1.5 shadow-sm">
+                  <img src="/imports/friend-logo.png" alt="HCH" className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <div className="font-['Plus_Jakarta_Sans'] font-extrabold text-[#1a1a1a] text-[15px] tracking-tight leading-none mb-1.5">HARMONY CLUB HOUSE</div>
+                  <div className="font-['Plus_Jakarta_Sans'] text-[11px] text-[#1a1a1a]/40 font-bold uppercase tracking-wider">Est. 2012 &middot; Cairo, Egypt</div>
+                </div>
               </div>
-              <div>
-                <div className="font-['Plus_Jakarta_Sans'] font-extrabold text-[#1a1a1a] text-[15px] tracking-tight leading-none mb-1.5">HARMONY CLUB HOUSE</div>
-                <div className="font-['Plus_Jakarta_Sans'] text-[11px] text-[#1a1a1a]/40 font-bold uppercase tracking-wider">Est. 2012 &middot; Cairo, Egypt</div>
+              <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/60 font-medium leading-[1.8] max-w-[320px]">
+                Premier F&B development and hospitality consultancy with over 13 years of international excellence.
+              </p>
+            </div>
+            
+            {FOOTER_SERVICES.map(s => (
+              <div key={s.id}>
+                <div className="font-['Plus_Jakarta_Sans'] text-[12px] font-extrabold mb-4 uppercase tracking-[0.1em]" style={{ color: s.color }}>{s.label}</div>
+                {s.features.map(f => (
+                  <div key={f} className="font-['Plus_Jakarta_Sans'] text-[14px] text-[#1a1a1a]/50 mb-3 hover:text-[#1a1a1a] cursor-pointer transition-colors leading-relaxed font-medium">{f}</div>
+                ))}
               </div>
-            </div>
-            <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/60 font-medium leading-[1.8] max-w-[320px]">
-              Premier F&B development and hospitality consultancy with over 13 years of international excellence.
-            </p>
-          </div>
-          {FOOTER_SERVICES.map(s => (
-            <div key={s.id}>
-              <div className="font-['Plus_Jakarta_Sans'] text-[12px] font-extrabold mb-4 uppercase tracking-[0.1em]" style={{ color: s.color }}>{s.label}</div>
-              {s.features.map(f => (
-                <div key={f} className="font-['Plus_Jakarta_Sans'] text-[14px] text-[#1a1a1a]/50 mb-3 hover:text-[#1a1a1a] cursor-pointer transition-colors leading-relaxed font-medium">{f}</div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="pt-8 border-t border-black/[0.04] flex flex-col md:flex-row items-center justify-between gap-6 text-[13px] text-[#1a1a1a]/40 font-['Plus_Jakarta_Sans'] font-medium">
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            <span>&copy; 2024 Harmony Club House. All rights reserved.</span>
-            <div className="flex gap-4">
-              {FOOTER_SOCIAL_ICONS.map(({ Icon, label, color }) => (
-                <button
-                  key={label}
-                  aria-label={label}
-                  className="w-10 h-10 rounded-full bg-[#FAF7F2] shadow-sm border border-black/5 flex items-center justify-center text-[#1a1a1a]/40 transition-all duration-300 hover:scale-110 hover:bg-white hover:shadow-md"
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = color; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = ""; }}
-                >
-                  <Icon size={16} />
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="flex gap-8">
-            {["Privacy", "Terms", "Cookies"].map(l => (
-              <span key={l} className="hover:text-[#1a1a1a] cursor-pointer transition-colors">{l}</span>
             ))}
+          </div>
+          
+          <div className="pt-8 border-t border-black/[0.04] flex flex-col md:flex-row items-center justify-between gap-6 text-[13px] text-[#1a1a1a]/40 font-['Plus_Jakarta_Sans'] font-medium">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <span>&copy; 2026 Harmony Club House. All rights reserved.</span>
+              <div className="flex gap-4">
+                {FOOTER_SOCIAL_ICONS.map(({ Icon, label, color }) => (
+                  <button
+                    key={label}
+                    aria-label={label}
+                    className="w-10 h-10 rounded-full bg-white/50 backdrop-blur-sm shadow-sm border border-black/5 flex items-center justify-center text-[#1a1a1a]/40 transition-all duration-300 hover:scale-110 hover:bg-white hover:shadow-md"
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = color; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = ""; }}
+                  >
+                    <Icon size={16} />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-8">
+              {["Privacy", "Terms", "Cookies"].map(l => (
+                <span key={l} className="hover:text-[#1a1a1a] cursor-pointer transition-colors">{l}</span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
