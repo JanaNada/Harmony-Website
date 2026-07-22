@@ -159,3 +159,12 @@ CREATE TABLE `contact_messages` (
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+-- Link contact messages to the submitting company (nullable: public form stays anonymous)
+
+ALTER TABLE `contact_messages`
+  ADD COLUMN `company_id` int DEFAULT NULL AFTER `id`,
+  ADD KEY `company_id` (`company_id`),
+  ADD CONSTRAINT `contact_messages_company_fk`
+    FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`);
