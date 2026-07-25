@@ -1830,8 +1830,8 @@ function ContactPage() {
       <div className="max-w-[1200px] mx-auto px-8 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_500px] gap-16 items-start">
           <div>
-            <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[#1a1a1a] mb-6" style={{ fontSize: "clamp(40px, 6vw, 72px)" }}>Let's build something great.</h1>
-            <p className="font-['Plus_Jakarta_Sans'] text-[17px] text-[#1a1a1a]/55 leading-[1.8] mb-10 max-w-md">Whether you have a clear brief or just a big ambition — reach out. We'll schedule a free 30-minute discovery call.</p>
+            <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[#1a1a1a] mb-6" style={{ fontSize: "clamp(40px, 6vw,50px)" }}>Let's build something great.</h1>
+            <p className="font-['Plus_Jakarta_Sans'] text-[17px] text-[#1a1a1a]/55 leading-[1.8] mb-10 max-w-md">Whether you have a clear brief or just a big ambition — reach out.</p>
             <div className="space-y-5">
               {[{ Icon: Mail, text: "hello@harmonyclubhouse.com" }, { Icon: Phone, text: "+20 100 000 0000" }, { Icon: MapPin, text: "Cairo, Egypt — 4 Continents" }].map(({ Icon, text }) => (
                 <div key={text} className="flex items-center gap-4">
@@ -1872,7 +1872,7 @@ function ContactPage() {
                     <select value={form.service} onChange={(e) => setForm({ ...form, service: e.target.value })}
                       className="w-full font-['Plus_Jakarta_Sans'] text-[14px] text-[#1a1a1a] bg-[#FAF7F2] border border-black/[0.08] rounded-xl px-4 py-3 outline-none focus:border-black/25 transition-colors appearance-none cursor-pointer">
                       <option value="">Select a service</option>
-                      {["Management & Consultancy", "Events", "Marketing", "Recruitment & Training", "Not sure yet"].map((s) => <option key={s} value={s}>{s}</option>)}
+                      {["Business Developement", "Events & Catering", "Marketing", "Recruitment & Training", "Not sure yet"].map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                     <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#1a1a1a]/30 pointer-events-none" />
                   </div>
@@ -1910,7 +1910,7 @@ const FOOTER_SOCIAL_ICONS = [
 
 const FOOTER_SERVICES = [
   { id: "management", color: "#F5841F", label: "Management", features: ["Pre-opening planning & setup", "Operations audit & restructuring", "Menu engineering", "P&L optimization"] },
-  { id: "events", color: "#E91E8C", label: "Events", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & décor coordination", "Guest management"] },
+  { id: "events", color: "#E91E8C", label: "Events & Catering", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & décor coordination", "Guest management"] },
   { id: "marketing", color: "#3AADE0", label: "Marketing", features: ["Brand identity & positioning", "Social media strategy", "Influencer & PR campaigns", "Photography direction"] },
   { id: "recruitment", color: "#78BE1F", label: "Recruitment", features: ["Executive placement", "Chef & culinary sourcing", "FOH & BOH recruitment", "Event & seasonal staffing"] }
 ];
@@ -2009,7 +2009,6 @@ export default function App() {
       {page === "marketing" && <MarketingPage go={go} />}
       {page === "events" && <EventsPage go={go} />}
       {page === "management" && <ManagementPage go={go} />}
-      {page === "contact" && <ContactPage />}
       {page === "login" && <LoginPage />}
       {page === "contact" && <ContactPage />}
     </div>
