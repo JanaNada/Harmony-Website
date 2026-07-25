@@ -234,7 +234,7 @@ function HomePage({ go }: { go: (p: Page) => void }) {
 
 function ServicesPage({ go }: { go: (p: Page) => void }) {
   const SERVICES = [
-    { id:"management", color: C_ORANGE, dim: `${C_ORANGE}15`, label:"Management",  tagline:"Operational Excellence",   icon: Building2,
+    { id:"management", color: C_ORANGE, dim: `${C_ORANGE}15`, label:"Management",  tagline:"Operational Excellence",  icon: Building2,
       desc:"From concept feasibility and kitchen design to full operational restructuring. We embed with your team to build venues that perform.",
       image:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop&auto=format" },
     { id:"events",     color: C_PINK,      dim: `${C_PINK}15`,      label:"Events",      tagline:"Unforgettable Experiences",icon: Calendar,
@@ -249,7 +249,7 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative">
+    <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative scroll-smooth">
       {/* Soft Colorful Ambient Backgrounds */}
       <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] bg-[#F5841F]/15 blur-[120px] rounded-full mix-blend-multiply" />
@@ -257,71 +257,23 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
         <div className="absolute bottom-[-10%] left-[20%] w-[50vw] h-[50vw] bg-[#E91E8C]/15 blur-[120px] rounded-full mix-blend-multiply" />
       </div>
 
-      <div className="relative z-10 pt-24 pb-0">
-        <div className="max-w-[1200px] mx-auto px-6 text-center mb-16 md:mb-20">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-            <span className="font-['Plus_Jakarta_Sans'] text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/50">WHAT WE DO</span>
-            <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-          </div>
-          <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[60px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
-            Four Pillars of Expertise
-          </h1>
-        </div>
-
-        <div className="max-w-[1200px] mx-auto px-6 mb-32">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {SERVICES.map((s) => (
-              <div key={s.id} className="group flex flex-col bg-white rounded-[32px] overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2">
-                <div className="h-1.5 w-full" style={{background:s.color}}/>
-                <div className="relative h-56 overflow-hidden bg-[#FAF7F2]">
-                  <img src={s.image} alt={s.label} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent opacity-80" />
-                </div>
-                <div className="p-8 flex flex-col flex-1 bg-white relative">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-110" style={{background:s.dim}}>
-                      <s.icon size={22} style={{color:s.color}} />
-                    </div>
-                    <div>
-                      <p className="font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase tracking-widest mb-1" style={{color:s.color}}>{s.tagline}</p>
-                      <h3 className="font-['Plus_Jakarta_Sans'] text-[22px] font-extrabold text-[#1a1a1a] leading-tight">{s.label}</h3>
-                    </div>
-                  </div>
-                  <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/70 leading-[1.7] mb-8 flex-1 font-medium">
-                    {s.desc}
-                  </p>
-                  <button onClick={() => go(s.id as Page)} className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[15px] font-bold hover:gap-3 transition-all mt-auto" style={{color:s.color}}>
-                    Request Service <ChevronRight size={18}/>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Section 1: The Bridge / Introduction */}
-        <div className="max-w-[900px] mx-auto px-6 mt-32 md:mt-40 text-center">
-          <p className="font-['Plus_Jakarta_Sans'] text-[18px] md:text-[24px] leading-[1.8] text-[#1a1a1a]/80 font-medium">
-            At Harmony Club House, we bridge the gap between traditional hospitality excellence and cutting-edge digital innovation. We provide end-to-end solutions designed to streamline operations, elevate your brand, and maximize your market presence.
-          </p>
-        </div>
-
-        {/* Section 2: Specialized Divisions */}
-        <div className="max-w-[1200px] mx-auto px-6 mt-32 md:mt-40 flex flex-col gap-24 md:gap-32 pb-32">
-          {/* Block 1: Food & Beverage Division */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
-            <div className="order-2 lg:order-1 relative group">
+      <div className="relative z-10">
+        
+        {/* --- 1. HERO SECTION: FOOD & BEVERAGE --- */}
+        <div className="min-h-[75vh] pt-12 pb-8 flex flex-col justify-center px-6 max-w-[1200px] mx-auto relative">
+          {/* Changed to 12-column grid to make image smaller (span-5) and text larger (span-7) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 items-center flex-1">
+            <div className="order-2 lg:order-1 lg:col-span-5 relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-[#F5841F]/30 to-[#E91E8C]/20 blur-[40px] rounded-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
               <ImageWithFallback src={divFnbImg} alt="Food & Beverage Division" className="relative w-full h-auto object-contain rounded-[32px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-white/60 transition-transform duration-700 group-hover:scale-[1.02] bg-white" />
             </div>
-            <div className="order-1 lg:order-2">
-              <div className="inline-flex items-center gap-3 mb-6">
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-</div>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-6 leading-[1.1] tracking-tight">Food & Beverage Division</h2>
+            <div className="order-1 lg:order-2 lg:col-span-7">
+              <div className="inline-flex items-center gap-3 mb-4">
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+                <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+              </div>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-5 leading-[1.1] tracking-tight">Food & Beverage Division</h2>
               <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-[1.8]">
                 End-to-end concept creation and execution. From innovative kitchen design and strategic equipment sourcing to comprehensive menu engineering, we build the culinary foundations for your success.
               </p>
@@ -331,15 +283,83 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
             </div>
           </div>
 
-          {/* Block 2: Premium Catering Services */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
-            <div className="order-1 lg:order-1">
-              <div className="inline-flex items-center gap-3 mb-6">
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-</div>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-6 leading-[1.1] tracking-tight">Premium Catering Services</h2>
+          {/* Scroll Down Indicator - Now positioned higher so it's visible on load */}
+          <div 
+            className="w-full flex justify-center mt-12 cursor-pointer opacity-70 hover:opacity-100 transition-opacity animate-bounce"
+            onClick={(e) => {
+              const grid = e.currentTarget.parentElement?.parentElement?.querySelector('#services-grid');
+              grid?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <span className="font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/60">Explore More Services</span>
+              <ChevronDown size={24} className="text-[#F5841F]" />
+            </div>
+          </div>
+        </div>
+
+        {/* --- 2. THE 4 PILLARS OF EXPERTISE --- */}
+        <div id="services-grid" className="pt-16 pb-12">
+          <div className="max-w-[1200px] mx-auto px-6 text-center mb-12">
+            <div className="inline-flex items-center gap-3 mb-6">
+              <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+              <span className="font-['Plus_Jakarta_Sans'] text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/50">WHAT WE DO</span>
+              <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+            </div>
+            <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[52px] leading-[1.1] tracking-tight mb-4 text-[#1a1a1a]">
+              Four Pillars of Expertise
+            </h1>
+          </div>
+
+          <div className="max-w-[1200px] mx-auto px-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+              {SERVICES.map((s) => (
+                <div key={s.id} className="group flex flex-col bg-white rounded-[32px] overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2">
+                  <div className="h-1.5 w-full" style={{background:s.color}}/>
+                  <div className="relative h-56 overflow-hidden bg-[#FAF7F2]">
+                    <img src={s.image} alt={s.label} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent opacity-80" />
+                  </div>
+                  <div className="p-8 flex flex-col flex-1 bg-white relative">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-110" style={{background:s.dim}}>
+                        <s.icon size={22} style={{color:s.color}} />
+                      </div>
+                      <div>
+                        <p className="font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase tracking-widest mb-1" style={{color:s.color}}>{s.tagline}</p>
+                        <h3 className="font-['Plus_Jakarta_Sans'] text-[22px] font-extrabold text-[#1a1a1a] leading-tight">{s.label}</h3>
+                      </div>
+                    </div>
+                    <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/70 leading-[1.7] mb-8 flex-1 font-medium">
+                      {s.desc}
+                    </p>
+                    <button onClick={() => go(s.id as Page)} className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[15px] font-bold hover:gap-3 transition-all mt-auto" style={{color:s.color}}>
+                      Request Service <ChevronRight size={18}/>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* --- 3. THE BRIDGE / INTRO TEXT --- */}
+        <div className="max-w-[900px] mx-auto px-6 mt-8 mb-12 text-center">
+          <p className="font-['Plus_Jakarta_Sans'] text-[18px] md:text-[22px] leading-[1.8] text-[#1a1a1a]/80 font-medium">
+            At Harmony Club House, we bridge the gap between traditional hospitality excellence and cutting-edge digital innovation. We provide end-to-end solutions designed to streamline operations, elevate your brand, and maximize your market presence.
+          </p>
+        </div>
+
+        {/* --- 4. PREMIUM CATERING SERVICES --- */}
+        <div className="max-w-[1200px] mx-auto px-6 mt-16 mb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 items-center">
+            <div className="order-1 lg:order-1 lg:col-span-7">
+              <div className="inline-flex items-center gap-3 mb-4">
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+                <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+              </div>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-5 leading-[1.1] tracking-tight">Premium Catering Services</h2>
               <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-[1.8]">
                 Delivering culinary excellence at scale. Whether it is a corporate mega-event, a grand opening, or an exclusive gathering, our catering division ensures flawless execution, strict international hygiene standards, and memorable flavors.
               </p>
@@ -347,21 +367,21 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
                 Explore Catering Services <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
-            <div className="order-2 lg:order-2 relative group">
+            <div className="order-2 lg:order-2 lg:col-span-5 relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-[#E91E8C]/30 to-[#3AADE0]/20 blur-[40px] rounded-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
               <ImageWithFallback src={divCateringImg} alt="Premium Catering Services" className="relative w-full h-auto object-contain rounded-[32px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-white/60 transition-transform duration-700 group-hover:scale-[1.02] bg-white" />
             </div>
           </div>
         </div>
 
-        {/* Section 3: Bottom Call-to-Action */}
-        <div className="w-full bg-[#111111] py-24 md:py-32 px-6 relative overflow-hidden">
-          {/* Ambient Glows for Dark Footer */}
-          <div className="absolute top-[-50%] left-[-10%] w-[500px] h-[500px] bg-[#F5841F]/20 blur-[150px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-[-50%] right-[-10%] w-[500px] h-[500px] bg-[#E91E8C]/20 blur-[150px] rounded-full pointer-events-none" />
+        {/* --- 5. BOTTOM CALL-TO-ACTION (Now Light & Ambient) --- */}
+        <div className="w-full py-16 md:py-24 px-6 relative overflow-hidden">
+          {/* Ambient Glows for Light Footer */}
+          <div className="absolute top-[-50%] left-[0%] w-[500px] h-[500px] bg-[#F5841F]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
+          <div className="absolute bottom-[-50%] right-[0%] w-[500px] h-[500px] bg-[#E91E8C]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
           
-          <div className="relative z-10 max-w-[800px] mx-auto text-center">
-            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[56px] text-white mb-10 tracking-tight leading-[1.1]">
+          <div className="relative z-10 max-w-[800px] mx-auto text-center bg-white/60 backdrop-blur-xl p-10 md:p-16 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)] border border-white">
+            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-8 tracking-tight leading-[1.1]">
               Ready to unlock your full potential?
             </h2>
             <button onClick={() => go("contact")} className="inline-flex items-center gap-3 font-['Plus_Jakarta_Sans'] text-[15px] font-bold text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(245,132,31,0.5)] group" style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}>
@@ -964,13 +984,18 @@ function MissionPage({ go }: { go: (p: Page) => void }) {
 
       <div className="relative z-10 pb-16">
         
-        {/* Top Image (Full Bleed, No Void Space) */}
-        <div className="w-full flex justify-center mb-12">
-          <ImageWithFallback 
-            src={missionTopImg} 
-            alt="Mission and Vision" 
-            className="w-full h-auto object-cover" 
-          />
+        {/* Top Image*/}
+        <div className="w-full flex justify-center mb-16 px-6 mt-8">
+          <div className="relative w-full max-w-[800px] rounded-[40px] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-white/60 group bg-white/40 backdrop-blur-sm">
+            {/* Soft overlay gradient for aesthetics */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/5 z-10 pointer-events-none transition-opacity duration-700 group-hover:opacity-0" />
+            
+            <ImageWithFallback 
+              src={missionTopImg} 
+              alt="Mission and Vision" 
+              className="w-full h-auto object-contain transition-transform duration-[2s] group-hover:scale-[1.02]" 
+            />
+          </div>
         </div>
 
         {/* Section 1: Our Mission */}
