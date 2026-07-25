@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "motion/react";
 import { ImageWithFallback } from "@/components";
 import {      
@@ -234,22 +234,22 @@ function HomePage({ go }: { go: (p: Page) => void }) {
 
 function ServicesPage({ go }: { go: (p: Page) => void }) {
   const SERVICES = [
-    { id:"management", color: C_ORANGE, dim: `${C_ORANGE}15`, label:"Management",  tagline:"Operational Excellence",   icon: Building2,
+    { id:"management", color: C_ORANGE, dim: `${C_ORANGE}15`, label:"Business Development",  tagline:"Operational Excellence",  icon: Building2,
       desc:"From concept feasibility and kitchen design to full operational restructuring. We embed with your team to build venues that perform.",
       image:"https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop&auto=format" },
-    { id:"events",     color: C_PINK,      dim: `${C_PINK}15`,      label:"Events",      tagline:"Unforgettable Experiences",icon: Calendar,
+    { id:"events",     color: C_PINK,      dim: `${C_PINK}15`,      label:"Events & Catering",      tagline:"Unforgettable Experiences",icon: Calendar,
       desc:"From intimate corporate dinners to grand galas — every detail handled. Venue sourcing, catering design, logistics, and on-the-day execution.",
       image:"https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&auto=format" },
-    { id:"marketing",  color: C_BLUE,   dim: `${C_BLUE}15`,   label:"Marketing",   tagline:"Brand & Digital Growth",  icon: Megaphone,
+    { id:"marketing",  color: C_BLUE,   dim: `${C_BLUE}15`,   label:"Marketing Recipe",   tagline:"Brand & Digital Growth",  icon: Megaphone,
       desc:"We build hospitality brands that resonate. Identity, digital strategy, influencer campaigns, and PR — all under one roof.",
       image:"https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=600&fit=crop&auto=format" },
-    { id:"recruitment",color: C_GREEN, dim: `${C_GREEN}15`, label:"Recruitment", tagline:"Talent Acquisition",      icon: UserCheck,
+    { id:"recruitment",color: C_GREEN, dim: `${C_GREEN}15`, label:"Recruitment & Training", tagline:"Talent Acquisition",      icon: UserCheck,
       desc:"We source, vet, and place hospitality professionals across every function. Our global network spans four continents.",
       image:"https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=600&fit=crop&auto=format" },
   ];
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative">
+    <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative scroll-smooth">
       {/* Soft Colorful Ambient Backgrounds */}
       <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] bg-[#F5841F]/15 blur-[120px] rounded-full mix-blend-multiply" />
@@ -257,71 +257,23 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
         <div className="absolute bottom-[-10%] left-[20%] w-[50vw] h-[50vw] bg-[#E91E8C]/15 blur-[120px] rounded-full mix-blend-multiply" />
       </div>
 
-      <div className="relative z-10 pt-24 pb-0">
-        <div className="max-w-[1200px] mx-auto px-6 text-center mb-16 md:mb-20">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-            <span className="font-['Plus_Jakarta_Sans'] text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/50">WHAT WE DO</span>
-            <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-          </div>
-          <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[40px] md:text-[60px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
-            Four Pillars of Expertise
-          </h1>
-        </div>
-
-        <div className="max-w-[1200px] mx-auto px-6 mb-32">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-            {SERVICES.map((s) => (
-              <div key={s.id} className="group flex flex-col bg-white rounded-[32px] overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2">
-                <div className="h-1.5 w-full" style={{background:s.color}}/>
-                <div className="relative h-56 overflow-hidden bg-[#FAF7F2]">
-                  <img src={s.image} alt={s.label} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent opacity-80" />
-                </div>
-                <div className="p-8 flex flex-col flex-1 bg-white relative">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-110" style={{background:s.dim}}>
-                      <s.icon size={22} style={{color:s.color}} />
-                    </div>
-                    <div>
-                      <p className="font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase tracking-widest mb-1" style={{color:s.color}}>{s.tagline}</p>
-                      <h3 className="font-['Plus_Jakarta_Sans'] text-[22px] font-extrabold text-[#1a1a1a] leading-tight">{s.label}</h3>
-                    </div>
-                  </div>
-                  <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/70 leading-[1.7] mb-8 flex-1 font-medium">
-                    {s.desc}
-                  </p>
-                  <button onClick={() => go(s.id as Page)} className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[15px] font-bold hover:gap-3 transition-all mt-auto" style={{color:s.color}}>
-                    Request Service <ChevronRight size={18}/>
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Section 1: The Bridge / Introduction */}
-        <div className="max-w-[900px] mx-auto px-6 mt-32 md:mt-40 text-center">
-          <p className="font-['Plus_Jakarta_Sans'] text-[18px] md:text-[24px] leading-[1.8] text-[#1a1a1a]/80 font-medium">
-            At Harmony Club House, we bridge the gap between traditional hospitality excellence and cutting-edge digital innovation. We provide end-to-end solutions designed to streamline operations, elevate your brand, and maximize your market presence.
-          </p>
-        </div>
-
-        {/* Section 2: Specialized Divisions */}
-        <div className="max-w-[1200px] mx-auto px-6 mt-32 md:mt-40 flex flex-col gap-24 md:gap-32 pb-32">
-          {/* Block 1: Food & Beverage Division */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
-            <div className="order-2 lg:order-1 relative group">
+      <div className="relative z-10">
+        
+        {/* --- 1. HERO SECTION: FOOD & BEVERAGE --- */}
+        <div className="min-h-[75vh] pt-12 pb-8 flex flex-col justify-center px-6 max-w-[1200px] mx-auto relative">
+          {/* Changed to 12-column grid to make image smaller (span-5) and text larger (span-7) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 items-center flex-1">
+            <div className="order-2 lg:order-1 lg:col-span-5 relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-[#F5841F]/30 to-[#E91E8C]/20 blur-[40px] rounded-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
               <ImageWithFallback src={divFnbImg} alt="Food & Beverage Division" className="relative w-full h-auto object-contain rounded-[32px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-white/60 transition-transform duration-700 group-hover:scale-[1.02] bg-white" />
             </div>
-            <div className="order-1 lg:order-2">
-              <div className="inline-flex items-center gap-3 mb-6">
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-</div>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-6 leading-[1.1] tracking-tight">Food & Beverage Division</h2>
+            <div className="order-1 lg:order-2 lg:col-span-7">
+              <div className="inline-flex items-center gap-3 mb-4">
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+                <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+              </div>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-5 leading-[1.1] tracking-tight">Food & Beverage Division</h2>
               <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-[1.8]">
                 End-to-end concept creation and execution. From innovative kitchen design and strategic equipment sourcing to comprehensive menu engineering, we build the culinary foundations for your success.
               </p>
@@ -331,15 +283,83 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
             </div>
           </div>
 
-          {/* Block 2: Premium Catering Services */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-16 items-center">
-            <div className="order-1 lg:order-1">
-              <div className="inline-flex items-center gap-3 mb-6">
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-</div>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-6 leading-[1.1] tracking-tight">Premium Catering Services</h2>
+          {/* Scroll Down Indicator - Now positioned higher so it's visible on load */}
+          <div 
+            className="w-full flex justify-center mt-12 cursor-pointer opacity-70 hover:opacity-100 transition-opacity animate-bounce"
+            onClick={(e) => {
+              const grid = e.currentTarget.parentElement?.parentElement?.querySelector('#services-grid');
+              grid?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            <div className="flex flex-col items-center gap-2">
+              <span className="font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/60">Explore More Services</span>
+              <ChevronDown size={24} className="text-[#F5841F]" />
+            </div>
+          </div>
+        </div>
+
+        {/* --- 2. THE 4 PILLARS OF EXPERTISE --- */}
+        <div id="services-grid" className="pt-16 pb-12">
+          <div className="max-w-[1200px] mx-auto px-6 text-center mb-12">
+            <div className="inline-flex items-center gap-3 mb-6">
+              <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+              <span className="font-['Plus_Jakarta_Sans'] text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/50">WHAT WE DO</span>
+              <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+            </div>
+            <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[52px] leading-[1.1] tracking-tight mb-4 text-[#1a1a1a]">
+              Four Pillars of Expertise
+            </h1>
+          </div>
+
+          <div className="max-w-[1200px] mx-auto px-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+              {SERVICES.map((s) => (
+                <div key={s.id} className="group flex flex-col bg-white rounded-[32px] overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2">
+                  <div className="h-1.5 w-full" style={{background:s.color}}/>
+                  <div className="relative h-56 overflow-hidden bg-[#FAF7F2]">
+                    <img src={s.image} alt={s.label} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent opacity-80" />
+                  </div>
+                  <div className="p-8 flex flex-col flex-1 bg-white relative">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-110" style={{background:s.dim}}>
+                        <s.icon size={22} style={{color:s.color}} />
+                      </div>
+                      <div>
+                        <p className="font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase tracking-widest mb-1" style={{color:s.color}}>{s.tagline}</p>
+                        <h3 className="font-['Plus_Jakarta_Sans'] text-[22px] font-extrabold text-[#1a1a1a] leading-tight">{s.label}</h3>
+                      </div>
+                    </div>
+                    <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/70 leading-[1.7] mb-8 flex-1 font-medium">
+                      {s.desc}
+                    </p>
+                    <button onClick={() => go(s.id as Page)} className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[15px] font-bold hover:gap-3 transition-all mt-auto" style={{color:s.color}}>
+                      Request Service <ChevronRight size={18}/>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* --- 3. THE BRIDGE / INTRO TEXT --- */}
+        <div className="max-w-[900px] mx-auto px-6 mt-8 mb-12 text-center">
+          <p className="font-['Plus_Jakarta_Sans'] text-[18px] md:text-[22px] leading-[1.8] text-[#1a1a1a]/80 font-medium">
+            At Harmony Club House, we bridge the gap between traditional hospitality excellence and cutting-edge digital innovation. We provide end-to-end solutions designed to streamline operations, elevate your brand, and maximize your market presence.
+          </p>
+        </div>
+
+        {/* --- 4. PREMIUM CATERING SERVICES --- */}
+        <div className="max-w-[1200px] mx-auto px-6 mt-16 mb-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 items-center">
+            <div className="order-1 lg:order-1 lg:col-span-7">
+              <div className="inline-flex items-center gap-3 mb-4">
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+                <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Division</span>
+                <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+              </div>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-5 leading-[1.1] tracking-tight">Premium Catering Services</h2>
               <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-[1.8]">
                 Delivering culinary excellence at scale. Whether it is a corporate mega-event, a grand opening, or an exclusive gathering, our catering division ensures flawless execution, strict international hygiene standards, and memorable flavors.
               </p>
@@ -347,21 +367,21 @@ function ServicesPage({ go }: { go: (p: Page) => void }) {
                 Explore Catering Services <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
-            <div className="order-2 lg:order-2 relative group">
+            <div className="order-2 lg:order-2 lg:col-span-5 relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-[#E91E8C]/30 to-[#3AADE0]/20 blur-[40px] rounded-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
               <ImageWithFallback src={divCateringImg} alt="Premium Catering Services" className="relative w-full h-auto object-contain rounded-[32px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-white/60 transition-transform duration-700 group-hover:scale-[1.02] bg-white" />
             </div>
           </div>
         </div>
 
-        {/* Section 3: Bottom Call-to-Action */}
-        <div className="w-full bg-[#111111] py-24 md:py-32 px-6 relative overflow-hidden">
-          {/* Ambient Glows for Dark Footer */}
-          <div className="absolute top-[-50%] left-[-10%] w-[500px] h-[500px] bg-[#F5841F]/20 blur-[150px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-[-50%] right-[-10%] w-[500px] h-[500px] bg-[#E91E8C]/20 blur-[150px] rounded-full pointer-events-none" />
+        {/* --- 5. BOTTOM CALL-TO-ACTION (Now Light & Ambient) --- */}
+        <div className="w-full py-16 md:py-24 px-6 relative overflow-hidden">
+          {/* Ambient Glows for Light Footer */}
+          <div className="absolute top-[-50%] left-[0%] w-[500px] h-[500px] bg-[#F5841F]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
+          <div className="absolute bottom-[-50%] right-[0%] w-[500px] h-[500px] bg-[#E91E8C]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
           
-          <div className="relative z-10 max-w-[800px] mx-auto text-center">
-            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[56px] text-white mb-10 tracking-tight leading-[1.1]">
+          <div className="relative z-10 max-w-[800px] mx-auto text-center bg-white/60 backdrop-blur-xl p-10 md:p-16 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)] border border-white">
+            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-8 tracking-tight leading-[1.1]">
               Ready to unlock your full potential?
             </h2>
             <button onClick={() => go("contact")} className="inline-flex items-center gap-3 font-['Plus_Jakarta_Sans'] text-[15px] font-bold text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(245,132,31,0.5)] group" style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}>
@@ -964,13 +984,18 @@ function MissionPage({ go }: { go: (p: Page) => void }) {
 
       <div className="relative z-10 pb-16">
         
-        {/* Top Image (Full Bleed, No Void Space) */}
-        <div className="w-full flex justify-center mb-12">
-          <ImageWithFallback 
-            src={missionTopImg} 
-            alt="Mission and Vision" 
-            className="w-full h-auto object-cover" 
-          />
+        {/* Top Image*/}
+        <div className="w-full flex justify-center mb-16 px-6 mt-8">
+          <div className="relative w-full max-w-[800px] rounded-[40px] overflow-hidden shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-white/60 group bg-white/40 backdrop-blur-sm">
+            {/* Soft overlay gradient for aesthetics */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/5 z-10 pointer-events-none transition-opacity duration-700 group-hover:opacity-0" />
+            
+            <ImageWithFallback 
+              src={missionTopImg} 
+              alt="Mission and Vision" 
+              className="w-full h-auto object-contain transition-transform duration-[2s] group-hover:scale-[1.02]" 
+            />
+          </div>
         </div>
 
         {/* Section 1: Our Mission */}
@@ -1720,96 +1745,211 @@ function EventsPage({ go }: { go: (p: Page) => void }) {
 }
 
 
-
 function ManagementPage({ go }: { go: (p: Page) => void }) {
-  const competencies = [
-    { icon: PieChart, title: "Operations & Finance", text: "Optimize your bottom line with ROI analysis, data-driven menu engineering, stringent cost control, and accurate budgeting.", color: C_ORANGE, img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&q=80" },
-    { icon: Briefcase, title: "Corporate Finance & Structure", text: "Professional oversight to stabilize and scale, including crisis management, legal structuring, and HR/payroll optimization.", color: C_PINK, img: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80" },
-    { icon: Building, title: "Hotel & Resort Consultancy", text: "Specialized asset management, strict brand standard compliance, and professional management agreements for large-scale properties.", color: C_BLUE, img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80" },
-    { icon: Monitor, title: "Integrated Technology", text: "Equipping your team with robust POS system integration, guest-facing digital solutions, and real-time analytical tools.", color: C_GREEN, img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80" },
-    { icon: Palette, title: "Marketing & Brand Identity", text: "Elevating your market presence through cohesive identity design, menu aesthetics, and conversion-focused SEO.", color: C_ORANGE, img: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&q=80" }
-  ];
+  const [businessStage, setBusinessStage] = useState<'new' | 'existing' | null>(null);
+  
+  // States for New Business
+  const [sector, setSector] = useState('');
+  const [otherSector, setOtherSector] = useState('');
+
+  // States for Existing Business
+  const [serviceNeeded, setServiceNeeded] = useState('');
+  const [otherService, setOtherService] = useState('');
+
+  // Ref to target the form container for auto-scrolling
+  const formRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll effect when business stage is selected
+  useEffect(() => {
+    if (businessStage && formRef.current) {
+      setTimeout(() => {
+        // Changed block to "nearest" to prevent it from forcefully pushing the whole page layout up
+        formRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 100);
+    }
+  }, [businessStage]);
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative">
+    // Removed min-h-screen here to stop the window from scrolling and hiding the nav
+    <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative scroll-smooth flex flex-col">
+      {/* Soft Colorful Ambient Backgrounds */}
       <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[0%] left-[-10%] w-[50vw] h-[50vw] bg-[#F5841F]/20 blur-[120px] rounded-full mix-blend-multiply" />
-        <div className="absolute top-[40%] right-[-10%] w-[60vw] h-[60vw] bg-[#E91E8C]/15 blur-[150px] rounded-full mix-blend-multiply" />
-        <div className="absolute bottom-[-10%] left-[20%] w-[50vw] h-[50vw] bg-[#F5841F]/20 blur-[120px] rounded-full mix-blend-multiply" />
+        <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] bg-[#F5841F]/15 blur-[120px] rounded-full mix-blend-multiply" />
+        <div className="absolute top-[20%] -right-[10%] w-[60vw] h-[60vw] bg-[#3AADE0]/10 blur-[150px] rounded-full mix-blend-multiply" />
       </div>
 
-      <div className="relative z-10 pt-24 pb-0">
+      <div className="relative z-[1] flex-1 flex flex-col">
         
-        {/* Section 1: Division Header & Intro */}
-        <div className="px-6 mb-32">
-          <div className="relative w-full max-w-[1200px] mx-auto min-h-[60vh] rounded-[48px] overflow-hidden flex items-center justify-center shadow-sm border border-black/5 mt-8 group bg-white/40 backdrop-blur-xl">
-            {/* Added Hero Image blending gracefully without black borders */}
-            <div className="absolute inset-0 w-full h-full p-6">
-              <ImageWithFallback src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1600&q=80" alt="Management & Consultancy" className="w-full h-full object-cover rounded-[32px] opacity-20 transition-transform duration-[2s] group-hover:scale-[1.03]" />
-            </div>
-            
-            <div className="relative z-10 bg-white/90 backdrop-blur-2xl max-w-[900px] w-[90%] p-10 md:p-16 rounded-[40px] text-center border border-white/40 shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
-              <div className="inline-flex items-center gap-3 mb-6">
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Specialized Division</span>
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-</div>
-              <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[52px] leading-[1.1] tracking-tight mb-8 text-[#1a1a1a]">
-                Management & Consultancy:<br/>Driving Operational Excellence
-              </h1>
-              <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-[1.8] font-medium max-w-[800px] mx-auto">
-                We operate as strategic partners in your business success. Anchored in 13+ years of global experience, we provide end-to-end management solutions that transition F&B and hospitality ventures from operational challenges to sustained profitability. We repair weak spots and elevate strengths through rigorous analysis.
-              </p>
-            </div>
+        {/* --- 1. COMPACT HERO SECTION --- */}
+        <div className="pt-24 pb-12 px-6 max-w-[800px] mx-auto text-center">
+          <div className="inline-flex items-center gap-3 mb-6">
+            <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
+            <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/50">Division</span>
+            <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
           </div>
+          <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[48px] text-[#1a1a1a] mb-4 leading-[1.1] tracking-tight">
+            Management Services
+          </h1>
+          <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-[1.7]">
+            Operational excellence tailored to your specific needs. Tell us where you are in your journey so we can provide the right support.
+          </p>
         </div>
 
-        {/* Section 2: Strategic Core Competencies (The 5 Pillars) */}
-        <div className="max-w-[1200px] mx-auto mb-32 px-6">
-          <div className="text-center mb-16 md:mb-20">
-            <div className="inline-flex items-center gap-3 mb-6">
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">Competencies</span>
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-</div>
-            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] tracking-tight text-[#1a1a1a]">Strategic Core Competencies</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {competencies.map((item, i) => (
-              <div key={i} className="relative overflow-hidden bg-white p-8 md:p-10 rounded-[40px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.03)] border border-white hover:-translate-y-2 transition-transform duration-500 flex flex-col group">
+        {/* --- 2. INTERACTIVE SELECTION SECTION --- */}
+        <div className="max-w-[900px] mx-auto px-6 w-full mb-20 flex-1">
+          {/* Two Main Options */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            {/* Option 1: New Business */}
+            <button 
+              type="button"
+              onClick={() => setBusinessStage('new')}
+              className={`p-8 rounded-[32px] border transition-all duration-300 text-left group ${
+                businessStage === 'new' 
+                  ? 'bg-white border-[#F5841F] shadow-[0_20px_40px_-15px_rgba(245,132,31,0.2)] ring-2 ring-[#F5841F]/20' 
+                  : 'bg-white/60 border-white/60 hover:bg-white hover:shadow-[0_15px_30px_-15px_rgba(0,0,0,0.1)]'
+              }`}
+            >
+              <div className="w-12 h-12 rounded-2xl bg-[#F5841F]/15 flex items-center justify-center mb-6">
+                <Rocket size={24} className="text-[#F5841F]" />
+              </div>
+              <h3 className="font-['Plus_Jakarta_Sans'] text-[20px] font-extrabold text-[#1a1a1a] mb-2">New Business</h3>
+              <p className="font-['Plus_Jakarta_Sans'] text-[14px] text-[#1a1a1a]/60 font-medium">I am starting a new venture and need foundational setup and strategy.</p>
+            </button>
 
-                
-                <div className="relative z-10 text-center flex flex-col items-center">
-                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm bg-white" style={{ color: item.color }}>
-                    <item.icon size={28} />
+            {/* Option 2: Existing Business */}
+            <button 
+              type="button"
+              onClick={() => setBusinessStage('existing')}
+              className={`p-8 rounded-[32px] border transition-all duration-300 text-left group ${
+                businessStage === 'existing' 
+                  ? 'bg-white border-[#E91E8C] shadow-[0_20px_40px_-15px_rgba(233,30,140,0.2)] ring-2 ring-[#E91E8C]/20' 
+                  : 'bg-white/60 border-white/60 hover:bg-white hover:shadow-[0_15px_30px_-15px_rgba(0,0,0,0.1)]'
+              }`}
+            >
+              <div className="w-12 h-12 rounded-2xl bg-[#E91E8C]/15 flex items-center justify-center mb-6">
+                <Building2 size={24} className="text-[#E91E8C]" />
+              </div>
+              <h3 className="font-['Plus_Jakarta_Sans'] text-[20px] font-extrabold text-[#1a1a1a] mb-2">Existing Business</h3>
+              <p className="font-['Plus_Jakarta_Sans'] text-[14px] text-[#1a1a1a]/60 font-medium">I have an established business and need operational improvements or restructuring.</p>
+            </button>
+          </div>
+
+          {/* Dynamic Forms based on selection */}
+          <div ref={formRef} className="transition-all duration-500 ease-in-out">
+            {businessStage === 'new' && (
+              <div className="bg-white p-8 md:p-10 rounded-[32px] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.1)] border border-white/80 animate-in fade-in slide-in-from-bottom-4">
+                <h4 className="font-['Plus_Jakarta_Sans'] text-[24px] font-extrabold text-[#1a1a1a] mb-6">Start Your Journey</h4>
+                <div className="flex flex-col gap-6">
+                  <div>
+                    <label className="block font-['Plus_Jakarta_Sans'] text-[13px] font-bold uppercase tracking-wider text-[#1a1a1a]/60 mb-3">Specify Your Sector</label>
+                    <select 
+                      value={sector}
+                      onChange={(e) => {
+                        setSector(e.target.value);
+                        if (e.target.value !== 'other') setOtherSector(''); // Clear input if changed
+                      }}
+                      className="w-full bg-[#FAF7F2] border-none rounded-2xl px-6 py-4 font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a] focus:ring-2 focus:ring-[#F5841F]/30 outline-none transition-shadow appearance-none cursor-pointer"
+                    >
+                      <option value="" disabled>Select a sector...</option>
+                      <option value="food_beverage">Food & Beverage (Restaurant, Cafe, Bar)</option>
+                      <option value="hotel_resort">Hotels & Resorts</option>
+                      <option value="event_venue">Event Venue</option>
+                      <option value="other">Other</option>
+                    </select>
                   </div>
-                  <h3 className="font-['Plus_Jakarta_Sans'] font-bold text-[18px] text-[#1a1a1a] mb-3 leading-[1.3] tracking-tight">{item.title}</h3>
-                  <p className="font-['Plus_Jakarta_Sans'] text-[14px] leading-[1.6] text-[#1a1a1a]/70 font-medium">{item.text}</p>
+
+                  {/* Conditional "Other" Input for Sector */}
+                  {sector === 'other' && (
+                    <div className="animate-in fade-in slide-in-from-top-2">
+                      <label className="block font-['Plus_Jakarta_Sans'] text-[13px] font-bold uppercase tracking-wider text-[#1a1a1a]/60 mb-3">Please specify</label>
+                      <input 
+                        type="text"
+                        value={otherSector}
+                        onChange={(e) => setOtherSector(e.target.value)}
+                        placeholder="Type your sector here..."
+                        className="w-full bg-[#FAF7F2] border-none rounded-2xl px-6 py-4 font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a] focus:ring-2 focus:ring-[#F5841F]/30 outline-none transition-shadow"
+                      />
+                    </div>
+                  )}
+
+                  <button 
+                    type="button"
+                    disabled={!sector || (sector === 'other' && !otherSector.trim())}
+                    className="mt-4 inline-flex items-center justify-center gap-2 font-['Plus_Jakarta_Sans'] text-[15px] font-bold text-white px-8 py-4 rounded-full transition-all duration-300 hover:scale-[1.02] shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed w-full md:w-auto self-start" 
+                    style={{ background: C_ORANGE }}
+                  >
+                    Schedule a Meeting <Calendar size={18} />
+                  </button>
                 </div>
               </div>
-            ))}
+            )}
+
+            {businessStage === 'existing' && (
+              <div className="bg-white p-8 md:p-10 rounded-[32px] shadow-[0_20px_50px_-20px_rgba(0,0,0,0.1)] border border-white/80 animate-in fade-in slide-in-from-bottom-4">
+                <h4 className="font-['Plus_Jakarta_Sans'] text-[24px] font-extrabold text-[#1a1a1a] mb-6">Optimize Your Operations</h4>
+                <div className="flex flex-col gap-6">
+                  <div>
+                    <label className="block font-['Plus_Jakarta_Sans'] text-[13px] font-bold uppercase tracking-wider text-[#1a1a1a]/60 mb-3">What service do you need?</label>
+                    <select 
+                      value={serviceNeeded}
+                      onChange={(e) => {
+                        setServiceNeeded(e.target.value);
+                        if (e.target.value !== 'other') setOtherService(''); // Clear input if changed
+                      }}
+                      className="w-full bg-[#FAF7F2] border-none rounded-2xl px-6 py-4 font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a] focus:ring-2 focus:ring-[#E91E8C]/30 outline-none transition-shadow appearance-none cursor-pointer"
+                    >
+                      <option value="" disabled>Select a required service...</option>
+                      <option value="operational_audit">Operational Audit & Restructuring</option>
+                      <option value="menu_engineering">Menu Engineering & Profitability</option>
+                      <option value="staff_training">Staff Training & Development</option>
+                      <option value="concept_revamp">Concept Revamp</option>
+                      <option value="other">Other specific requirement</option>
+                    </select>
+                  </div>
+
+                  {/* Conditional "Other" Input for Service */}
+                  {serviceNeeded === 'other' && (
+                    <div className="animate-in fade-in slide-in-from-top-2">
+                      <label className="block font-['Plus_Jakarta_Sans'] text-[13px] font-bold uppercase tracking-wider text-[#1a1a1a]/60 mb-3">Please specify</label>
+                      <input 
+                        type="text"
+                        value={otherService}
+                        onChange={(e) => setOtherService(e.target.value)}
+                        placeholder="Describe the service you need..."
+                        className="w-full bg-[#FAF7F2] border-none rounded-2xl px-6 py-4 font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a] focus:ring-2 focus:ring-[#E91E8C]/30 outline-none transition-shadow"
+                      />
+                    </div>
+                  )}
+
+                  <button 
+                    type="button"
+                    disabled={!serviceNeeded || (serviceNeeded === 'other' && !otherService.trim())}
+                    className="mt-4 inline-flex items-center justify-center gap-2 font-['Plus_Jakarta_Sans'] text-[15px] font-bold text-white px-8 py-4 rounded-full transition-all duration-300 hover:scale-[1.02] shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed w-full md:w-auto self-start" 
+                    style={{ background: C_PINK }}
+                  >
+                    Request Service <ArrowRight size={18} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Section 3: Why Partner With Us? (Footer CTA) */}
-        <div className="w-full bg-[#111111] py-24 md:py-32 px-6 relative overflow-hidden">
-          <div className="absolute top-[-50%] left-[-10%] w-[500px] h-[500px] bg-[#F5841F]/20 blur-[150px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-[-50%] right-[-10%] w-[500px] h-[500px] bg-[#E91E8C]/15 blur-[150px] rounded-full pointer-events-none" />
+        {/* --- 3. AMBIENT BOTTOM CALL-TO-ACTION --- */}
+        <div className="w-full py-16 md:py-24 px-6 relative overflow-hidden mt-auto">
+          {/* Ambient Glows for Light Footer */}
+          <div className="absolute top-[-50%] left-[0%] w-[500px] h-[500px] bg-[#F5841F]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
+          <div className="absolute bottom-[-50%] right-[0%] w-[500px] h-[500px] bg-[#E91E8C]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
           
-          <div className="relative z-10 max-w-[800px] mx-auto text-center">
-            <div className="inline-flex items-center gap-3 mb-6">
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-  <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-white/70">Why Partner With Us?</span>
-  <div className="h-px w-8 md:w-12" style={{background:GRAD_FRIEND}}/>
-</div>
-            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[56px] text-white mb-6 tracking-tight leading-[1.1]">
-              Practical, Sustainable, and Scalable Solutions
+          <div className="relative z-[1] max-w-[800px] mx-auto text-center bg-white/60 backdrop-blur-xl p-10 md:p-16 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)] border border-white">
+            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[28px] md:text-[40px] text-[#1a1a1a] mb-6 tracking-tight leading-[1.1]">
+              Not sure where to start?
             </h2>
-            <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-white/70 leading-[1.8] font-medium max-w-[600px] mx-auto mb-10">
-              Founded on the 'been there, done that' philosophy, we combine academic rigor with hands-on operational experience. Let us supply the strategic plans necessary to achieve industry-leading results.
+            <p className="font-['Plus_Jakarta_Sans'] text-[15px] md:text-[16px] text-[#1a1a1a]/70 mb-8 max-w-[500px] mx-auto leading-relaxed">
+              Reach out directly to our management consulting team to discuss a custom approach for your hospitality venue.
             </p>
-            <button onClick={() => go("contact")} className="inline-flex items-center gap-3 font-['Plus_Jakarta_Sans'] text-[15px] font-bold text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(245,132,31,0.5)] group" style={{ background: C_ORANGE }}>
-              Contact Us <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            <button type="button" onClick={() => go("contact")} className="inline-flex items-center gap-3 font-['Plus_Jakarta_Sans'] text-[15px] font-bold text-white px-10 py-4 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(58,173,224,0.4)] group" style={{ background: C_BLUE }}>
+              Contact Our Team <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
         </div>
@@ -1819,8 +1959,6 @@ function ManagementPage({ go }: { go: (p: Page) => void }) {
     </div>
   );
 }
-
-
 function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", company: "", service: "", message: "" });
   const [sent, setSent] = useState(false);
@@ -1830,8 +1968,8 @@ function ContactPage() {
       <div className="max-w-[1200px] mx-auto px-8 py-20">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_500px] gap-16 items-start">
           <div>
-            <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[#1a1a1a] mb-6" style={{ fontSize: "clamp(40px, 6vw, 72px)" }}>Let's build something great.</h1>
-            <p className="font-['Plus_Jakarta_Sans'] text-[17px] text-[#1a1a1a]/55 leading-[1.8] mb-10 max-w-md">Whether you have a clear brief or just a big ambition — reach out. We'll schedule a free 30-minute discovery call.</p>
+            <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[#1a1a1a] mb-6" style={{ fontSize: "clamp(40px, 6vw,50px)" }}>Let's build something great.</h1>
+            <p className="font-['Plus_Jakarta_Sans'] text-[17px] text-[#1a1a1a]/55 leading-[1.8] mb-10 max-w-md">Whether you have a clear brief or just a big ambition — reach out.</p>
             <div className="space-y-5">
               {[{ Icon: Mail, text: "hello@harmonyclubhouse.com" }, { Icon: Phone, text: "+20 100 000 0000" }, { Icon: MapPin, text: "Cairo, Egypt — 4 Continents" }].map(({ Icon, text }) => (
                 <div key={text} className="flex items-center gap-4">
@@ -1872,7 +2010,7 @@ function ContactPage() {
                     <select value={form.service} onChange={(e) => setForm({ ...form, service: e.target.value })}
                       className="w-full font-['Plus_Jakarta_Sans'] text-[14px] text-[#1a1a1a] bg-[#FAF7F2] border border-black/[0.08] rounded-xl px-4 py-3 outline-none focus:border-black/25 transition-colors appearance-none cursor-pointer">
                       <option value="">Select a service</option>
-                      {["Management & Consultancy", "Events", "Marketing", "Recruitment & Training", "Not sure yet"].map((s) => <option key={s} value={s}>{s}</option>)}
+                      {["Business Developement", "Events & Catering", "Marketing", "Recruitment & Training", "Not sure yet"].map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                     <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#1a1a1a]/30 pointer-events-none" />
                   </div>
@@ -1910,7 +2048,7 @@ const FOOTER_SOCIAL_ICONS = [
 
 const FOOTER_SERVICES = [
   { id: "management", color: "#F5841F", label: "Management", features: ["Pre-opening planning & setup", "Operations audit & restructuring", "Menu engineering", "P&L optimization"] },
-  { id: "events", color: "#E91E8C", label: "Events", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & décor coordination", "Guest management"] },
+  { id: "events", color: "#E91E8C", label: "Events & Catering", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & décor coordination", "Guest management"] },
   { id: "marketing", color: "#3AADE0", label: "Marketing", features: ["Brand identity & positioning", "Social media strategy", "Influencer & PR campaigns", "Photography direction"] },
   { id: "recruitment", color: "#78BE1F", label: "Recruitment", features: ["Executive placement", "Chef & culinary sourcing", "FOH & BOH recruitment", "Event & seasonal staffing"] }
 ];
@@ -2009,7 +2147,6 @@ export default function App() {
       {page === "marketing" && <MarketingPage go={go} />}
       {page === "events" && <EventsPage go={go} />}
       {page === "management" && <ManagementPage go={go} />}
-      {page === "contact" && <ContactPage />}
       {page === "login" && <LoginPage />}
       {page === "contact" && <ContactPage />}
     </div>
