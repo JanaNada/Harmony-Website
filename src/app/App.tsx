@@ -42,7 +42,7 @@ const divFnbImg = "/imports/image-16.png";
 const divCateringImg = "/imports/image-17.png";
 const teamImg = "/imports/image-18.png";
 
-type Page = "home" | "services" | "stories" | "about" | "mission" | "fnb" | "catering" | "recruitment" | "marketing" | "events" | "management" | "contact";
+type Page = "home" | "services" | "stories" | "about" | "mission" | "fnb" | "catering" | "recruitment" | "marketing" | "events" | "management" | "contact" | "login";
 
 const C_ORANGE = "#F5841F";
 const C_PINK = "#E91E8C";
@@ -2147,7 +2147,7 @@ export default function App() {
       {page === "marketing" && <MarketingPage go={go} />}
       {page === "events" && <EventsPage go={go} />}
       {page === "management" && <ManagementPage go={go} />}
-      {page === "login" && <LoginPage />}
+      {page === "login" && <LoginPage go={go} />}
       {page === "contact" && <ContactPage />}
     </div>
   );
