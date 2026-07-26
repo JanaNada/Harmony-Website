@@ -62,7 +62,6 @@ const C = {
 };
 const GRAD = `linear-gradient(90deg,${C.management},${C.events},${C.marketing},${C.recruitment})`;
 
-
 function HeroCircle({ go }: { go: (p: Page) => void }) {
   return (
     <div className="flex justify-center">
@@ -194,39 +193,131 @@ function Nav({ current, go }: { current: Page; go: (p: Page) => void }) {
 // ─── Home Page (single-screen) ────────────────────────────────────────────────
 function HomePage({ go }: { go: (p: Page) => void }) {
   return (
-    <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative">
-      {/* Hero Section */}
-      <section id="hero" className="min-h-screen flex items-center justify-center p-6 pt-24 relative z-10">
-        <div className="max-w-7xl w-full grid lg:grid-cols-2 gap-16 items-center">
+    <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-[#FAF7F2] relative selection:bg-[#F5841F]/20">
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-15px) scale(1.02); }
+        }
+        @keyframes drift {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(25px, 25px); }
+        }
+        @keyframes drift-reverse {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(-25px, -25px); }
+        }
+        .animate-float { animation: float 7s ease-in-out infinite; }
+        .animate-drift { animation: drift 12s ease-in-out infinite; }
+        .animate-drift-reverse { animation: drift-reverse 15s ease-in-out infinite; }
+      `}</style>
+
+      {/* Soft Colorful Ambient Backgrounds - Now Animated */}
+      <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] bg-[#F5841F]/20 blur-[120px] rounded-full mix-blend-multiply animate-drift" />
+        <div className="absolute top-[20%] -right-[10%] w-[60vw] h-[60vw] bg-[#3AADE0]/15 blur-[150px] rounded-full mix-blend-multiply animate-drift-reverse" />
+        <div className="absolute bottom-[-10%] left-[20%] w-[50vw] h-[50vw] bg-[#E91E8C]/20 blur-[120px] rounded-full mix-blend-multiply animate-float" />
+      </div>
+
+      <div className="relative z-10 pb-32">
+        {/* ── Hero ──────────────────────────────────────────────────────────── */}
+        <div className="flex flex-col items-center pt-16 pb-24 md:pb-32 px-4 relative">
           
-          {/* Left: Text Content */}
-          <div className="space-y-8 text-center lg:text-left">
-            <span className="inline-block px-4 py-1 rounded-full bg-[#F5841F]/10 text-[#F5841F] text-[11px] font-bold uppercase tracking-[0.2em]">
-              ESTABLISHED 2012 · CAIRO, EGYPT
-            </span>
-            <h1 className="text-6xl md:text-7xl font-black text-gray-900 leading-[1.05]" style={{fontFamily:"'Montserrat',sans-serif"}}>
-              Where Hospitality<br />
-              <span style={{backgroundImage:GRAD, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent"}}>Meets Excellence.</span>
+          <style>{`
+            @keyframes fade-in-up {
+              0% { opacity: 0; transform: translateY(20px); }
+              100% { opacity: 1; transform: translateY(0); }
+            }
+            .animate-fade-in-up {
+              animation: fade-in-up 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            }
+          `}</style>
+
+          {/* Logo - Cleaner presentation, slightly larger, no 'mushy' glow */}
+          <div className="w-full max-w-[1200px] flex justify-center mb-10 hover:scale-[1.02] transition-transform duration-700 ease-out cursor-default opacity-0 animate-fade-in-up z-10">
+            <ImageWithFallback
+              src={logoImg}
+              alt="Harmony Club House"
+              className="object-contain w-full h-auto drop-shadow-[0_15px_35px_rgba(0,0,0,0.15)] filter brightness-105"
+            />
+          </div>
+
+          {/* Decorative Divider */}
+          <div className="w-12 h-1 rounded-full mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '150ms', backgroundImage: `linear-gradient(90deg, ${C_ORANGE}, ${C_PINK})` }} />
+
+          {/* Headline */}
+          <div className="text-center max-w-[920px] px-6 opacity-0 animate-fade-in-up z-10" style={{ animationDelay: '300ms' }}>
+            <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[#1a1a1a] leading-[1.15] tracking-tight mb-8 text-[34px] md:text-[44px]">
+              Elevating hospitality through expert <span className="text-transparent bg-clip-text relative inline-block group cursor-default" style={{ backgroundImage: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}>management
+                <span className="absolute -bottom-1 left-0 w-full h-[3px] rounded-full bg-gradient-to-r from-[#F5841F] to-[#E91E8C] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+              </span>, curated <span style={{ color: C_PINK }}>events</span>, strategic <span style={{ color: C_BLUE }}>marketing</span>, and top-tier <span style={{ color: C_GREEN }}>recruitment</span>.
             </h1>
-            <p className="text-lg text-gray-500 font-light leading-relaxed max-w-md mx-auto lg:mx-0">
-              Delivering management, events, marketing, and recruitment solutions under one harmonious ecosystem — with 13 years of international experience across four continents.
+            <p className="font-['Plus_Jakarta_Sans'] text-center text-[#1a1a1a]/70 max-w-[650px] mx-auto font-medium leading-[1.8] text-[16px] md:text-[18px]">
+              We bridge the gap between ambition and operational reality, transforming concepts into industry-leading destinations.
             </p>
-            <div className="flex gap-4 justify-center lg:justify-start">
-              <button onClick={() => go("services")} className="px-8 py-4 rounded-full font-bold text-sm text-white transition-all hover:shadow-lg" style={{background:C.management}}>
-                Explore Services
-              </button>
-              <button onClick={() => go("contact")} className="px-8 py-4 rounded-full font-bold text-sm border-2 border-gray-200 text-gray-700 hover:border-gray-800">
-                Contact Us
+          </div>
+        </div>
+
+        {/* ── Welcome Section ───────────────────────────────────────────────── */}
+        <div className="max-w-[1200px] w-full mx-auto px-6 mb-32 md:mb-48">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            
+            {/* Visual Side */}
+            <div className="relative order-2 lg:order-1 group">
+               <div className="absolute -inset-4 bg-gradient-to-r from-[#F5841F]/40 via-[#E91E8C]/30 to-[#3AADE0]/40 blur-[60px] rounded-[60px] opacity-40 group-hover:opacity-70 transition-opacity duration-700 animate-pulse" />
+               <div className="relative bg-white/70 backdrop-blur-3xl rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.15)] border border-white overflow-hidden transition-transform duration-1000 group-hover:-translate-y-2">
+                
+                <div className="aspect-[4/3] w-full relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[#1a1a1a]/5 mix-blend-overlay z-10 group-hover:opacity-0 transition-opacity duration-700" />
+                  <ImageWithFallback 
+                    src={welcomeImg} 
+                    alt="Hospitality Interior" 
+                    className="w-full h-full object-cover transition-transform duration-[2s] group-hover:scale-110"
+                  />
+                </div>
+                
+                {/* Floating circular badge */}
+                <div className="absolute bottom-6 right-6 w-28 h-28 md:w-32 md:h-32 bg-white/95 backdrop-blur-xl rounded-full p-2.5 shadow-2xl shadow-black/10 flex items-center justify-center border-2 border-white animate-float">
+                  <div className="w-full h-full rounded-full border-2 border-dashed border-[#1a1a1a]/15 flex flex-col items-center justify-center font-['Plus_Jakarta_Sans'] text-[#1a1a1a] group-hover:border-[#F5841F]/40 transition-colors duration-500">
+                    <span className="text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50 mb-0.5">Est.</span>
+                    <span className="text-[18px] md:text-[22px] font-black bg-clip-text text-transparent bg-gradient-to-r from-[#1a1a1a] to-[#1a1a1a] group-hover:from-[#F5841F] group-hover:to-[#E91E8C] transition-all duration-500">2013</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Text Side */}
+            <div className="order-1 lg:order-2 text-center lg:text-left">
+              <div className="inline-flex items-center gap-4 mb-8">
+                <div className="h-px w-10 md:w-16" style={{background:GRAD}}/>
+                <span className="font-['Plus_Jakarta_Sans'] text-[12px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/50">Welcome</span>
+                <div className="h-px w-10 md:w-16" style={{background:GRAD}}/>
+              </div>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-black text-[40px] md:text-[52px] text-[#1a1a1a] mb-8 leading-[1.1] tracking-tight">
+                Welcome to <br className="hidden lg:block"/>
+                <span className="text-transparent bg-clip-text" style={{ backgroundImage: GRAD }}>Harmony Club House</span>
+              </h2>
+              <p className="font-['Plus_Jakarta_Sans'] text-[17px] md:text-[19px] text-[#1a1a1a]/70 leading-[1.8] font-medium mb-10">
+                We are a premium hospitality consultancy dedicated to elevating brand experiences. With over 13 years of industry obsession, we provide hands-on leadership, strategic direction, and creative execution to hospitality businesses worldwide.
+              </p>
+              
+              {/* Call to action */}
+              <button 
+                onClick={() => go("about")}
+                className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white rounded-full overflow-hidden transition-transform duration-300 hover:scale-105 active:scale-95 shadow-[0_15px_30px_-10px_rgba(245,132,31,0.4)]"
+              >
+                <div className="absolute inset-0 w-full h-full" style={{background:GRAD}} />
+                <div className="absolute inset-0 w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{background: `linear-gradient(90deg, ${C.events}, ${C.management}, ${C.marketing})`}} />
+                <span className="relative font-['Plus_Jakarta_Sans'] text-[15px] tracking-wide">Discover Our Story</span>
+                <svg className="w-5 h-5 ml-2 relative group-hover:translate-x-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
               </button>
             </div>
           </div>
-
-          {/* Right: Quadrant Circle */}
-          <HeroCircle go={go} />
         </div>
-      </section>
 
-      {/* The Footer with the colorful bar */}
+      </div>
       <Footer />
     </div>
   );
@@ -2055,7 +2146,7 @@ const FOOTER_SERVICES = [
 
 function Footer() {
   return (
-    <footer className="relative bg-[#FAF7F2] border-t border-gray-100 w-full overflow-hidden">
+    <footer className="relative bg-[#FAF7F2] border-t border-gray-100 w-full overflow-hidden shrink-0">
       
       {/* Soft Ambient Background matching the screenshot */}
       <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
