@@ -1,0 +1,416 @@
+"use client";
+
+import { useState } from "react";
+import {
+  ArrowRight, ArrowLeft, Check, CheckCircle2, X, CalendarDays,
+} from "lucide-react";
+import { useBrief } from "@/state/BriefContext";
+import {
+  findModule, SERVICE_BY_ID, SERVICES,
+  C_ORANGE, C_PINK, C_GREEN,
+  type GapQuestion,
+} from "@/content/services";
+
+type Answers = Record<string, string>;
+
+/* Three steps, in this order on purpose: the visitor confirms what they picked,
+   answers only the questions their picks left open, and gives contact details
+   last — asking for a name first is the biggest drop-off point. */
+
+export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
+  const { selected, count, toggle, activeServices, clear } = useBrief();
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<Answers>({});
+  const [contact, setContact] = useState({
+    name: "", email: "", phone: "", company: "", note: "", when: "",
+  });
+  const [sent, setSent] = useState(false);
+
+  const set = (id: string, v: string) => setAnswers((a) => ({ ...a, [id]: v }));
+
+  // Only ask about services they actually selected. Nothing chosen → skip
+  // straight to contact, so "just talk to someone" stays a two-click path.
+  const questionServices = activeServices;
+  const steps = count > 0 ? ["Your brief", "A few details", "Your contact"] : ["Your contact"];
+  const lastStep = steps.length - 1;
+
+  const requiredMissing = questionServices
+    .flatMap((sid) => SERVICE_BY_ID[sid].questions.filter((q) => q.required))
+    .some((q) => !answers[q.id]);
+
+  const canSubmit = contact.name.trim() && contact.email.trim() && !requiredMissing;
+
+  if (sent) {
+    return (
+      <div className="flex-1 overflow-y-auto bg-[#FAF7F2] flex items-center justify-center px-6 py-24">
+        <div className="max-w-[560px] w-full text-center bg-white rounded-[40px] p-12 md:p-16 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.12)] border border-black/[0.05]">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-7"
+            style={{ background: `${C_GREEN}18` }}
+          >
+            <CheckCircle2 size={30} style={{ color: C_GREEN }} />
+          </div>
+          <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[30px] md:text-[36px] text-[#1a1a1a] mb-4 tracking-tight leading-[1.15]">
+            Your brief is with us.
+          </h1>
+          <p className="font-['Plus_Jakarta_Sans'] text-[16px] text-[#1a1a1a]/55 leading-[1.75] font-medium mb-9">
+            We'll come back within 24 hours with a time and the right person from the
+            team — someone who actually works on what you picked.
+          </p>
+          <button
+            onClick={() => { clear(); setSent(false); setStep(0); onBrowse(); }}
+            className="font-['Plus_Jakarta_Sans'] text-[14.5px] font-bold text-[#1a1a1a]/50 hover:text-[#1a1a1a] transition-colors"
+          >
+            Back to the site
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-[10%] -left-[10%] w-[45vw] h-[45vw] bg-[#F5841F]/12 blur-[130px] rounded-full mix-blend-multiply" />
+        <div className="absolute bottom-[-10%] right-[0%] w-[50vw] h-[50vw] bg-[#E91E8C]/12 blur-[140px] rounded-full mix-blend-multiply" />
+      </div>
+
+      <div className="relative z-10 max-w-[820px] mx-auto px-6 pt-16 md:pt-20 pb-32">
+        <div className="text-center mb-12">
+          <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[34px] md:text-[46px] tracking-tight leading-[1.1] mb-4">
+            Book your appointment
+          </h1>
+          <p className="font-['Plus_Jakarta_Sans'] text-[16px] text-[#1a1a1a]/55 font-medium leading-[1.7]">
+            No cost, no commitment. We just need enough to bring the right person.
+          </p>
+        </div>
+
+        {/* Step rail */}
+        <div className="flex items-center justify-center gap-2 mb-12">
+          {steps.map((label, i) => (
+            <div key={label} className="flex items-center gap-2">
+              <div
+                className={`flex items-center gap-2.5 px-4 py-2 rounded-full transition-all duration-300 ${
+                  i === step ? "bg-white shadow-sm" : ""
+                }`}
+              >
+                <span
+                  className={`w-6 h-6 rounded-full flex items-center justify-center font-['Plus_Jakarta_Sans'] text-[11px] font-extrabold transition-colors ${
+                    i < step ? "text-white" : i === step ? "text-white" : "bg-black/[0.06] text-[#1a1a1a]/35"
+                  }`}
+                  style={i <= step ? { background: i < step ? C_GREEN : C_ORANGE } : undefined}
+                >
+                  {i < step ? <Check size={12} strokeWidth={3} /> : i + 1}
+                </span>
+                <span
+                  className={`font-['Plus_Jakarta_Sans'] text-[12.5px] font-bold hidden sm:block ${
+                    i === step ? "text-[#1a1a1a]" : "text-[#1a1a1a]/35"
+                  }`}
+                >
+                  {label}
+                </span>
+              </div>
+              {i < steps.length - 1 && <span className="w-6 h-px bg-black/10" />}
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-white rounded-[36px] p-8 md:p-12 shadow-[0_25px_60px_-25px_rgba(0,0,0,0.12)] border border-black/[0.05]">
+          {/* ── Step 1: confirm the brief ─────────────────────────────── */}
+          {count > 0 && step === 0 && (
+            <div>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[24px] md:text-[28px] mb-2.5 tracking-tight">
+                Here's what you picked
+              </h2>
+              <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/50 font-medium leading-[1.7] mb-8">
+                Remove anything that doesn't belong, or{" "}
+                <button
+                  onClick={onBrowse}
+                  className="font-bold underline underline-offset-2 hover:text-[#1a1a1a] transition-colors"
+                >
+                  keep browsing
+                </button>{" "}
+                to add more.
+              </p>
+
+              <div className="flex flex-col gap-6">
+                {activeServices.map((sid) => {
+                  const svc = SERVICE_BY_ID[sid];
+                  return (
+                    <div key={sid}>
+                      <div className="flex items-center gap-2.5 mb-3">
+                        <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: svc.dim, color: svc.color }}>
+                          <svc.icon size={15} />
+                        </span>
+                        <span className="font-['Plus_Jakarta_Sans'] text-[14px] font-extrabold text-[#1a1a1a]">
+                          {svc.label}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2 pl-1">
+                        {selected
+                          .filter((id) => findModule(id)?.serviceId === sid)
+                          .map((id) => {
+                            const mod = findModule(id);
+                            if (!mod) return null;
+                            return (
+                              <button
+                                key={id}
+                                onClick={() => toggle(id)}
+                                className="group inline-flex items-center gap-2 pl-3.5 pr-2.5 py-2 rounded-full border transition-colors"
+                                style={{ background: svc.dim, borderColor: `${svc.color}30` }}
+                              >
+                                <span className="font-['Plus_Jakarta_Sans'] text-[13px] font-bold text-[#1a1a1a]/80">
+                                  {mod.label}
+                                </span>
+                                <X size={14} className="text-[#1a1a1a]/30 group-hover:text-[#1a1a1a]/70 transition-colors" />
+                              </button>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── Step 2: gap questions ─────────────────────────────────── */}
+          {count > 0 && step === 1 && (
+            <div>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[24px] md:text-[28px] mb-2.5 tracking-tight">
+                A few details
+              </h2>
+              <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/50 font-medium leading-[1.7] mb-9">
+                Only what your selection doesn't already tell us.
+              </p>
+
+              <div className="flex flex-col gap-10">
+                {questionServices.map((sid) => {
+                  const svc = SERVICE_BY_ID[sid];
+                  return (
+                    <div key={sid}>
+                      <div className="flex items-center gap-2.5 mb-6">
+                        <span className="h-px w-6" style={{ background: svc.color }} />
+                        <span
+                          className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-[0.14em]"
+                          style={{ color: svc.color }}
+                        >
+                          {svc.label}
+                        </span>
+                      </div>
+                      <div className="flex flex-col gap-6">
+                        {svc.questions.map((q) => (
+                          <Question
+                            key={q.id}
+                            q={q}
+                            value={answers[q.id] ?? ""}
+                            onChange={(v) => set(q.id, v)}
+                            color={svc.color}
+                            dim={svc.dim}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* ── Final: contact ────────────────────────────────────────── */}
+          {step === lastStep && (
+            <div>
+              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[24px] md:text-[28px] mb-2.5 tracking-tight">
+                How do we reach you?
+              </h2>
+              <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/50 font-medium leading-[1.7] mb-9">
+                {count > 0
+                  ? "Last step — then we'll confirm a time."
+                  : "Tell us roughly what you're after and we'll work out the rest together."}
+              </p>
+
+              <div className="flex flex-col gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <Field label="Your name" required value={contact.name} onChange={(v) => setContact({ ...contact, name: v })} placeholder="Ahmed Hassan" />
+                  <Field label="Email" required type="email" value={contact.email} onChange={(v) => setContact({ ...contact, email: v })} placeholder="ahmed@brand.com" />
+                  <Field label="Phone" value={contact.phone} onChange={(v) => setContact({ ...contact, phone: v })} placeholder="+20 100 000 0000" />
+                  <Field label="Company or brand" value={contact.company} onChange={(v) => setContact({ ...contact, company: v })} placeholder="Optional" />
+                </div>
+
+                <div>
+                  <Label>When suits you?</Label>
+                  <div className="flex flex-wrap gap-2.5">
+                    {["This week", "Next week", "Later this month", "I'm flexible"].map((w) => (
+                      <Chip key={w} on={contact.when === w} onClick={() => setContact({ ...contact, when: w })} color={C_ORANGE}>
+                        {w}
+                      </Chip>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Anything else we should know?</Label>
+                  <textarea
+                    rows={4}
+                    value={contact.note}
+                    onChange={(e) => setContact({ ...contact, note: e.target.value })}
+                    placeholder={count > 0 ? "Optional" : "What are you trying to do?"}
+                    className="w-full font-['Plus_Jakarta_Sans'] text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-4 outline-none focus:border-black/25 transition-colors resize-none placeholder:text-[#1a1a1a]/25"
+                  />
+                </div>
+              </div>
+
+              {requiredMissing && (
+                <p className="mt-5 font-['Plus_Jakarta_Sans'] text-[13.5px] font-semibold text-[#E91E8C]">
+                  Some details are still missing — go back one step.
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* ── Nav ───────────────────────────────────────────────────── */}
+          <div className="flex items-center justify-between gap-4 mt-10 pt-8 border-t border-black/[0.06]">
+            {step > 0 ? (
+              <button
+                onClick={() => setStep((s) => s - 1)}
+                className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[14px] font-bold text-[#1a1a1a]/45 hover:text-[#1a1a1a] transition-colors"
+              >
+                <ArrowLeft size={16} /> Back
+              </button>
+            ) : (
+              <span />
+            )}
+
+            {step < lastStep ? (
+              <button
+                onClick={() => setStep((s) => s + 1)}
+                className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[14.5px] font-bold text-white px-8 py-3.5 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_12px_24px_-10px_rgba(245,132,31,0.5)] group"
+                style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
+              >
+                Continue
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            ) : (
+              <button
+                onClick={() => canSubmit && setSent(true)}
+                disabled={!canSubmit}
+                className="inline-flex items-center gap-2.5 font-['Plus_Jakarta_Sans'] text-[14.5px] font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_14px_28px_-10px_rgba(233,30,140,0.55)] disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed group"
+                style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
+              >
+                <CalendarDays size={17} />
+                Request my appointment
+              </button>
+            )}
+          </div>
+        </div>
+
+        {count === 0 && (
+          <p className="text-center mt-8 font-['Plus_Jakarta_Sans'] text-[14.5px] text-[#1a1a1a]/45 font-medium">
+            Want to pick specifics first?{" "}
+            <button onClick={onBrowse} className="font-bold text-[#1a1a1a]/70 hover:text-[#1a1a1a] underline underline-offset-2 transition-colors">
+              Browse the services
+            </button>
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Small pieces ───────────────────────────────────────────────────────── */
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-[0.11em] text-[#1a1a1a]/40 block mb-2.5">
+      {children}
+    </label>
+  );
+}
+
+function Chip({
+  children, on, onClick, color,
+}: {
+  children: React.ReactNode; on: boolean; onClick: () => void; color: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`font-['Plus_Jakarta_Sans'] text-[13.5px] font-bold px-4.5 py-2.5 rounded-full border transition-all duration-200 ${
+        on ? "text-white scale-[1.02]" : "bg-[#FAF7F2] border-black/[0.07] text-[#1a1a1a]/60 hover:border-black/20"
+      }`}
+      style={on ? { background: color, borderColor: color } : undefined}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Field({
+  label, value, onChange, placeholder, type = "text", required,
+}: {
+  label: string; value: string; onChange: (v: string) => void;
+  placeholder?: string; type?: string; required?: boolean;
+}) {
+  return (
+    <div>
+      <Label>{label}{required && <span className="text-[#E91E8C] ml-1">*</span>}</Label>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full font-['Plus_Jakarta_Sans'] text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-3.5 outline-none focus:border-black/25 transition-colors placeholder:text-[#1a1a1a]/25"
+      />
+    </div>
+  );
+}
+
+function Question({
+  q, value, onChange, color, dim,
+}: {
+  q: GapQuestion; value: string; onChange: (v: string) => void;
+  color: string; dim: string;
+}) {
+  return (
+    <div>
+      <Label>
+        {q.label}
+        {q.required && <span className="text-[#E91E8C] ml-1">*</span>}
+      </Label>
+
+      {q.type === "choice" && (
+        <div className="flex flex-wrap gap-2.5">
+          {q.options?.map((o) => (
+            <Chip key={o} on={value === o} onClick={() => onChange(o)} color={color}>
+              {o}
+            </Chip>
+          ))}
+        </div>
+      )}
+
+      {q.type === "select" && (
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full font-['Plus_Jakarta_Sans'] text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-3.5 outline-none focus:border-black/25 transition-colors appearance-none cursor-pointer"
+        >
+          <option value="">Select…</option>
+          {q.options?.map((o) => (
+            <option key={o} value={o}>{o}</option>
+          ))}
+        </select>
+      )}
+
+      {(q.type === "text" || q.type === "date") && (
+        <input
+          type={q.type === "date" ? "date" : "text"}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={q.placeholder}
+          className="w-full font-['Plus_Jakarta_Sans'] text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-3.5 outline-none focus:border-black/25 transition-colors placeholder:text-[#1a1a1a]/25"
+        />
+      )}
+    </div>
+  );
+}
