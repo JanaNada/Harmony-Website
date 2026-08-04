@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "motion/react";
 import { ImageWithFallback } from "@/components";
+import AdminDashboard from "./AdminDashboard";
 import {      
   Instagram,
   Facebook,
@@ -42,7 +43,7 @@ const divFnbImg = "/imports/image-16.png";
 const divCateringImg = "/imports/image-17.png";
 const teamImg = "/imports/image-18.png";
 
-type Page = "home" | "services" | "stories" | "about" | "mission" | "fnb" | "catering" | "recruitment" | "marketing" | "events" | "management" | "contact" | "login";
+type Page = "home" | "services" | "stories" | "about" | "mission" | "fnb" | "catering" | "recruitment" | "marketing" | "events" | "management" | "contact" | "login" | "admin";
 
 const C_ORANGE = "#F5841F";
 const C_PINK = "#E91E8C";
@@ -516,7 +517,7 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
 
         {/* Auth Card */}
         <div className="bg-white/80 backdrop-blur-2xl p-8 md:p-10 rounded-[40px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] border border-white">
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+          <form onSubmit={(e) => { e.preventDefault(); go("admin"); }} className="space-y-4">
             
             {/* Sign Up Only: Name */}
             {mode === "signup" && (
@@ -569,7 +570,7 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
             )}
 
             {/* Submit Button */}
-            <button type="submit" 
+            <button type="button" onClick={() => go("admin")}
               className="w-full py-3.5 mt-2 rounded-full text-sm font-black text-white transition-all hover:shadow-lg hover:-translate-y-0.5 group flex items-center justify-center gap-2"
               style={{ background: `linear-gradient(135deg, #F5841F, #E91E8C)`, fontFamily:"'Montserrat',sans-serif" }}>
               {mode === "login" ? "Sign In" : "Create Account"} 
@@ -2239,6 +2240,7 @@ export default function App() {
       {page === "events" && <EventsPage go={go} />}
       {page === "management" && <ManagementPage go={go} />}
       {page === "login" && <LoginPage go={go} />}
+      {page === "admin" && <AdminDashboard />}
       {page === "contact" && <ContactPage />}
     </div>
   );
