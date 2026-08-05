@@ -64,17 +64,17 @@ export function ModuleCard({
           </span>
         </div>
 
-        <h4 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[16px] text-[#1a1a1a] mb-2 leading-[1.3]">
+        <h4 className="font-bold text-xl text-[#1a1a1a] mb-2 leading-[1.3]">
           {m.label}
         </h4>
-        <p className="font-['Plus_Jakarta_Sans'] text-[13.5px] leading-[1.65] text-[#1a1a1a]/55 font-medium flex-1">
+        <p className="text-sm leading-[1.65] text-[#1a1a1a]/55 font-medium flex-1">
           {m.desc}
         </p>
 
         {/* Status + the expand control */}
         <div className="flex items-end justify-between gap-3 mt-4">
           <span
-            className={`font-['Plus_Jakarta_Sans'] text-[12px] font-bold uppercase tracking-[0.1em] transition-colors ${
+            className={`text-xs font-bold uppercase tracking-[0.1em] transition-colors ${
               on ? "" : "text-[#1a1a1a]/30 group-hover:text-[#1a1a1a]/50"
             }`}
             style={on ? { color } : undefined}
@@ -117,7 +117,7 @@ export function ModuleCard({
                 className="w-full h-full object-cover"
               />
             </div>
-            <p className="font-['Plus_Jakarta_Sans'] text-[13.5px] leading-[1.75] text-[#1a1a1a]/65 font-medium">
+            <p className="text-sm leading-[1.75] text-[#1a1a1a]/65 font-medium">
               {m.long}
             </p>
           </div>
@@ -157,7 +157,7 @@ export function SectorPage({
 
       <div className="relative z-10 pt-16 md:pt-20 pb-40 px-6">
         {/* ── Hero ─────────────────────────────────────────────────────── */}
-        <div className="max-w-[1200px] mx-auto mb-20 md:mb-28">
+        <div className="w-full w-full max-w-[1600px] mx-auto mb-24 md:mb-32">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-7">
               <div className="inline-flex items-center gap-3 mb-6">
@@ -168,22 +168,22 @@ export function SectorPage({
                   <service.icon size={17} />
                 </span>
                 <span
-                  className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-[0.18em]"
+                  className="text-xs font-bold uppercase tracking-widest"
                   style={{ color: service.color }}
                 >
                   {service.tagline}
                 </span>
               </div>
 
-              <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[38px] md:text-[54px] leading-[1.08] tracking-tight mb-6 text-[#1a1a1a]">
+              <h1 className="font-extrabold text-5xl md:text-6xl leading-[1.1] tracking-tight mb-6 text-[#1a1a1a]">
                 {service.label}
               </h1>
 
-              <p className="font-['Plus_Jakarta_Sans'] text-[19px] md:text-[22px] leading-[1.55] font-bold text-[#1a1a1a]/85 mb-6">
+              <p className="text-xl md:text-2xl leading-[1.8] font-medium text-[#1a1a1a]/85 mb-6">
                 {service.promise}
               </p>
 
-              <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[17px] text-[#1a1a1a]/60 leading-[1.8] font-medium max-w-[620px]">
+              <p className="text-lg font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-4xl">
                 {service.intro}
               </p>
             </div>
@@ -193,7 +193,7 @@ export function SectorPage({
                 className="absolute -inset-3 blur-[45px] rounded-[44px] opacity-30 group-hover:opacity-50 transition-opacity duration-700"
                 style={{ background: service.color }}
               />
-              <div className="relative w-full aspect-[4/3] rounded-[34px] overflow-hidden shadow-[0_25px_55px_-20px_rgba(0,0,0,0.22)] border border-white/60">
+              <div className="relative w-full aspect-[4/3] max-w-3xl mx-auto rounded-[34px] overflow-hidden shadow-[0_25px_55px_-20px_rgba(0,0,0,0.22)] border border-white/60">
                 <img
                   src={service.image}
                   alt={service.label}
@@ -204,16 +204,25 @@ export function SectorPage({
           </div>
         </div>
 
-        {story && <div className="max-w-[1200px] mx-auto mb-20 md:mb-28">{story}</div>}
+        {story && <div className="w-full w-full max-w-[1600px] mx-auto mb-24 md:mb-32">{story}</div>}
+
+        {/* Explore More Indicator */}
+        <div 
+          onClick={() => document.getElementById('modules-grid')?.scrollIntoView({ behavior: 'smooth' })}
+          className="w-full flex flex-col items-center justify-center mt-12 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+        >
+          <span className="uppercase tracking-[0.2em] font-bold text-sm text-[#1a1a1a]/60 mb-2">Explore More Services</span>
+          <ChevronDown className="animate-bounce text-[#F5841F]" size={24} />
+        </div>
 
         {/* ── Pick what you need ───────────────────────────────────────── */}
-        <div className="max-w-[1200px] mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-14">
-            <div className="max-w-[640px]">
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[30px] md:text-[40px] tracking-tight text-[#1a1a1a] mb-4 leading-[1.12]">
+        <div id="modules-grid" className="w-full max-w-[1600px] mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10 md:mb-14">
+            <div className="max-w-4xl">
+              <h2 className="font-extrabold text-4xl md:text-5xl tracking-tight text-[#1a1a1a] mb-4 leading-[1.15]">
                 Pick what you need
               </h2>
-              <p className="font-['Plus_Jakarta_Sans'] text-[16px] text-[#1a1a1a]/55 leading-[1.75] font-medium">
+              <p className="text-xl text-[#1a1a1a]/55 leading-[1.75] font-medium">
                 Take one, take several, or take everything — you're not buying a package.
                 Add what's relevant and we'll build the meeting around it.
               </p>
@@ -222,7 +231,7 @@ export function SectorPage({
             <button
               type="button"
               onClick={() => (allOn ? removeMany(allIds) : addMany(allIds))}
-              className="font-['Plus_Jakarta_Sans'] text-[13.5px] font-bold px-6 py-3.5 rounded-full border transition-all duration-300 hover:scale-[1.03] flex-shrink-0 self-start"
+              className="text-[13.5px] font-bold px-6 py-3.5 rounded-full border transition-all duration-300 hover:scale-[1.03] flex-shrink-0 self-start"
               style={{
                 borderColor: `${service.color}45`,
                 color: service.color,
@@ -236,20 +245,20 @@ export function SectorPage({
           <div className="flex flex-col gap-14 md:gap-16">
             {service.groups.map((group) => (
               <div key={group.title}>
-                <div className="mb-6 md:mb-8 max-w-[620px]">
+                <div className="mb-6 md:mb-8 max-w-4xl">
                   <div className="flex items-center gap-3 mb-2.5">
                     <span className="h-px w-7" style={{ background: service.color }} />
-                    <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[20px] md:text-[24px] text-[#1a1a1a] tracking-tight">
+                    <h3 className="font-extrabold text-2xl md:text-3xl text-[#1a1a1a] tracking-tight">
                       {group.title}
                     </h3>
                   </div>
-                  <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/55 leading-[1.7] font-medium pl-10">
+                  <p className="text-lg text-[#1a1a1a]/55 leading-[1.7] font-medium pl-10">
                     {group.blurb}
                   </p>
                 </div>
 
                 {/* items-start so expanding one card doesn't stretch its neighbours */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 items-start">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-5 items-start">
                   {group.modules.map((m) => (
                     <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} />
                   ))}
@@ -257,29 +266,31 @@ export function SectorPage({
               </div>
             ))}
           </div>
+        </div>
 
-          {/* ── Close ──────────────────────────────────────────────────── */}
-          <div className="mt-20 md:mt-24 rounded-[40px] p-10 md:p-14 text-center relative overflow-hidden border border-white/60 bg-white/70 backdrop-blur-xl shadow-[0_25px_60px_-25px_rgba(0,0,0,0.1)]">
+        {/* ── Close ──────────────────────────────────────────────────── */}
+        <div className="w-full px-4 md:px-8 mt-20 md:mt-24 mb-24 md:mb-32">
+          <div className="w-full rounded-[40px] p-10 md:p-14 text-center relative overflow-hidden border border-white/60 bg-white/70 backdrop-blur-xl shadow-[0_25px_60px_-25px_rgba(0,0,0,0.1)]">
             <div
               className="absolute -top-1/2 left-1/4 w-[420px] h-[420px] blur-[130px] rounded-full pointer-events-none mix-blend-multiply opacity-20"
               style={{ background: service.color }}
             />
             <div className="relative z-10">
-              <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[26px] md:text-[36px] text-[#1a1a1a] mb-4 tracking-tight leading-[1.15]">
+              <h3 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-4 tracking-tight leading-[1.15]">
                 {chosen > 0
                   ? chosen === 1
                     ? "One thing picked. Let's talk about it."
                     : `${chosen} things picked. Let's talk about them.`
                   : "Not sure what you need?"}
               </h3>
-              <p className="font-['Plus_Jakarta_Sans'] text-[15.5px] text-[#1a1a1a]/55 leading-[1.75] font-medium max-w-[520px] mx-auto mb-8">
+              <p className="text-lg font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-3xl mx-auto mb-8">
                 {chosen > 0
                   ? "A few quick questions and we'll put the right person in the room."
                   : "Book anyway. Tell us the problem and we'll work out which parts apply."}
               </p>
               <button
                 onClick={onBook}
-                className="inline-flex items-center gap-2.5 font-['Plus_Jakarta_Sans'] text-[15px] font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-12px_rgba(0,0,0,0.35)] group"
+                className="inline-flex items-center gap-2.5 text-lg font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-12px_rgba(0,0,0,0.35)] group"
                 style={{ background: service.color }}
               >
                 Book an appointment
@@ -292,3 +303,9 @@ export function SectorPage({
     </div>
   );
 }
+
+
+
+
+
+

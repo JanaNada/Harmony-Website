@@ -23,17 +23,17 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[60] pointer-events-none">
-      <div className="max-w-[1200px] mx-auto px-4 pb-4 pointer-events-auto">
+      <div className="w-full px-4 pb-4 pointer-events-auto">
         {/* Expanded list */}
         {open && (
           <div className="bg-white rounded-t-[28px] border border-b-0 border-black/[0.06] shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.18)] p-6 max-h-[45vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[18px] text-[#1a1a1a]">
+              <h3 className="font-extrabold text-lg text-[#1a1a1a]">
                 Your brief
               </h3>
               <button
                 onClick={clear}
-                className="font-['Plus_Jakarta_Sans'] text-[13px] font-bold text-[#1a1a1a]/40 hover:text-[#1a1a1a]/70 transition-colors"
+                className="text-sm font-bold text-[#1a1a1a]/40 hover:text-[#1a1a1a]/70 transition-colors"
               >
                 Clear all
               </button>
@@ -49,7 +49,7 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
                         className="w-2 h-2 rounded-full"
                         style={{ background: svc.color }}
                       />
-                      <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-[0.12em] text-[#1a1a1a]/45">
+                      <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/45">
                         {svc.label} · {countFor(sid)}
                       </span>
                     </div>
@@ -69,7 +69,7 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
                                 borderColor: `${svc.color}30`,
                               }}
                             >
-                              <span className="font-['Plus_Jakarta_Sans'] text-[13px] font-bold text-[#1a1a1a]/80">
+                              <span className="text-sm font-bold text-[#1a1a1a]/80">
                                 {mod.label}
                               </span>
                               <X
@@ -89,7 +89,7 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
 
         {/* Bar */}
         <div
-          className={`border border-white/25 shadow-[0_-12px_45px_-12px_rgba(0,0,0,0.3)] px-5 md:px-6 py-4 flex items-center gap-4 transition-all duration-500 ${
+          className={`border border-white/25 shadow-[0_-12px_45px_-12px_rgba(0,0,0,0.3)] px-5 md:px-6 py-4 flex items-center gap-8 transition-all duration-500 ${
             open ? "rounded-b-[28px]" : "rounded-[28px]"
           }`}
           style={{ background: gradient }}
@@ -98,14 +98,14 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
             onClick={() => setOpen((v) => !v)}
             className="flex items-center gap-3 flex-1 min-w-0 text-left group"
           >
-            <span className="w-10 h-10 rounded-full bg-white flex items-center justify-center font-['Plus_Jakarta_Sans'] font-extrabold text-[15px] text-[#1a1a1a] flex-shrink-0 shadow-sm">
+            <span className="w-10 h-10 rounded-full bg-white flex items-center justify-center font-extrabold text-base text-[#1a1a1a] flex-shrink-0 shadow-sm">
               {count}
             </span>
             <span className="min-w-0">
-              <span className="block font-['Plus_Jakarta_Sans'] text-[14.5px] font-extrabold text-white truncate drop-shadow-sm">
+              <span className="block text-[14.5px] font-extrabold text-white truncate drop-shadow-sm">
                 {count === 1 ? "1 service selected" : `${count} services selected`}
               </span>
-              <span className="hidden sm:flex items-center gap-1 font-['Plus_Jakarta_Sans'] text-[12.5px] font-bold text-white/80 group-hover:text-white transition-colors">
+              <span className="hidden sm:flex items-center gap-1 text-[12.5px] font-bold text-white/80 group-hover:text-white transition-colors">
                 {open ? "Hide" : "Review"} your brief
                 {open ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
               </span>
@@ -114,7 +114,7 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
 
           <button
             onClick={onBook}
-            className="font-['Plus_Jakarta_Sans'] text-[14px] font-extrabold text-[#1a1a1a] bg-white px-6 md:px-8 py-3.5 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_10px_25px_-8px_rgba(0,0,0,0.35)] inline-flex items-center gap-2 flex-shrink-0 group"
+            className="text-sm font-extrabold text-[#1a1a1a] bg-white px-6 md:px-8 py-3.5 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_10px_25px_-8px_rgba(0,0,0,0.35)] inline-flex items-center gap-2 flex-shrink-0 group"
           >
             Book<span className="hidden sm:inline"> appointment</span>
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -124,3 +124,7 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
     </div>
   );
 }
+
+
+
+

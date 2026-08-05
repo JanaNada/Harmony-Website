@@ -50,16 +50,15 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
           >
             <CheckCircle2 size={30} style={{ color: C_GREEN }} />
           </div>
-          <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[30px] md:text-[36px] text-[#1a1a1a] mb-4 tracking-tight leading-[1.15]">
+          <h1 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-4 tracking-tight leading-[1.15]">
             Your brief is with us.
           </h1>
-          <p className="font-['Plus_Jakarta_Sans'] text-[16px] text-[#1a1a1a]/55 leading-[1.75] font-medium mb-9">
-            We'll come back within 24 hours with a time and the right person from the
-            team — someone who actually works on what you picked.
+          <p className="text-base font-medium leading-[1.7] text-[#1a1a1a]/55 mb-9">
+            One of our admins will call you within 24 hours to arrange a meeting and connect you with the right person from the team.
           </p>
           <button
             onClick={() => { clear(); setSent(false); setStep(0); onBrowse(); }}
-            className="font-['Plus_Jakarta_Sans'] text-[14.5px] font-bold text-[#1a1a1a]/50 hover:text-[#1a1a1a] transition-colors"
+            className="text-[14.5px] font-bold text-[#1a1a1a]/50 hover:text-[#1a1a1a] transition-colors"
           >
             Back to the site
           </button>
@@ -77,10 +76,10 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
 
       <div className="relative z-10 max-w-[820px] mx-auto px-6 pt-16 md:pt-20 pb-32">
         <div className="text-center mb-12">
-          <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[34px] md:text-[46px] tracking-tight leading-[1.1] mb-4">
+          <h1 className="font-extrabold text-5xl md:text-6xl tracking-tight leading-[1.1] mb-4">
             Book your appointment
           </h1>
-          <p className="font-['Plus_Jakarta_Sans'] text-[16px] text-[#1a1a1a]/55 font-medium leading-[1.7]">
+          <p className="text-base font-medium leading-[1.7] text-[#1a1a1a]/55">
             No cost, no commitment. We just need enough to bring the right person.
           </p>
         </div>
@@ -95,7 +94,7 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
                 }`}
               >
                 <span
-                  className={`w-6 h-6 rounded-full flex items-center justify-center font-['Plus_Jakarta_Sans'] text-[11px] font-extrabold transition-colors ${
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-extrabold transition-colors ${
                     i < step ? "text-white" : i === step ? "text-white" : "bg-black/[0.06] text-[#1a1a1a]/35"
                   }`}
                   style={i <= step ? { background: i < step ? C_GREEN : C_ORANGE } : undefined}
@@ -103,7 +102,7 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
                   {i < step ? <Check size={12} strokeWidth={3} /> : i + 1}
                 </span>
                 <span
-                  className={`font-['Plus_Jakarta_Sans'] text-[12.5px] font-bold hidden sm:block ${
+                  className={`text-[12.5px] font-bold hidden sm:block ${
                     i === step ? "text-[#1a1a1a]" : "text-[#1a1a1a]/35"
                   }`}
                 >
@@ -119,10 +118,10 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
           {/* ── Step 1: confirm the brief ─────────────────────────────── */}
           {count > 0 && step === 0 && (
             <div>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[24px] md:text-[28px] mb-2.5 tracking-tight">
+              <h2 className="font-extrabold text-2xl md:text-2xl mb-2.5 tracking-tight">
                 Here's what you picked
               </h2>
-              <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/50 font-medium leading-[1.7] mb-8">
+              <p className="text-base text-[#1a1a1a]/50 font-medium leading-[1.7] mb-8">
                 Remove anything that doesn't belong, or{" "}
                 <button
                   onClick={onBrowse}
@@ -133,7 +132,7 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
                 to add more.
               </p>
 
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-8">
                 {activeServices.map((sid) => {
                   const svc = SERVICE_BY_ID[sid];
                   return (
@@ -142,7 +141,7 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
                         <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: svc.dim, color: svc.color }}>
                           <svc.icon size={15} />
                         </span>
-                        <span className="font-['Plus_Jakarta_Sans'] text-[14px] font-extrabold text-[#1a1a1a]">
+                        <span className="text-sm font-extrabold text-[#1a1a1a]">
                           {svc.label}
                         </span>
                       </div>
@@ -159,7 +158,7 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
                                 className="group inline-flex items-center gap-2 pl-3.5 pr-2.5 py-2 rounded-full border transition-colors"
                                 style={{ background: svc.dim, borderColor: `${svc.color}30` }}
                               >
-                                <span className="font-['Plus_Jakarta_Sans'] text-[13px] font-bold text-[#1a1a1a]/80">
+                                <span className="text-sm font-bold text-[#1a1a1a]/80">
                                   {mod.label}
                                 </span>
                                 <X size={14} className="text-[#1a1a1a]/30 group-hover:text-[#1a1a1a]/70 transition-colors" />
@@ -177,10 +176,10 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
           {/* ── Step 2: gap questions ─────────────────────────────────── */}
           {count > 0 && step === 1 && (
             <div>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[24px] md:text-[28px] mb-2.5 tracking-tight">
+              <h2 className="font-extrabold text-2xl md:text-2xl mb-2.5 tracking-tight">
                 A few details
               </h2>
-              <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/50 font-medium leading-[1.7] mb-9">
+              <p className="text-base text-[#1a1a1a]/50 font-medium leading-[1.7] mb-9">
                 Only what your selection doesn't already tell us.
               </p>
 
@@ -192,13 +191,13 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
                       <div className="flex items-center gap-2.5 mb-6">
                         <span className="h-px w-6" style={{ background: svc.color }} />
                         <span
-                          className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-[0.14em]"
+                          className="text-xs font-bold uppercase tracking-widest"
                           style={{ color: svc.color }}
                         >
                           {svc.label}
                         </span>
                       </div>
-                      <div className="flex flex-col gap-6">
+                      <div className="flex flex-col gap-8">
                         {svc.questions.map((q) => (
                           <Question
                             key={q.id}
@@ -220,13 +219,13 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
           {/* ── Final: contact ────────────────────────────────────────── */}
           {step === lastStep && (
             <div>
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[24px] md:text-[28px] mb-2.5 tracking-tight">
+              <h2 className="font-extrabold text-2xl md:text-2xl mb-2.5 tracking-tight">
                 How do we reach you?
               </h2>
-              <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/50 font-medium leading-[1.7] mb-9">
+              <p className="text-base text-[#1a1a1a]/50 font-medium leading-[1.7] mb-9">
                 {count > 0
-                  ? "Last step — then we'll confirm a time."
-                  : "Tell us roughly what you're after and we'll work out the rest together."}
+                  ? "Last step — then an admin will call you to arrange a meeting."
+                  : "Tell us roughly what you're after and an admin will call you to arrange a meeting."}
               </p>
 
               <div className="flex flex-col gap-5">
@@ -237,16 +236,7 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
                   <Field label="Company or brand" value={contact.company} onChange={(v) => setContact({ ...contact, company: v })} placeholder="Optional" />
                 </div>
 
-                <div>
-                  <Label>When suits you?</Label>
-                  <div className="flex flex-wrap gap-2.5">
-                    {["This week", "Next week", "Later this month", "I'm flexible"].map((w) => (
-                      <Chip key={w} on={contact.when === w} onClick={() => setContact({ ...contact, when: w })} color={C_ORANGE}>
-                        {w}
-                      </Chip>
-                    ))}
-                  </div>
-                </div>
+
 
                 <div>
                   <Label>Anything else we should know?</Label>
@@ -255,13 +245,13 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
                     value={contact.note}
                     onChange={(e) => setContact({ ...contact, note: e.target.value })}
                     placeholder={count > 0 ? "Optional" : "What are you trying to do?"}
-                    className="w-full font-['Plus_Jakarta_Sans'] text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-4 outline-none focus:border-black/25 transition-colors resize-none placeholder:text-[#1a1a1a]/25"
+                    className="w-full text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-4 outline-none focus:border-black/25 transition-colors resize-none placeholder:text-[#1a1a1a]/25"
                   />
                 </div>
               </div>
 
               {requiredMissing && (
-                <p className="mt-5 font-['Plus_Jakarta_Sans'] text-[13.5px] font-semibold text-[#E91E8C]">
+                <p className="mt-5 text-[13.5px] font-semibold text-[#E91E8C]">
                   Some details are still missing — go back one step.
                 </p>
               )}
@@ -269,11 +259,11 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
           )}
 
           {/* ── Nav ───────────────────────────────────────────────────── */}
-          <div className="flex items-center justify-between gap-4 mt-10 pt-8 border-t border-black/[0.06]">
+          <div className="flex items-center justify-between gap-8 mt-10 pt-8 border-t border-black/[0.06]">
             {step > 0 ? (
               <button
                 onClick={() => setStep((s) => s - 1)}
-                className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[14px] font-bold text-[#1a1a1a]/45 hover:text-[#1a1a1a] transition-colors"
+                className="inline-flex items-center gap-2 text-sm font-bold text-[#1a1a1a]/45 hover:text-[#1a1a1a] transition-colors"
               >
                 <ArrowLeft size={16} /> Back
               </button>
@@ -284,7 +274,7 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
             {step < lastStep ? (
               <button
                 onClick={() => setStep((s) => s + 1)}
-                className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[14.5px] font-bold text-white px-8 py-3.5 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_12px_24px_-10px_rgba(245,132,31,0.5)] group"
+                className="inline-flex items-center gap-2 text-[14.5px] font-bold text-white px-8 py-3.5 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_12px_24px_-10px_rgba(245,132,31,0.5)] group"
                 style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
               >
                 Continue
@@ -294,7 +284,7 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
               <button
                 onClick={() => canSubmit && setSent(true)}
                 disabled={!canSubmit}
-                className="inline-flex items-center gap-2.5 font-['Plus_Jakarta_Sans'] text-[14.5px] font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_14px_28px_-10px_rgba(233,30,140,0.55)] disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed group"
+                className="inline-flex items-center gap-2.5 text-[14.5px] font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_14px_28px_-10px_rgba(233,30,140,0.55)] disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed group"
                 style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
               >
                 <CalendarDays size={17} />
@@ -305,7 +295,7 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
         </div>
 
         {count === 0 && (
-          <p className="text-center mt-8 font-['Plus_Jakarta_Sans'] text-[14.5px] text-[#1a1a1a]/45 font-medium">
+          <p className="text-center mt-8 text-[14.5px] text-[#1a1a1a]/45 font-medium">
             Want to pick specifics first?{" "}
             <button onClick={onBrowse} className="font-bold text-[#1a1a1a]/70 hover:text-[#1a1a1a] underline underline-offset-2 transition-colors">
               Browse the services
@@ -321,7 +311,7 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <label className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-[0.11em] text-[#1a1a1a]/40 block mb-2.5">
+    <label className="text-xs font-bold uppercase tracking-wider text-[#1a1a1a]/40 block mb-2.5">
       {children}
     </label>
   );
@@ -336,7 +326,7 @@ function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`font-['Plus_Jakarta_Sans'] text-[13.5px] font-bold px-4.5 py-2.5 rounded-full border transition-all duration-200 ${
+      className={`text-[13.5px] font-bold px-4.5 py-2.5 rounded-full border transition-all duration-200 ${
         on ? "text-white scale-[1.02]" : "bg-[#FAF7F2] border-black/[0.07] text-[#1a1a1a]/60 hover:border-black/20"
       }`}
       style={on ? { background: color, borderColor: color } : undefined}
@@ -360,7 +350,7 @@ function Field({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full font-['Plus_Jakarta_Sans'] text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-3.5 outline-none focus:border-black/25 transition-colors placeholder:text-[#1a1a1a]/25"
+        className="w-full text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-3.5 outline-none focus:border-black/25 transition-colors placeholder:text-[#1a1a1a]/25"
       />
     </div>
   );
@@ -393,7 +383,7 @@ function Question({
         <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full font-['Plus_Jakarta_Sans'] text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-3.5 outline-none focus:border-black/25 transition-colors appearance-none cursor-pointer"
+          className="w-full text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-3.5 outline-none focus:border-black/25 transition-colors appearance-none cursor-pointer"
         >
           <option value="">Select…</option>
           {q.options?.map((o) => (
@@ -408,9 +398,13 @@ function Question({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={q.placeholder}
-          className="w-full font-['Plus_Jakarta_Sans'] text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-3.5 outline-none focus:border-black/25 transition-colors placeholder:text-[#1a1a1a]/25"
+          className="w-full text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-3.5 outline-none focus:border-black/25 transition-colors placeholder:text-[#1a1a1a]/25"
         />
       )}
     </div>
   );
 }
+
+
+
+

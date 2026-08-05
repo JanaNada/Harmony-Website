@@ -18,9 +18,10 @@ type Tab = "overview" | "revenue" | "billing" | "payroll" | "projects" | "docume
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [role, setRole] = useState<"ADMIN" | "SUPER_ADMIN">("SUPER_ADMIN");
 
   return (
-    <div className="flex h-screen bg-[#FAF7F2] font-['Plus_Jakarta_Sans'] overflow-hidden relative w-full z-50">
+    <div className="flex h-screen bg-[#FAF7F2] overflow-hidden relative w-full z-50">
       
       {/* Ambient Glows (Preserved exactly as requested) */}
       <div className="fixed inset-0 pointer-events-none z-0">
@@ -30,41 +31,55 @@ export default function AdminDashboard() {
 
       {/* Sidebar Navigation */}
       <aside className="w-64 bg-white/70 backdrop-blur-3xl border-r border-white/60 shadow-[10px_0_30px_-15px_rgba(0,0,0,0.05)] flex flex-col z-20 flex-shrink-0 relative">
-        <div className="p-6 pb-4 border-b border-white/40">
+        <div className="p-6 pb-4 border-b border-white/40 flex justify-between items-start">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#F5841F] to-[#E91E8C] flex items-center justify-center shadow-lg">
               <ShieldCheck className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="font-extrabold text-[15px] text-gray-900 leading-tight">Admin Portal</h2>
-              <p className="text-[11px] text-gray-500 font-bold uppercase tracking-widest">Harmony</p>
+              <h2 className="font-extrabold text-base text-gray-900 leading-tight">Admin Portal</h2>
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">{role === "SUPER_ADMIN" ? "Super Admin" : "Admin"}</p>
             </div>
           </div>
+          <button 
+            onClick={() => setRole(r => r === "SUPER_ADMIN" ? "ADMIN" : "SUPER_ADMIN")}
+            className="text-xs font-bold bg-black/5 text-gray-600 rounded-full px-2 py-1 hover:bg-black/10 transition whitespace-nowrap"
+          >
+            Toggle Role
+          </button>
         </div>
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-2">Core</span>
+          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-2">Core</span>
           <NavItem icon={LayoutDashboard} label="Overview" active={activeTab === "overview"} onClick={() => setActiveTab("overview")} color={C_ORANGE} />
           
-          <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Operations</span>
+          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Operations</span>
           <NavItem icon={KanbanSquare} label="Projects" active={activeTab === "projects"} onClick={() => setActiveTab("projects")} color={C_PINK} />
           <NavItem icon={LifeBuoy} label="Tickets (SLAs)" active={activeTab === "inquiries"} onClick={() => setActiveTab("inquiries")} color={C_ORANGE} />
           <NavItem icon={Calendar} label="Calendar" active={activeTab === "calendar"} onClick={() => setActiveTab("calendar")} color={C_BLUE} />
           
-          <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Client Data</span>
+          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Client Data</span>
           <NavItem icon={Users} label="CRM" active={activeTab === "crm"} onClick={() => setActiveTab("crm")} color={C_GREEN} />
           <NavItem icon={Building2} label="Companies" active={activeTab === "companies"} onClick={() => setActiveTab("companies")} color={C_BLUE} />
           <NavItem icon={FileText} label="Documents" active={activeTab === "documents"} onClick={() => setActiveTab("documents")} color={C_PINK} />
           
-          <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Financials</span>
-          <NavItem icon={TrendingUp} label="Revenue & ROI" active={activeTab === "revenue"} onClick={() => setActiveTab("revenue")} color={C_GREEN} />
-          <NavItem icon={Receipt} label="Billing" active={activeTab === "billing"} onClick={() => setActiveTab("billing")} color={C_ORANGE} />
-          <NavItem icon={Wallet} label="Payroll" active={activeTab === "payroll"} onClick={() => setActiveTab("payroll")} color={C_PINK} />
+          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Financials</span>
+          {role === "SUPER_ADMIN" ? (
+            <>
+              <NavItem icon={TrendingUp} label="Revenue & ROI" active={activeTab === "revenue"} onClick={() => setActiveTab("revenue")} color={C_GREEN} />
+              <NavItem icon={Receipt} label="Billing" active={activeTab === "billing"} onClick={() => setActiveTab("billing")} color={C_ORANGE} />
+              <NavItem icon={Wallet} label="Payroll" active={activeTab === "payroll"} onClick={() => setActiveTab("payroll")} color={C_PINK} />
+            </>
+          ) : (
+            <div className="px-4 py-2 text-xs text-gray-400 font-bold italic">Restricted</div>
+          )}
           
-          <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">System</span>
+          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">System</span>
           <NavItem icon={Settings} label="Services Setup" active={activeTab === "services"} onClick={() => setActiveTab("services")} color={C_PINK} />
           <NavItem icon={Briefcase} label="Hiring" active={activeTab === "hiring"} onClick={() => setActiveTab("hiring")} color={C_PINK} />
-          <NavItem icon={SlidersHorizontal} label="Access Config" active={activeTab === "settings"} onClick={() => setActiveTab("settings")} color={C_BLUE} />
+          {role === "SUPER_ADMIN" && (
+            <NavItem icon={SlidersHorizontal} label="Access Config" active={activeTab === "settings"} onClick={() => setActiveTab("settings")} color={C_BLUE} />
+          )}
         </nav>
 
         <div className="p-4 border-t border-white/40">
@@ -79,8 +94,8 @@ export default function AdminDashboard() {
       <main className="relative z-10 flex-1 p-8 lg:p-12 pb-32 overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           {activeTab === "overview" && <OverviewTab setActiveTab={setActiveTab} />}
-          {activeTab === "revenue" && <RevenueTab />}
-          {activeTab === "billing" && <BillingTab />}
+          {activeTab === "revenue" && (role === "SUPER_ADMIN" ? <RevenueTab /> : <AccessDenied />)}
+          {activeTab === "billing" && (role === "SUPER_ADMIN" ? <BillingTab /> : <AccessDenied />)}
           {activeTab === "projects" && <ProjectsTab />}
           {activeTab === "documents" && <DocumentsTab />}
           {activeTab === "companies" && <CompaniesTab />}
@@ -89,8 +104,8 @@ export default function AdminDashboard() {
           {activeTab === "inquiries" && <InquiriesTab />}
           {activeTab === "calendar" && <CalendarTab />}
           {activeTab === "hiring" && <HiringTab />}
-          {activeTab === "payroll" && <PayrollTab />}
-          {activeTab === "settings" && <SettingsTab />}
+          {activeTab === "payroll" && (role === "SUPER_ADMIN" ? <PayrollTab /> : <AccessDenied />)}
+          {activeTab === "settings" && (role === "SUPER_ADMIN" ? <SettingsTab /> : <AccessDenied />)}
         </div>
       </main>
     </div>
@@ -103,7 +118,7 @@ function NavItem({ icon: Icon, label, active, onClick, color }: any) {
   return (
     <button
       onClick={onClick}
-      className={`w-full px-4 py-3 rounded-xl transition-all duration-300 font-bold text-[13px] flex items-center gap-3 ${
+      className={`w-full px-4 py-3 rounded-xl transition-all duration-300 font-bold text-sm flex items-center gap-3 ${
         active 
           ? "bg-white text-gray-900 shadow-md border border-gray-100 scale-[1.02]" 
           : "text-gray-500 hover:text-gray-900 hover:bg-white/50"
@@ -130,17 +145,18 @@ function OverviewTab({ setActiveTab }: any) {
         
         {/* Left Column (Main Stats & Activity Flowing together) */}
         <div className="flex-1 space-y-8">
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-8">
             <StatPill title="Total Revenue" value="$1.2M" color={C_GREEN} onClick={() => setActiveTab("revenue")} />
             <StatPill title="Active Companies" value="48" color={C_BLUE} onClick={() => setActiveTab("companies")} />
             <StatPill title="Pending Verifications" value="12" color={C_ORANGE} onClick={() => setActiveTab("crm")} />
+            <StatPill title="Avg Resolution Time" value="2.4 hrs" color={C_PINK} onClick={() => setActiveTab("inquiries")} />
           </div>
 
           <div className="bg-white/60 backdrop-blur-2xl rounded-[3rem] p-8 md:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
             <h3 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
               <TrendingUp className="text-[#F5841F]"/> Recent Activity
             </h3>
-            <div className="space-y-6 relative before:absolute before:inset-y-0 before:left-[11px] before:w-[2px] before:bg-gradient-to-b before:from-[#F5841F] before:to-[#E91E8C] before:opacity-20">
+            <div className="space-y-8 relative before:absolute before:inset-y-0 before:left-[11px] before:w-[2px] before:bg-gradient-to-b before:from-[#F5841F] before:to-[#E91E8C] before:opacity-20">
               <div className="relative pl-10">
                 <div className="absolute left-0 top-1 w-6 h-6 rounded-full bg-white border-[3px] border-[#F5841F] shadow-md z-10" />
                 <p className="text-base font-bold text-gray-900">Kempinski Hotel requested "Menu Engineering"</p>
@@ -172,7 +188,7 @@ function OverviewTab({ setActiveTab }: any) {
             <h3 className="text-3xl font-black mb-3 leading-tight text-gray-900">System<br/>Operational</h3>
             <p className="text-gray-600 font-medium mb-10 text-lg">Your digital storefront is actively accepting new business.</p>
             
-            <div className="space-y-4">
+            <div className="space-y-8">
               <div className="flex justify-between items-center bg-white/60 border border-[#F5841F]/20 p-4 rounded-2xl">
                 <span className="font-bold text-gray-700">Client Booking Engine</span>
                 <span className="flex items-center gap-1.5 bg-[#78BE1F]/10 text-[#78BE1F] px-3 py-1 rounded-full text-sm font-black"><CheckCircle2 className="w-4 h-4"/> Online</span>
@@ -224,7 +240,7 @@ function CompaniesTab() {
 
   return (
     <div className="animate-in fade-in duration-700">
-      <div className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+      <div className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
         <div>
           <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Ecosystem Partners</h1>
           <p className="text-gray-500 mt-2 text-lg">Manage integrations and operational status.</p>
@@ -234,7 +250,7 @@ function CompaniesTab() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {companies.map(c => (
           <div key={c.id} className="relative bg-white/70 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white shadow-[0_15px_35px_-10px_rgba(0,0,0,0.06)] group hover:bg-white transition-all">
             <div className={`absolute top-0 right-8 w-16 h-2 rounded-b-full`} style={{ backgroundColor: c.color }} />
@@ -268,7 +284,7 @@ function CompaniesTab() {
 // 3. Services (Flowing Blocks)
 function ServicesTab() {
   return (
-    <div className="animate-in fade-in duration-700 max-w-5xl mx-auto">
+    <div className="animate-in fade-in duration-700 w-full">
       <div className="text-center mb-16">
         <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Service Architect</h1>
         <p className="text-gray-500 mt-4 text-lg max-w-2xl mx-auto">Design and automate the offerings presented in the front-end intake forms.</p>
@@ -307,7 +323,7 @@ function ServicesTab() {
         </div>
 
         {/* Existing Services List */}
-        <div className="flex-1 space-y-6 pt-4">
+        <div className="flex-1 space-y-8 pt-4">
           <h3 className="text-xl font-bold text-gray-400 uppercase tracking-widest pl-4">Active Offerings</h3>
           {["Venue Scouting & Negotiation", "Executive Placement", "Menu Engineering"].map((srv, i) => (
             <div key={i} className="bg-white/60 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-lg shadow-black/5 flex items-center justify-between hover:bg-white transition-colors group">
@@ -348,14 +364,14 @@ function CRMTab() {
         <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#78BE1F]/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Header Profile */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-          <div className="flex items-center gap-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
+          <div className="flex items-center gap-8">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#78BE1F] to-[#3AADE0] p-1 shadow-lg">
               <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-2xl font-black text-gray-900">AM</div>
             </div>
             <div>
               <h2 className="text-4xl font-black text-gray-900 tracking-tight">Ahmed Mahmoud</h2>
-              <div className="flex flex-wrap gap-4 mt-2">
+              <div className="flex flex-wrap gap-8 mt-2">
                 <span className="flex items-center text-sm text-gray-500 font-bold gap-2"><Phone className="w-4 h-4 text-[#78BE1F]"/> +20 100 123 4567</span>
                 <span className="flex items-center text-sm text-gray-500 font-bold gap-2"><Mail className="w-4 h-4 text-[#3AADE0]"/> ahmed@example.com</span>
               </div>
@@ -375,7 +391,7 @@ function CRMTab() {
               <h4 className="font-extrabold text-sm uppercase tracking-widest text-gray-400 mb-6 flex items-center gap-2">
                 <MapPin className="w-4 h-4"/> Logistics Profile
               </h4>
-              <div className="space-y-6">
+              <div className="space-y-8">
                 <div>
                   <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Exact Location</p>
                   <p className="text-2xl font-black text-[#3AADE0]">Fifth Settlement</p>
@@ -384,13 +400,13 @@ function CRMTab() {
                   <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">Event Blueprint</p>
                   <p className="text-xl font-bold text-gray-900">Corporate Gala Dinner</p>
                 </div>
-                <div className="flex gap-4">
+                <div className="flex gap-8">
                   <div className="bg-yellow-50 px-4 py-3 rounded-2xl border border-yellow-100">
-                    <p className="text-[10px] font-bold text-yellow-600 uppercase tracking-widest mb-1">Venue</p>
+                    <p className="text-xs font-bold text-yellow-600 uppercase tracking-widest mb-1">Venue</p>
                     <p className="font-black text-yellow-900">Needs Sourcing</p>
                   </div>
                   <div className="bg-gray-50 px-4 py-3 rounded-2xl border border-gray-100">
-                    <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Capacity</p>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Capacity</p>
                     <p className="font-black text-gray-900">~250 Pax</p>
                   </div>
                 </div>
@@ -411,7 +427,7 @@ function CRMTab() {
               ].map((entry, idx) => (
                 <div key={idx} className="relative">
                   <div className="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full border-4 border-white shadow-sm" style={{ backgroundColor: entry.color }} />
-                  <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: entry.color }}>{entry.section}</p>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: entry.color }}>{entry.section}</p>
                   <p className="text-lg font-bold text-gray-900">{entry.item}</p>
                 </div>
               ))}
@@ -451,7 +467,7 @@ function InquiriesTab() {
         </button>
       </div>
 
-      <div className="flex gap-4 mb-8 overflow-x-auto pb-2">
+      <div className="flex gap-8 mb-8 overflow-x-auto pb-2">
         <div className="bg-white/80 backdrop-blur-xl border border-white p-5 rounded-2xl min-w-[200px] shadow-sm flex-1">
           <p className="text-gray-400 font-bold text-sm uppercase tracking-wider mb-1">Avg Resolution</p>
           <p className="text-3xl font-black text-gray-900">1.4 hrs</p>
@@ -467,7 +483,7 @@ function InquiriesTab() {
       </div>
 
       <div className="bg-white/60 backdrop-blur-3xl rounded-[3rem] border border-white shadow-xl shadow-black/5 overflow-hidden flex-1">
-        <div className="grid grid-cols-12 gap-4 p-6 border-b border-gray-100 bg-gray-50/50 text-xs font-black text-gray-400 uppercase tracking-widest">
+        <div className="grid grid-cols-12 gap-8 p-6 border-b border-gray-100 bg-gray-50/50 text-xs font-black text-gray-400 uppercase tracking-widest">
           <div className="col-span-2">Ticket ID</div>
           <div className="col-span-3">Client</div>
           <div className="col-span-4">Issue</div>
@@ -476,7 +492,7 @@ function InquiriesTab() {
         </div>
         <div className="divide-y divide-gray-100/50">
           {tickets.map((t, i) => (
-            <div key={i} className="grid grid-cols-12 gap-4 p-6 items-center hover:bg-white transition-colors group cursor-default">
+            <div key={i} className="grid grid-cols-12 gap-8 p-6 items-center hover:bg-white transition-colors group cursor-default">
               <div className="col-span-2 font-bold text-gray-500">{t.id}</div>
               <div className="col-span-3 font-bold text-gray-900 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full" style={{backgroundColor: t.color}}></div>
@@ -512,8 +528,8 @@ function InquiriesTab() {
               </button>
             </div>
             
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gray-50/30">
-              <div className="flex gap-4">
+            <div className="flex-1 overflow-y-auto p-6 space-y-8 bg-gray-50/30">
+              <div className="flex gap-8">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#EF4444] to-[#F87171] flex-shrink-0 flex items-center justify-center text-white font-bold text-sm">C</div>
                 <div className="bg-white border border-gray-100 p-5 rounded-2xl rounded-tl-sm shadow-sm">
                   <p className="text-xs font-bold text-gray-400 mb-2">Client • Today, 10:24 AM</p>
@@ -523,7 +539,7 @@ function InquiriesTab() {
                 </div>
               </div>
               
-              <div className="flex gap-4 flex-row-reverse">
+              <div className="flex gap-8 flex-row-reverse">
                 <div className="w-10 h-10 rounded-full bg-gray-900 flex-shrink-0 flex items-center justify-center text-white font-bold text-sm">A</div>
                 <div className="bg-gray-900 text-white p-5 rounded-2xl rounded-tr-sm shadow-sm">
                   <p className="text-xs font-bold text-gray-400 mb-2">Agency • Today, 10:45 AM</p>
@@ -598,7 +614,7 @@ function HiringTab() {
                 <div className="w-8 h-8 rounded-full bg-[#3AADE0]/10 flex items-center justify-center text-[#3AADE0]"><Target className="w-4 h-4"/></div>
                 The Mission
               </h3>
-              <ul className="space-y-4 text-gray-600 font-medium leading-relaxed">
+              <ul className="space-y-8 text-gray-600 font-medium leading-relaxed">
                 <li className="flex items-start gap-3"><span className="text-[#3AADE0] font-black mt-0.5">•</span> Oversee daily kitchen operations and staff management.</li>
                 <li className="flex items-start gap-3"><span className="text-[#3AADE0] font-black mt-0.5">•</span> Ensure consistency and quality of all dishes served.</li>
                 <li className="flex items-start gap-3"><span className="text-[#3AADE0] font-black mt-0.5">•</span> Assist in menu engineering and cost control.</li>
@@ -610,7 +626,7 @@ function HiringTab() {
                 <div className="w-8 h-8 rounded-full bg-[#F5841F]/10 flex items-center justify-center text-[#F5841F]"><Star className="w-4 h-4"/></div>
                 Requirements
               </h3>
-              <ul className="space-y-4 text-gray-600 font-medium leading-relaxed">
+              <ul className="space-y-8 text-gray-600 font-medium leading-relaxed">
                 <li className="flex items-start gap-3"><span className="text-[#F5841F] font-black mt-0.5">•</span> Minimum 5 years experience in high-volume.</li>
                 <li className="flex items-start gap-3"><span className="text-[#F5841F] font-black mt-0.5">•</span> Strong leadership and communication.</li>
                 <li className="flex items-start gap-3"><span className="text-gray-300 font-black mt-0.5">•</span> Experience with Mediterranean cuisine (Bonus).</li>
@@ -667,7 +683,7 @@ function HiringTab() {
 // 7. Calendar
 function CalendarTab() {
   return (
-    <div className="animate-in fade-in duration-700 max-w-5xl mx-auto">
+    <div className="animate-in fade-in duration-700 w-full">
       <div className="text-center mb-16">
         <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Availability</h1>
         <p className="text-gray-500 mt-4 text-lg">Define structural rules for client bookings.</p>
@@ -675,10 +691,10 @@ function CalendarTab() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <div className="space-y-6">
+        <div className="space-y-8">
           <div className="bg-white/80 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
             <h3 className="font-black text-xl text-gray-900 mb-6">Exposed Days</h3>
-            <div className="space-y-4">
+            <div className="space-y-8">
               {['Thu', 'Sat'].map(d => (
                 <div key={d} className="flex justify-between items-center p-4 bg-[#78BE1F]/10 rounded-2xl border border-[#78BE1F]/20">
                   <span className="font-black text-[#78BE1F]">{d}</span>
@@ -702,13 +718,13 @@ function CalendarTab() {
         <div className="lg:col-span-2 bg-white/70 backdrop-blur-3xl p-10 rounded-[3rem] border border-white shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)]">
           <h2 className="text-3xl font-black text-gray-900 mb-10">July 2026</h2>
           
-          <div className="grid grid-cols-7 gap-4 text-center mb-6">
+          <div className="grid grid-cols-7 gap-8 text-center mb-6">
             {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
               <span key={i} className="text-sm font-black text-gray-400">{d}</span>
             ))}
           </div>
           
-          <div className="grid grid-cols-7 gap-3 md:gap-4">
+          <div className="grid grid-cols-7 gap-3 md:gap-8">
             {Array.from({length: 31}).map((_, i) => {
               const day = (i % 7) + 1;
               const isAllowed = day === 4 || day === 6;
@@ -722,7 +738,7 @@ function CalendarTab() {
             })}
           </div>
 
-          <div className="mt-10 flex gap-6 border-t border-gray-100 pt-8">
+          <div className="mt-10 flex gap-8 border-t border-gray-100 pt-8">
             <span className="flex items-center gap-2 text-sm font-bold text-gray-500"><div className="w-3 h-3 rounded-full bg-[#3AADE0]"/> Client Call</span>
             <span className="flex items-center gap-2 text-sm font-bold text-gray-500"><div className="w-3 h-3 rounded-full bg-[#E91E8C]"/> Ops Block</span>
           </div>
@@ -770,7 +786,7 @@ function RevenueTab() {
           <h3 className="text-white/80 font-bold mb-2">YTD Total Revenue</h3>
           <p className="text-5xl font-black tracking-tight mb-8">$1.2M</p>
           
-          <div className="space-y-4">
+          <div className="space-y-8">
             <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm border border-white/20">
               <span className="block text-xs font-bold text-white/70 uppercase mb-1">Target Achievement</span>
               <div className="flex items-center gap-3">
@@ -789,7 +805,7 @@ function RevenueTab() {
           <span>Marketing ROI & Client Performance</span>
           <span className="text-sm font-bold text-gray-400 bg-white px-3 py-1 rounded-full shadow-sm">Global Average</span>
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="bg-white rounded-2xl p-6 border border-gray-50 shadow-sm relative overflow-hidden group hover:-translate-y-1 transition-all">
             <div className="absolute top-0 right-0 w-16 h-16 bg-[#F5841F]/10 rounded-full blur-xl -translate-y-1/2 translate-x-1/2"></div>
             <p className="text-gray-400 font-bold text-xs uppercase tracking-wider mb-2">Avg Cost Per Lead (CPL)</p>
@@ -813,7 +829,7 @@ function RevenueTab() {
 
       <div className="bg-white/60 backdrop-blur-2xl rounded-[3rem] p-8 border border-white shadow-xl shadow-black/5">
         <h3 className="text-xl font-black text-gray-900 mb-6">Revenue by Service Segment</h3>
-        <div className="space-y-4">
+        <div className="space-y-8">
           {[
             { s: "Menu Engineering & F&B Consulting", v: "$450,000", p: "37.5%", c: "#F5841F" },
             { s: "Marketing & Lead Generation", v: "$320,000", p: "26.6%", c: "#E91E8C" },
@@ -821,7 +837,7 @@ function RevenueTab() {
             { s: "Recruitment & Training", v: "$150,000", p: "12.5%", c: "#78BE1F" },
           ].map((item, i) => (
             <div key={i} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-white rounded-2xl shadow-sm border border-gray-50 group hover:-translate-y-1 transition-transform cursor-default">
-              <div className="flex items-center gap-4 mb-2 md:mb-0">
+              <div className="flex items-center gap-8 mb-2 md:mb-0">
                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.c }}></div>
                 <span className="font-bold text-gray-700">{item.s}</span>
               </div>
@@ -848,7 +864,7 @@ function BillingTab() {
         <p className="text-gray-500 mt-3 text-lg">Manage invoices, retainers, and cash flow.</p>
       </div>
       <div className="flex flex-col lg:flex-row gap-8">
-        <div className="flex-1 space-y-6">
+        <div className="flex-1 space-y-8">
           <h3 className="text-2xl font-black text-gray-900 ml-2">Outstanding Invoices</h3>
           {[
             { c: "Kempinski Hotel", s: "F&B Consulting (Phase 1)", a: "$12,500", d: "Overdue by 3 days", st: "Overdue" },
@@ -959,14 +975,14 @@ function ProjectsTab() {
         </h1>
         <p className="text-gray-500 mt-3 text-lg">Track client deliverables across milestones.</p>
       </div>
-      <div className="flex gap-6 overflow-x-auto pb-8 flex-1 min-h-[500px]">
+      <div className="flex gap-8 overflow-x-auto pb-8 flex-1 min-h-[500px]">
         {columns.map((col, i) => (
           <div key={i} className="flex-1 min-w-[320px] bg-white/40 backdrop-blur-md rounded-[2rem] border border-white p-4 flex flex-col">
             <div className="flex items-center justify-between px-2 mb-6">
               <h3 className="font-bold text-gray-700">{col.title}</h3>
               <span className="text-xs font-black px-2 py-1 rounded-full text-white" style={{ backgroundColor: col.color }}>{col.tasks.length}</span>
             </div>
-            <div className="space-y-4 flex-1">
+            <div className="space-y-8 flex-1">
               {col.tasks.map((task, j) => (
                 <div key={j} className="bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all hover:-translate-y-1 cursor-grab overflow-hidden group">
                   {task.img && (
@@ -1049,7 +1065,7 @@ function DocumentsTab() {
         </h1>
         <p className="text-gray-500 mt-3 text-lg">Secure contracts, NDAs, and proposals.</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {[
           { t: "Service Level Agreement (SLA)", c: "Kempinski Hotel", s: "Signed", color: C_GREEN },
           { t: "Marketing Retainer Q3", c: "The Ritz", s: "Awaiting Signature", color: C_ORANGE },
@@ -1089,21 +1105,21 @@ function SettingsTab() {
             + Invite User
           </button>
         </div>
-        <div className="p-8 space-y-6">
+        <div className="p-8 space-y-8">
           {[
             { n: "Sarah Jenkins", r: "Super Admin", e: "sarah@harmony.com", full: true },
             { n: "David Chen", r: "Recruitment Manager", e: "david@harmony.com", full: false },
             { n: "Elena Rodriguez", r: "Marketing Lead", e: "elena@harmony.com", full: false }
           ].map((user, i) => (
             <div key={i} className="flex items-center justify-between p-4 hover:bg-white rounded-2xl transition-colors border border-transparent hover:border-gray-100 cursor-default">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-8">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-200 to-gray-300"></div>
                 <div>
                   <h4 className="font-bold text-gray-900">{user.n}</h4>
                   <p className="text-sm text-gray-500">{user.e}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-8">
                 <span className={`text-xs font-bold px-3 py-1 rounded-full ${user.full ? 'bg-gray-900 text-white' : 'bg-[#3AADE0]/10 text-[#3AADE0]'}`}>
                   {user.r}
                 </span>
@@ -1142,7 +1158,7 @@ function PayrollTab() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
         <div className="bg-white/80 backdrop-blur-xl border border-white p-6 rounded-3xl shadow-sm">
           <p className="text-gray-400 font-bold text-sm uppercase tracking-wider mb-2">Total Monthly Payroll</p>
           <p className="text-4xl font-black text-gray-900">$30,000</p>
@@ -1158,7 +1174,7 @@ function PayrollTab() {
       </div>
 
       <div className="bg-white/60 backdrop-blur-3xl rounded-[3rem] border border-white shadow-xl shadow-black/5 overflow-hidden flex-1">
-        <div className="grid grid-cols-12 gap-4 p-6 border-b border-gray-100 bg-gray-50/50 text-xs font-black text-gray-400 uppercase tracking-widest">
+        <div className="grid grid-cols-12 gap-8 p-6 border-b border-gray-100 bg-gray-50/50 text-xs font-black text-gray-400 uppercase tracking-widest">
           <div className="col-span-4">Employee</div>
           <div className="col-span-3">Role</div>
           <div className="col-span-2">Salary</div>
@@ -1167,7 +1183,7 @@ function PayrollTab() {
         </div>
         <div className="divide-y divide-gray-100/50">
           {employees.map((emp, i) => (
-            <div key={i} className="grid grid-cols-12 gap-4 p-6 items-center hover:bg-white transition-colors group cursor-default">
+            <div key={i} className="grid grid-cols-12 gap-8 p-6 items-center hover:bg-white transition-colors group cursor-default">
               <div className="col-span-4 font-bold text-gray-900 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm" style={{backgroundColor: emp.color}}>
                   {emp.name.split(' ').map(n => n[0]).join('')}
@@ -1193,3 +1209,21 @@ function PayrollTab() {
     </div>
   );
 }
+
+function AccessDenied() {
+  return (
+    <div className="flex flex-col items-center justify-center h-[60vh] animate-in fade-in zoom-in duration-500">
+      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+        <ShieldCheck className="w-10 h-10 text-gray-400" />
+      </div>
+      <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Access Restricted</h2>
+      <p className="text-gray-500 text-center max-w-sm">
+        You need <span className="font-bold text-gray-900">Super Admin</span> privileges to view and manage this section.
+      </p>
+    </div>
+  );
+}
+
+
+
+

@@ -35,7 +35,7 @@ export function ServicesOverview({
 
       <div className="relative z-10">
         {/* --- 1. FEATURED DIVISION: F&B TECHNOLOGY --- */}
-        <div className="min-h-[70vh] pt-12 pb-8 flex flex-col justify-center px-6 max-w-[1200px] mx-auto relative">
+        <div className="min-h-[70vh] pt-12 pb-8 flex flex-col justify-center px-6 w-full relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 items-center flex-1">
             <div className="order-2 lg:order-1 lg:col-span-5 relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-[#F5841F]/30 to-[#E91E8C]/20 blur-[40px] rounded-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
@@ -51,23 +51,23 @@ export function ServicesOverview({
             <div className="order-1 lg:order-2 lg:col-span-7">
               <div className="inline-flex items-center gap-3 mb-4">
                 <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
-                <span className="font-['Plus_Jakarta_Sans'] text-[11px] font-bold uppercase tracking-widest text-[#1a1a1a]/50">
+                <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/50">
                   Division
                 </span>
                 <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
               </div>
 
-              <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-5 leading-[1.1] tracking-tight">
+              <h2 className="font-extrabold text-5xl md:text-6xl text-[#1a1a1a] mb-5 leading-[1.1] tracking-tight">
                 {tech.label}
               </h2>
 
-              <p className="font-['Plus_Jakarta_Sans'] text-[16px] md:text-[18px] text-[#1a1a1a]/70 leading-[1.8]">
+              <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/70 font-medium">
                 {tech.intro}
               </p>
 
               <button
                 onClick={() => onOpen("technology")}
-                className="mt-8 inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[14px] font-bold text-white px-6 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)] group"
+                className="mt-8 inline-flex items-center gap-2 text-lg font-bold text-white px-6 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)] group"
                 style={{ background: C_ORANGE }}
               >
                 Explore F&amp;B Technology
@@ -84,7 +84,7 @@ export function ServicesOverview({
             }
           >
             <div className="flex flex-col items-center gap-2">
-              <span className="font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/60">
+              <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/60">
                 Explore More Services
               </span>
               <ChevronDown size={24} className="text-[#F5841F]" />
@@ -94,21 +94,21 @@ export function ServicesOverview({
 
         {/* --- 2. THE 4 PILLARS OF EXPERTISE --- */}
         <div id="services-grid" className="pt-16 pb-12">
-          <div className="max-w-[1200px] mx-auto px-6 text-center mb-12">
+          <div className="w-full w-full max-w-[1600px] mx-auto px-6 lg:px-12 text-center mb-12">
             <div className="inline-flex items-center gap-3 mb-6">
               <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
-              <span className="font-['Plus_Jakarta_Sans'] text-[11px] md:text-[12px] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/50">
+              <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/50">
                 WHAT WE DO
               </span>
               <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
             </div>
-            <h1 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[36px] md:text-[52px] leading-[1.1] tracking-tight mb-4 text-[#1a1a1a]">
+            <h1 className="font-extrabold text-4xl md:text-5xl leading-[1.15] tracking-tight mb-4 text-[#1a1a1a]">
               Four Pillars of Expertise
             </h1>
           </div>
 
-          <div className="max-w-[1200px] mx-auto px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="w-full w-full max-w-[1600px] mx-auto px-6 lg:px-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-8">
               {pillars.map((s) => {
                 const picked = countFor(s.id);
                 return (
@@ -127,7 +127,7 @@ export function ServicesOverview({
                       <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent opacity-80" />
                       {picked > 0 && (
                         <span
-                          className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white font-['Plus_Jakarta_Sans'] text-[11.5px] font-extrabold shadow-lg"
+                          className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-[11.5px] font-extrabold shadow-lg"
                           style={{ background: s.color }}
                         >
                           <Check size={12} strokeWidth={3} />
@@ -137,7 +137,7 @@ export function ServicesOverview({
                     </div>
 
                     <div className="p-8 flex flex-col flex-1 bg-white relative">
-                      <div className="flex items-center gap-4 mb-6">
+                      <div className="flex items-center gap-8 mb-6">
                         <div
                           className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-110"
                           style={{ background: s.dim }}
@@ -146,24 +146,24 @@ export function ServicesOverview({
                         </div>
                         <div>
                           <p
-                            className="font-['Plus_Jakarta_Sans'] text-[10px] font-bold uppercase tracking-widest mb-1"
+                            className="text-xs font-bold uppercase tracking-widest mb-1"
                             style={{ color: s.color }}
                           >
                             {s.tagline}
                           </p>
-                          <h3 className="font-['Plus_Jakarta_Sans'] text-[22px] font-extrabold text-[#1a1a1a] leading-tight">
+                          <h3 className="text-2xl font-bold leading-[1.3] text-[#1a1a1a]">
                             {s.label}
                           </h3>
                         </div>
                       </div>
 
-                      <p className="font-['Plus_Jakarta_Sans'] text-[15px] text-[#1a1a1a]/70 leading-[1.7] mb-8 flex-1 font-medium">
+                      <p className="text-lg text-[#1a1a1a]/70 leading-[1.7] mb-8 flex-1 font-medium">
                         {s.promise}
                       </p>
 
                       <button
                         onClick={() => onOpen(s.id)}
-                        className="inline-flex items-center gap-2 font-['Plus_Jakarta_Sans'] text-[15px] font-bold hover:gap-3 transition-all mt-auto"
+                        className="inline-flex items-center gap-2 text-lg font-bold hover:gap-3 transition-all mt-auto"
                         style={{ color: s.color }}
                       >
                         Request Service <ChevronRight size={18} />
@@ -178,7 +178,7 @@ export function ServicesOverview({
 
         {/* --- 3. THE BRIDGE / INTRO TEXT --- */}
         <div className="max-w-[900px] mx-auto px-6 mt-8 mb-12 text-center">
-          <p className="font-['Plus_Jakarta_Sans'] text-[18px] md:text-[22px] leading-[1.8] text-[#1a1a1a]/80 font-medium">
+          <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/80 font-medium">
             Nothing here is a fixed package. Open any service, add the specific pieces that
             apply to you — one, several, or all of them — and book a single appointment
             that covers everything you picked.
@@ -186,17 +186,17 @@ export function ServicesOverview({
         </div>
 
         {/* --- 4. BOTTOM CALL-TO-ACTION --- */}
-        <div className="w-full py-16 md:py-24 px-6 relative overflow-hidden">
+        <div className="w-full py-16 md:py-24 px-4 md:px-8 relative overflow-hidden">
           <div className="absolute top-[-50%] left-[0%] w-[500px] h-[500px] bg-[#F5841F]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
           <div className="absolute bottom-[-50%] right-[0%] w-[500px] h-[500px] bg-[#E91E8C]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
 
-          <div className="relative z-10 max-w-[800px] mx-auto text-center bg-white/60 backdrop-blur-xl p-10 md:p-16 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)] border border-white">
-            <h2 className="font-['Plus_Jakarta_Sans'] font-extrabold text-[32px] md:text-[48px] text-[#1a1a1a] mb-8 tracking-tight leading-[1.1]">
+          <div className="relative z-10 w-full text-center bg-white/60 backdrop-blur-xl p-10 md:p-16 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)] border border-white">
+            <h2 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-8 tracking-tight leading-[1.15]">
               Ready to unlock your full potential?
             </h2>
             <button
               onClick={onBook}
-              className="inline-flex items-center gap-3 font-['Plus_Jakarta_Sans'] text-[15px] font-bold text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(245,132,31,0.5)] group"
+              className="inline-flex items-center gap-3 text-lg font-bold text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(245,132,31,0.5)] group"
               style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
             >
               Book an Appointment
@@ -208,3 +208,9 @@ export function ServicesOverview({
     </div>
   );
 }
+
+
+
+
+
+
