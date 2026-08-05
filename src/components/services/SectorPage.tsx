@@ -64,17 +64,17 @@ export function ModuleCard({
           </span>
         </div>
 
-        <h4 className="font-bold text-xl text-[#1a1a1a] mb-2 leading-[1.3]">
+        <h4 className="font-bold text-2xl text-[#1a1a1a] mb-2 leading-[1.3]">
           {m.label}
         </h4>
-        <p className="text-sm leading-[1.65] text-[#1a1a1a]/55 font-medium flex-1">
+        <p className="text-base leading-[1.65] text-[#1a1a1a]/55 font-medium flex-1">
           {m.desc}
         </p>
 
         {/* Status + the expand control */}
         <div className="flex items-end justify-between gap-3 mt-4">
           <span
-            className={`text-xs font-bold uppercase tracking-[0.1em] transition-colors ${
+            className={`text-sm font-bold uppercase tracking-widest transition-colors ${
               on ? "" : "text-[#1a1a1a]/30 group-hover:text-[#1a1a1a]/50"
             }`}
             style={on ? { color } : undefined}
@@ -179,11 +179,11 @@ export function SectorPage({
                 {service.label}
               </h1>
 
-              <p className="text-xl md:text-2xl leading-[1.8] font-medium text-[#1a1a1a]/85 mb-6">
+              <p className="text-2xl md:text-3xl leading-[1.8] font-medium text-[#1a1a1a]/85 mb-6">
                 {service.promise}
               </p>
 
-              <p className="text-lg font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-4xl">
+              <p className="text-xl font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-4xl">
                 {service.intro}
               </p>
             </div>
@@ -222,7 +222,7 @@ export function SectorPage({
               <h2 className="font-extrabold text-4xl md:text-5xl tracking-tight text-[#1a1a1a] mb-4 leading-[1.15]">
                 Pick what you need
               </h2>
-              <p className="text-xl text-[#1a1a1a]/55 leading-[1.75] font-medium">
+              <p className="text-2xl text-[#1a1a1a]/55 leading-[1.75] font-medium">
                 Take one, take several, or take everything — you're not buying a package.
                 Add what's relevant and we'll build the meeting around it.
               </p>
@@ -252,7 +252,7 @@ export function SectorPage({
                       {group.title}
                     </h3>
                   </div>
-                  <p className="text-lg text-[#1a1a1a]/55 leading-[1.7] font-medium pl-10">
+                  <p className="text-xl text-[#1a1a1a]/55 leading-[1.7] font-medium pl-10">
                     {group.blurb}
                   </p>
                 </div>
