@@ -1,9 +1,11 @@
-"use client"
+﻿"use client"
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { ImageWithFallback } from "@/components";
 import AdminDashboard from "./AdminDashboard";
+import CompanyDashboard from "./CompanyDashboard";
 import {
   Instagram,
   Facebook,
@@ -40,9 +42,9 @@ import {
   Briefcase,
 } from 'lucide-react';
 
-import { SERVICES, SERVICE_BY_ID, INTENTS, type ServiceId } from "@/content/services";
-import { BriefProvider } from "@/state/BriefContext";
-import { BriefBar } from "@/components/brief/BriefBar";
+import { SERVICES, SERVICE_BY_ID, type ServiceId } from "@/content/services";
+import { type Page, isKnownPage, pageToPath, pathToPage } from "./routes";
+import { isStaffRole, useAuth } from "./auth";
 import { BookingPage } from "@/components/brief/BookingPage";
 import { ServicesOverview } from "@/components/services/ServicesOverview";
 import { SectorPage } from "@/components/services/SectorPage";
@@ -53,17 +55,12 @@ const logoImg = "/imports/image-10.png";
 const welcomeImg = "/imports/image-11.png";
 const missionTopImg = "/imports/image-7.png";
 
-type Page =
-  | "services" | "stories" | "about" | "mission"
-  | "booking" | "contact" | "login" | "admin"
-  | ServiceId;
-
 const C_ORANGE = "#F5841F";
 const C_PINK = "#E91E8C";
 const C_BLUE = "#3AADE0";
 const C_GREEN = "#78BE1F";
 
-// ── Brand ───────────────────────────────────────────────────────────────────
+// â”€â”€ Brand â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const C = {
   management:    "#FFB343",
   managementDim: "#FFF8EC",
@@ -97,175 +94,51 @@ function HeroCircle({ go }: { go: (p: Page) => void }) {
   );
 }
 
-// ─── Nav ─────────────────────────────────────────────────────────────────────
 
-function Nav({ current, go }: { current: Page; go: (p: Page) => void }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const tabs: { label: string; page: Page; exact?: boolean }[] = [
-    { label: "About Us", page: "about" },
-    { label: "Mission & Vision", page: "mission" },
-    { label: "Service", page: "services" },
-    { label: "Portfolio", page: "stories" },
-  ];
-
-  const isActive = (page: Page) =>
-    current === page && current !== "contact";
-
-  return (
-    <header className="bg-[#FAF7F2] border-b border-black/[0.07] flex-shrink-0 z-50 relative">
-      <div className="h-[80px] md:h-[90px] flex items-center px-6 md:px-12 gap-8">
-        {/* Brand */}
-        <button
-          onClick={() => { go("about"); }}
-          className="flex-shrink-0 flex items-center gap-2.5 transition-opacity hover:opacity-80 text-left"
-        >
-          <ImageWithFallback src="/imports/friend-logo.png" alt="Harmony Club House" className="h-9 w-9 object-contain rounded-full"/>
-          <div className="hidden sm:block">
-            <div className="text-base font-black leading-none tracking-widest text-gray-900" style={{fontFamily:"'Montserrat',sans-serif"}}>HARMONY</div>
-            <div className="text-[10px] font-semibold tracking-[0.22em] text-gray-400 leading-none mt-0.5" style={{fontFamily:"'Montserrat',sans-serif"}}>CLUB HOUSE</div>
-          </div>
-        </button>
-
-        {/* Tab links — desktop */}
-        <nav className="hidden md:flex items-center gap-2 flex-1 justify-center">
-          {tabs.map(({ label, page }) =>
-            page === "services" ? (
-              // Services opens a menu so all four are one click away
-              <div key={label} className="relative group/svc">
-                <button
-                  onClick={() => go("services")}
-                  className={`relative text-[14.5px] font-bold px-4 py-2.5 rounded-full transition-all duration-300 inline-flex items-center gap-1.5 ${
-                    isActive(page) || SERVICES.some((s) => s.id === current)
-                      ? "text-[#1a1a1a] bg-black/[0.04]"
-                      : "text-[#1a1a1a]/50 hover:text-[#1a1a1a] hover:bg-black/[0.02]"
-                  }`}
-                >
-                  {label}
-                  <ChevronDown size={13} className="transition-transform duration-300 group-hover/svc:rotate-180" />
-                </button>
-
-                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover/svc:opacity-100 group-hover/svc:visible transition-all duration-200 z-50">
-                  <div className="bg-white rounded-[22px] shadow-[0_25px_50px_-15px_rgba(0,0,0,0.18)] border border-black/[0.05] p-2.5 w-[290px]">
-                    {SERVICES.map((s) => (
-                      <button
-                        key={s.id}
-                        onClick={() => go(s.id)}
-                        className="w-full text-left flex items-start gap-3 p-3 rounded-2xl hover:bg-black/[0.03] transition-colors group/item"
-                      >
-                        <span
-                          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover/item:scale-110"
-                          style={{ background: s.dim, color: s.color }}
-                        >
-                          <s.icon size={16} />
-                        </span>
-                        <span className="min-w-0">
-                          <span className="block text-lg font-extrabold text-[#1a1a1a] leading-tight mb-0.5">
-                            {s.label}
-                          </span>
-                          <span className="block text-[11.5px] font-semibold text-[#1a1a1a]/45 leading-snug">
-                            {s.tagline}
-                          </span>
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <button
-                key={label}
-                onClick={() => go(page)}
-                className={`relative text-[14.5px] font-bold px-4 py-2.5 rounded-full transition-all duration-300 ${
-                  isActive(page)
-                    ? "text-[#1a1a1a] bg-black/[0.04]"
-                    : "text-[#1a1a1a]/50 hover:text-[#1a1a1a] hover:bg-black/[0.02]"
-                }`}
-              >
-                {label}
-                {isActive(page) && (
-                  <span
-                    className="absolute bottom-1 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full"
-                    style={{ background: C_ORANGE }}
-                  />
-                )}
-              </button>
-            ),
-          )}
-        </nav>
-
-        
-
-        <div className="flex-1 md:hidden" />
-
-        {/* Primary CTA — the whole site points here */}
-        <button
-          onClick={() => go("booking")}
-          className="hidden md:inline-flex text-lg font-bold text-white px-7 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)] flex-shrink-0"
-          style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
-        >
-          Book Appointment
-        </button>
-
-        <button 
-            onClick={() => go("login")} // Directs to the login page
-            className="text-lg font-bold text-[#1a1a1a] px-5 py-2.5 rounded-full hover:bg-black/5 transition-all"
-          >
-            Sign In
-          </button>
-
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden text-[#1a1a1a]/60 p-2"
-          onClick={() => setMobileOpen((v) => !v)}
-        >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t border-black/[0.07] bg-[#FAF7F2] px-6 py-6 flex flex-col gap-8 absolute w-full shadow-xl">
-          {tabs.map(({ label, page }) => (
-            <button
-              key={label}
-              onClick={() => { go(page); setMobileOpen(false); }}
-              className="text-left text-xl font-bold text-[#1a1a1a]/70 hover:text-[#1a1a1a] transition-colors"
-            >
-              {label}
-            </button>
-          ))}
-          <div className="pl-3 flex flex-col gap-3 border-l-2 border-black/[0.06]">
-            {SERVICES.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => { go(s.id); setMobileOpen(false); }}
-                className="text-left text-[14.5px] font-bold text-[#1a1a1a]/55 hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2.5"
-              >
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: s.color }} />
-                {s.label}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => { go("booking"); setMobileOpen(false); }}
-            className="mt-4 text-lg font-bold text-white py-3.5 rounded-full shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)]"
-            style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
-          >
-            Book Appointment
-          </button>
-        </div>
-      )}
-    </header>
-  );
-}
-
-// ─── Home Page (single-screen) ────────────────────────────────────────────────
+// â”€â”€â”€ Home Page (single-screen) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 
 function LoginPage({ go }: { go: (p: Page) => void }) {
   const [mode, setMode] = useState<"login" | "signup">("login");
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (busy) return;
+
+    setError(null);
+
+    // Self-service registration isn't wired up yet. Until it is, this must not
+    // fall through to the dashboard.
+    if (mode === "signup") {
+      setError("Account creation isn't available yet â€” please contact us to get set up.");
+      return;
+    }
+
+    /* Pasted credentials routinely carry a stray space or newline, which would
+       otherwise read as a wrong password. Surrounding whitespace is never part
+       of what someone meant to type. */
+    setBusy(true);
+    const result = await login(email.trim(), password.trim());
+    setBusy(false);
+
+    if (!result.ok) {
+      setError(result.message ?? "Sign in failed.");
+      return;
+    }
+
+    /* Signing in just signs you in â€” it doesn't hijack where you were going.
+       Head back to whatever page sent you here; the nav's Profile button is
+       how you reach your own area. */
+    const returnTo = typeof window !== "undefined" ? sessionStorage.getItem("returnTo") : null;
+    if (returnTo) sessionStorage.removeItem("returnTo");
+    go(isKnownPage(returnTo) ? (returnTo as Page) : "about");
+  };
 
   return (
     <div className="flex-1 overflow-y-auto flex items-center justify-center bg-[#FAF7F2] relative p-6 py-12">
@@ -293,7 +166,7 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
 
         {/* Auth Card */}
         <div className="bg-white/80 backdrop-blur-2xl p-8 md:p-10 rounded-[40px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] border border-white">
-          <form onSubmit={(e) => { e.preventDefault(); go("admin"); }} className="space-y-8">
+          <form onSubmit={handleSignIn} className="space-y-8">
             
             {/* Sign Up Only: Name */}
             {mode === "signup" && (
@@ -313,6 +186,8 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Mail size={16} /></div>
                 <input type="email" placeholder="hello@example.com" required
+                  value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email"
+                  autoCapitalize="none" autoCorrect="off" spellCheck={false}
                   className="w-full pl-11 pr-4 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
               </div>
             </div>
@@ -322,7 +197,9 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>Password</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Lock size={16} /></div>
-                <input type="password" placeholder="••••••••" required
+                <input type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required
+                  value={password} onChange={(e) => setPassword(e.target.value)}
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
                   className="w-full pl-11 pr-4 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
               </div>
             </div>
@@ -345,12 +222,18 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
               </div>
             )}
 
+            {error && (
+              <div role="alert" className="rounded-2xl bg-red-50 border border-red-100 px-5 py-3.5 text-base font-semibold text-red-700">
+                {error}
+              </div>
+            )}
+
             {/* Submit Button */}
-            <button type="button" onClick={() => go("admin")}
-              className="w-full py-3.5 mt-2 rounded-full text-lg font-bold text-white transition-all hover:shadow-lg hover:-translate-y-0.5 group flex items-center justify-center gap-2"
+            <button type="submit" disabled={busy}
+              className="w-full py-3.5 mt-2 rounded-full text-lg font-bold text-white transition-all hover:shadow-lg hover:-translate-y-0.5 group flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{ background: `linear-gradient(135deg, #F5841F, #E91E8C)`, fontFamily:"'Montserrat',sans-serif" }}>
-              {mode === "login" ? "Sign In" : "Create Account"} 
-              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              {busy ? "Signing inâ€¦" : mode === "login" ? "Sign In" : "Create Account"}
+              {!busy && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
             </button>
           </form>
 
@@ -359,7 +242,7 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
             <p className="text-base text-[#1a1a1a]/55 font-medium">
               {mode === "login" ? "Don't have an account? " : "Already have an account? "}
               <button 
-                onClick={() => setMode(mode === "login" ? "signup" : "login")} 
+                onClick={() => { setMode(mode === "login" ? "signup" : "login"); setError(null); }}
                 className="font-bold text-[#E91E8C] hover:text-[#F5841F] transition-colors"
               >
                 {mode === "login" ? "Sign up" : "Log in"}
@@ -460,7 +343,7 @@ const TIMELINE_FRIEND = [
   { year:"2017", label:"Events Division",  desc:"Launched dedicated events arm, delivering 50+ large-scale corporate and private events.", color:C_FRIEND.marketing },
   { year:"2019", label:"Digital & Marketing",desc:"Introduced full-stack marketing services as brands demanded stronger digital presence.", color:C_FRIEND.recruitment },
   { year:"2021", label:"2,500 Trained",    desc:"Milestone: trained over 2,500 hospitality professionals across the region.", color:C_FRIEND.management },
-  { year:"2024", label:"4 Continents",     desc:"Active across MENA, Europe, Asia, and the Americas — 30+ projects and growing.", color:C_FRIEND.events },
+  { year:"2024", label:"4 Continents",     desc:"Active across MENA, Europe, Asia, and the Americas â€” 30+ projects and growing.", color:C_FRIEND.events },
 ];
 
 function TimelineSection() {
@@ -588,7 +471,7 @@ function PartnersSection() {
             Trusted by <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Industry Giants</span>
           </h2>
           <p className="text-lg font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-4xl mx-auto">
-            From global hospitality leaders and banking institutions to iconic F&B brands — 14 trusted partners across the industry.
+            From global hospitality leaders and banking institutions to iconic F&B brands â€” 14 trusted partners across the industry.
           </p>
         </div>
 
@@ -842,7 +725,7 @@ function MissionPage({ go }: { go: (p: Page) => void }) {
     { icon: Settings, title: "Operational Excellence", text: "We repair weak spots and elevate strengths through strategic planning and precise analysis.", color: "#F5841F", image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop&auto=format" },
     { icon: Users, title: "Human Capital Development", text: "We build high-performing teams through expert recruitment and hands-on training for long-term stability.", color: "#E91E8C", image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=600&fit=crop&auto=format" },
     { icon: ShieldCheck, title: "Quality & Safety", text: "We deliver world-class F&B and facility services, strictly adhering to the highest international safety and hygiene standards.", color: "#3AADE0", image: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&h=600&fit=crop&auto=format" },
-    { icon: Lightbulb, title: "Creative Innovation", text: "We blend concept creation with artistic execution—from menu engineering to digital marketing—to deliver memorable customer experiences.", color: "#78BE1F", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop&auto=format" },
+    { icon: Lightbulb, title: "Creative Innovation", text: "We blend concept creation with artistic executionâ€”from menu engineering to digital marketingâ€”to deliver memorable customer experiences.", color: "#78BE1F", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop&auto=format" },
     { icon: Handshake, title: "Client-Centric Approach", text: "We handle the complex operations and logistics so you can focus on your core business. We build long-term partnerships by understanding your unique brand story.", color: "#F5841F", image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=600&fit=crop&auto=format" }
   ];
 
@@ -964,9 +847,9 @@ function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_500px] gap-16 items-start">
           <div>
             <h1 className="text-5xl md:text-6xl font-extrabold leading-[1.1] tracking-tight text-[#1a1a1a] mb-6">Let's build something great.</h1>
-            <p className="text-xl md:text-2xl text-[#1a1a1a]/70 font-medium leading-[1.8] mb-10 max-w-2xl">Whether you have a clear brief or just a big ambition — reach out.</p>
+            <p className="text-xl md:text-2xl text-[#1a1a1a]/70 font-medium leading-[1.8] mb-10 max-w-2xl">Whether you have a clear brief or just a big ambition â€” reach out.</p>
             <div className="space-y-5">
-              {[{ Icon: Mail, text: "hello@harmonyclubhouse.com" }, { Icon: Phone, text: "+20 100 000 0000" }, { Icon: MapPin, text: "Cairo, Egypt — 4 Continents" }].map(({ Icon, text }) => (
+              {[{ Icon: Mail, text: "hello@harmonyclubhouse.com" }, { Icon: Phone, text: "+20 100 000 0000" }, { Icon: MapPin, text: "Cairo, Egypt â€” 4 Continents" }].map(({ Icon, text }) => (
                 <div key={text} className="flex items-center gap-8">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${C_ORANGE}15` }}>
                     <Icon size={16} style={{ color: C_ORANGE }} />
@@ -1030,7 +913,7 @@ function ContactPage() {
   );
 }
 
-// ─── Root App ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Root App â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 const FOOTER_SOCIAL_ICONS = [
@@ -1043,7 +926,7 @@ const FOOTER_SOCIAL_ICONS = [
 
 const FOOTER_SERVICES = [
   { id: "management", color: "#F5841F", label: "Management", features: ["Pre-opening planning & setup", "Operations audit & restructuring", "Menu engineering", "P&L optimization"] },
-  { id: "events", color: "#E91E8C", label: "Events & Catering", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & décor coordination", "Guest management"] },
+  { id: "events", color: "#E91E8C", label: "Events & Catering", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & dÃ©cor coordination", "Guest management"] },
   { id: "marketing", color: "#3AADE0", label: "Marketing", features: ["Brand identity & positioning", "Social media strategy", "Influencer & PR campaigns", "Photography direction"] },
   { id: "recruitment", color: "#78BE1F", label: "Recruitment", features: ["Executive placement", "Chef & culinary sourcing", "FOH & BOH recruitment", "Event & seasonal staffing"] }
 ];
@@ -1123,50 +1006,85 @@ const SERVICE_IDS = SERVICES.map((s) => s.id);
 const isServicePage = (p: Page): p is ServiceId =>
   (SERVICE_IDS as string[]).includes(p);
 
-export default function App() {
-  const [page, setPage] = useState<Page>("about");
-
-  const go = (p: Page) => setPage(p);
-
+/** Full-screen status message, used while the session is being resolved. */
+function SessionNotice({ children }: { children: React.ReactNode }) {
   return (
-    <BriefProvider>
-      <div
-        className="h-screen overflow-hidden flex flex-col"
-        style={{ background: "#FAF7F2", fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-      >
-        <Nav current={page} go={go} />
-        {page === "services" && (
-          <ServicesOverview onOpen={(id) => go(id)} onBook={() => go("booking")} />
-        )}
-        {isServicePage(page) && (
-          <SectorPage
-            key={page}
-            service={SERVICE_BY_ID[page]}
-            onBook={() => go("booking")}
-            story={page === "marketing" ? <MarketingStory /> : undefined}
-          />
-        )}
-        {page === "booking" && <BookingPage onBrowse={() => go("services")} />}
-        {page === "stories" && <StoriesPage go={go} />}
-        {page === "about" && <AboutPage go={go} />}
-        {page === "mission" && <MissionPage go={go} />}
-        {page === "login" && <LoginPage go={go} />}
-        {page === "contact" && <ContactPage />}
-        {page === "admin" && <AdminDashboard />}
-
-        {/* The running selection follows the visitor everywhere except checkout
-            and sign-in, where it would sit on top of the form. */}
-        {page !== "booking" && page !== "login" && page !== "admin" && (
-          <BriefBar onBook={() => go("booking")} />
-        )}
-      </div>
-    </BriefProvider>
+    <div className="flex-1 flex items-center justify-center bg-[#FAF7F2]">
+      <p className="text-lg font-bold text-[#1a1a1a]/50">{children}</p>
+    </div>
   );
 }
 
+/**
+ * The dashboard is only rendered for a signed-in ADMIN. Anyone else is sent to
+ * the sign-in page. The server enforces this too â€” every /api/admin route sits
+ * behind the JWT cookie â€” so this guard is about UX, not about being the lock.
+ */
+function AdminRoute() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  // Coordinators work in the same portal; the dashboard hides what they can't use.
+  const allowed = isStaffRole(user?.role);
 
+  useEffect(() => {
+    if (!loading && !allowed) router.replace(pageToPath("login"));
+  }, [loading, allowed, router]);
 
+  if (loading) return <SessionNotice>Checking your sessionâ€¦</SessionNotice>;
+  if (!allowed) return <SessionNotice>Taking you to sign inâ€¦</SessionNotice>;
+  return <AdminDashboard />;
+}
 
+/** The company-side equivalent of AdminRoute. */
+function CompanyRoute() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  const allowed = user?.role === "COMPANY";
 
+  useEffect(() => {
+    if (!loading && !allowed) router.replace(pageToPath("login"));
+  }, [loading, allowed, router]);
 
+  if (loading) return <SessionNotice>Checking your sessionâ€¦</SessionNotice>;
+  if (!allowed) return <SessionNotice>Taking you to sign inâ€¦</SessionNotice>;
+  return <CompanyDashboard />;
+}
 
+/**
+ * The page body. Providers, the header, the guide and the brief bar all live
+ * in SiteShell (the root layout) so they survive navigation between routes.
+ */
+export default function App() {
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // The URL is the source of truth, so Back/Forward and refresh all work.
+  const page = pathToPage(pathname);
+  const go = (p: Page) => router.push(pageToPath(p));
+
+  return (
+    <>
+      {page === "services" && (
+        <ServicesOverview onOpen={(id) => go(id)} onBook={() => go("booking")} />
+      )}
+      {isServicePage(page) && (
+        <SectorPage
+          key={page}
+          service={SERVICE_BY_ID[page]}
+          onBook={() => go("booking")}
+          story={page === "marketing" ? <MarketingStory /> : undefined}
+        />
+      )}
+      {page === "booking" && (
+        <BookingPage onBrowse={() => go("services")} onSignIn={() => go("login")} />
+      )}
+      {page === "stories" && <StoriesPage go={go} />}
+      {page === "about" && <AboutPage go={go} />}
+      {page === "mission" && <MissionPage go={go} />}
+      {page === "login" && <LoginPage go={go} />}
+      {page === "contact" && <ContactPage />}
+      {page === "admin" && <AdminRoute />}
+      {page === "dashboard" && <CompanyRoute />}
+    </>
+  );
+}

@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowRight, ArrowLeft, Check, CheckCircle2, X, CalendarDays,
+  ArrowRight, ArrowLeft, Check, CheckCircle2, X, CalendarDays, Clock, LogIn,
 } from "lucide-react";
 import { useBrief } from "@/state/BriefContext";
+import { useAuth } from "@/app/auth";
+import { api, formatDay, formatTime, SERVICE_TYPE_BY_ID, type Slot } from "@/lib/api";
 import {
-  findModule, SERVICE_BY_ID, SERVICES,
+  findModule, SERVICE_BY_ID,
   C_ORANGE, C_PINK, C_GREEN,
   type GapQuestion,
 } from "@/content/services";
@@ -17,14 +19,89 @@ type Answers = Record<string, string>;
    answers only the questions their picks left open, and gives contact details
    last — asking for a name first is the biggest drop-off point. */
 
-export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
+export function BookingPage({
+  onBrowse,
+  onSignIn,
+}: {
+  onBrowse: () => void;
+  onSignIn?: () => void;
+}) {
   const { selected, count, toggle, activeServices, clear } = useBrief();
+  const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<Answers>({});
   const [contact, setContact] = useState({
     name: "", email: "", phone: "", company: "", note: "", when: "",
   });
   const [sent, setSent] = useState(false);
+
+  // Meeting time selection
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [slotId, setSlotId] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  /* Which service the request is filed under. The brief can span several, so
+     the first one picked leads and the rest ride along in the description. */
+  const primaryService = activeServices[0];
+  const serviceType = primaryService ? SERVICE_TYPE_BY_ID[primaryService] : "OTHER";
+
+  useEffect(() => {
+    const query = primaryService ? `?service=${SERVICE_TYPE_BY_ID[primaryService]}` : "";
+    api
+      .get<{ slots: Slot[] }>(`/scheduling/slots${query}`)
+      .then((d) => setSlots(d.slots.filter((s) => s.status === "OPEN" && new Date(s.startsAt) > new Date())))
+      .catch(() => setSlots([]));
+  }, [primaryService]);
+
+  /** Free slots grouped by day, so the picker reads like a calendar. */
+  const slotsByDay = useMemo(() => {
+    const map = new Map<string, Slot[]>();
+    for (const s of slots) {
+      const key = s.startsAt.slice(0, 10);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(s);
+    }
+    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+  }, [slots]);
+
+  const submit = async () => {
+    if (!canSubmit || submitting) return;
+
+    // A request has to belong to an account, so sign-in comes first.
+    if (!user || user.role !== "COMPANY") {
+      setSubmitError(
+        user
+          ? "You're signed in as staff. Use a client account to book an appointment."
+          : "Please sign in to your client account so we can attach this to your profile."
+      );
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    const picks = selected.map((id) => findModule(id)?.label).filter(Boolean).join(", ");
+    const extras = Object.entries(answers).map(([k, v]) => `${k}: ${v}`).join("\n");
+
+    try {
+      await api.post("/service-requests", {
+        serviceType,
+        title: picks ? picks.slice(0, 240) : "General enquiry",
+        description:
+          [contact.note, picks && `Selected: ${picks}`, extras].filter(Boolean).join("\n\n") ||
+          "No further detail provided.",
+        slotId: slotId ?? undefined,
+        location: answers.city || undefined,
+      });
+
+      setSent(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Could not send your request.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const set = (id: string, v: string) => setAnswers((a) => ({ ...a, [id]: v }));
 
@@ -250,10 +327,67 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
                 </div>
               </div>
 
+              {/* ── Pick a meeting time ─────────────────────────────── */}
+              <div className="mt-10 pt-8 border-t border-black/[0.06]">
+                <h3 className="font-extrabold text-xl mb-2 tracking-tight flex items-center gap-2.5">
+                  <Clock size={19} style={{ color: C_ORANGE }} />
+                  Choose your meeting time
+                </h3>
+                <p className="text-base text-[#1a1a1a]/50 font-medium leading-[1.7] mb-6">
+                  {slotsByDay.length > 0
+                    ? "These are the times we're free. Pick one and it's held for you."
+                    : "No times are open right now — send the request and we'll call you to arrange one."}
+                </p>
+
+                {slotsByDay.length > 0 && (
+                  <div className="flex flex-col gap-6">
+                    {slotsByDay.map(([day, daySlots]) => (
+                      <div key={day}>
+                        <p className="text-xs font-bold uppercase tracking-wider text-[#1a1a1a]/40 mb-3">
+                          {formatDay(daySlots[0].startsAt)}
+                        </p>
+                        <div className="flex flex-wrap gap-2.5">
+                          {daySlots.map((s) => (
+                            <button
+                              key={s.id}
+                              type="button"
+                              onClick={() => setSlotId(slotId === s.id ? null : s.id)}
+                              className={`text-[14px] font-bold px-5 py-3 rounded-full border transition-all duration-200 ${
+                                slotId === s.id
+                                  ? "text-white scale-[1.03] border-transparent"
+                                  : "bg-[#FAF7F2] border-black/[0.07] text-[#1a1a1a]/70 hover:border-black/25"
+                              }`}
+                              style={slotId === s.id ? { background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` } : undefined}
+                            >
+                              {formatTime(s.startsAt)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {requiredMissing && (
                 <p className="mt-5 text-[13.5px] font-semibold text-[#E91E8C]">
                   Some details are still missing — go back one step.
                 </p>
+              )}
+
+              {submitError && (
+                <div className="mt-6 rounded-2xl bg-[#E91E8C]/8 border border-[#E91E8C]/20 px-5 py-4">
+                  <p className="text-[14px] font-bold text-[#1a1a1a]/80">{submitError}</p>
+                  {!user && onSignIn && (
+                    <button
+                      onClick={onSignIn}
+                      className="mt-3 inline-flex items-center gap-2 text-[14px] font-bold text-white px-5 py-2.5 rounded-full"
+                      style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
+                    >
+                      <LogIn size={15} /> Sign in
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -282,13 +416,13 @@ export function BookingPage({ onBrowse }: { onBrowse: () => void }) {
               </button>
             ) : (
               <button
-                onClick={() => canSubmit && setSent(true)}
-                disabled={!canSubmit}
+                onClick={submit}
+                disabled={!canSubmit || submitting}
                 className="inline-flex items-center gap-2.5 text-[14.5px] font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_14px_28px_-10px_rgba(233,30,140,0.55)] disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed group"
                 style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
               >
                 <CalendarDays size={17} />
-                Request my appointment
+                {submitting ? "Sending…" : "Request my appointment"}
               </button>
             )}
           </div>

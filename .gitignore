@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# ...but the template must be committed - it's how a new machine gets set up
+!.env.example
 
 # vercel
 .vercel

@@ -41,6 +41,7 @@ const createServiceRequest = async (req, res) => {
       location,
       budgetRange,
       notes,
+      slotId,
     } = req.body;
 
     const missingFields = [];
@@ -84,8 +85,33 @@ const createServiceRequest = async (req, res) => {
       });
     }
 
-    const [result] = await db.query(
-      `
+    let connection;
+    let result;
+
+    try {
+      connection = await db.getConnection();
+      await connection.beginTransaction();
+
+      if (slotId) {
+        /* Claim the time only if it is still OPEN. Doing it as a conditional
+           UPDATE means two companies submitting at the same instant can't both
+           win — the second one's UPDATE matches zero rows. */
+        const [claim] = await connection.query(
+          "UPDATE availability_slots SET status = 'REQUESTED' WHERE id = ? AND status = 'OPEN'",
+          [slotId]
+        );
+
+        if (claim.affectedRows === 0) {
+          await connection.rollback();
+          return res.status(409).json({
+            success: false,
+            message: "That time has just been taken. Please choose another slot.",
+          });
+        }
+      }
+
+      [result] = await connection.query(
+        `
         INSERT INTO service_requests
           (
             company_id,
@@ -95,21 +121,31 @@ const createServiceRequest = async (req, res) => {
             preferred_date,
             location,
             budget_range,
-            notes
+            notes,
+            slot_id
           )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
-      [
-        company.id,
-        normalizedServiceType,
-        title,
-        description,
-        preferredDate || null,
-        location || null,
-        budgetRange || null,
-        notes || null,
-      ]
-    );
+        [
+          company.id,
+          normalizedServiceType,
+          title,
+          description,
+          preferredDate || null,
+          location || null,
+          budgetRange || null,
+          notes || null,
+          slotId || null,
+        ]
+      );
+
+      await connection.commit();
+    } catch (error) {
+      if (connection) await connection.rollback();
+      throw error;
+    } finally {
+      if (connection) connection.release();
+    }
 
     return res.status(201).json({
       success: true,
@@ -124,6 +160,7 @@ const createServiceRequest = async (req, res) => {
         location: location || null,
         budgetRange: budgetRange || null,
         notes: notes || null,
+        slotId: slotId || null,
         status: "PENDING",
       },
     });
@@ -141,11 +178,9 @@ const getCompanyServiceRequests = async (req, res) => {
   try {
     const company = await getCompanyByUserId(req.user.userId);
 
+    // No company row yet just means no bookings, not a broken account.
     if (!company) {
-      return res.status(404).json({
-        success: false,
-        message: "Company profile not found",
-      });
+      return res.status(200).json({ success: true, serviceRequests: [] });
     }
 
     const [requests] = await db.query(

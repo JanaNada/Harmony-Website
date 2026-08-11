@@ -31,6 +31,23 @@ const authenticate = (req, res, next) => {
   	}
 };
 
+/**
+ * Attaches req.user when a valid token is present, but lets the request
+ * through either way. Used for endpoints that show more to a signed-in user
+ * without being closed to visitors — free meeting times, for instance.
+ */
+const optionalAuthenticate = (req, res, next) => {
+	try {
+		const token = req.cookies.token;
+		if (token) {
+			req.user = jwt.verify(token, process.env.JWT_SECRET);
+		}
+	} catch {
+		// An expired or malformed token just means "treat them as a visitor".
+	}
+	next();
+};
+
 const authorize = (...allowedRoles) => {
 
     return (req, res, next) => {
@@ -57,5 +74,6 @@ const authorize = (...allowedRoles) => {
 
 module.exports = {
     authenticate,
+    optionalAuthenticate,
     authorize
 };

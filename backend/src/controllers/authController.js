@@ -157,10 +157,12 @@ const login = async (req, res) => {
 
   try {
 
-    const { 
-        email, 
-        password 
-    } = req.body;
+    /* Trim on the server too, so a stray space from any client — the web form,
+       a mobile keyboard, curl — can't be mistaken for a wrong credential.
+       Leading or trailing whitespace is never part of an email or a password;
+       set-password.js trims the same way when hashing, so the two agree. */
+    const email = req.body?.email?.trim();
+    const password = req.body?.password?.trim();
 
     if (!email || !password) {
       return res.status(400).json({
