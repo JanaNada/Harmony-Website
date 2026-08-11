@@ -112,7 +112,17 @@ To see anything on the calendar, sign in as an admin and publish some available 
 
 ---
 
-## If something goes wrong
+## If something goes wrong — run this first
+
+```bash
+node backend/scripts/doctor.js
+```
+
+It checks your Node version, your `.env`, the database, and both servers, then tells you exactly what to fix. Run it with both servers started, in a third terminal.
+
+**"The page opens but nothing is clickable"** — this is almost always an old Node version. The site needs **Node 20.9 or newer**. Check with `node -v`. If it's older, install Node 20 LTS from nodejs.org, then delete the `node_modules` folders and run the installs again. The page renders because the server sends the HTML, but the browser part never starts, so no button responds.
+
+## Other things that go wrong
 
 **"Can't reach the server" when signing in**
 The API isn't running. Check Terminal 1 — it should say `Server running on port 4000`.
