@@ -347,10 +347,13 @@ const TIMELINE_FRIEND = [
 ];
 
 function TimelineSection() {
+  /* Spacing comes from the section margin only. Its own vertical padding would
+     stack on top of the neighbouring margin and open a bigger gap here than
+     between the other sections. */
   return (
-    <section id="timeline" className="py-24 overflow-hidden">
-      <div className="w-full w-full max-w-[1600px] mx-auto px-6 lg:px-12">
-        <div className="text-center mb-16">
+    <section id="timeline" className="mb-24 md:mb-32 overflow-hidden">
+      <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
+        <div className="text-center mb-14 md:mb-16">
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
             <span className="text-xs font-bold uppercase tracking-widest text-gray-400" >Our Journey</span>
@@ -459,18 +462,18 @@ function PartnersSection() {
   const cats = ["All", ...Array.from(new Set(PARTNERS_FRIEND.map(p=>p.cat)))];
   const shown = cat==="All" ? PARTNERS_FRIEND : PARTNERS_FRIEND.filter(p=>p.cat===cat);
   return (
-    <section id="partners" className="py-24">
-      <div className="w-full w-full max-w-[1600px] mx-auto px-6 lg:px-12">
-        <div className="text-center mb-12">
+    <section id="partners">
+      <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
+        <div className="text-center mb-14 md:mb-16">
           <div className="inline-flex items-center gap-2 mb-4">
             <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
             <span className="text-xs font-bold uppercase tracking-widest text-gray-400" >Success Partners</span>
             <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
           </div>
-          <h2 className="font-extrabold text-4xl md:text-5xl leading-[1.15] tracking-tight text-[#1a1a1a] mb-4">
+          <h2 className="font-extrabold text-4xl md:text-5xl leading-[1.15] tracking-tight text-[#1a1a1a] mb-6">
             Trusted by <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Industry Giants</span>
           </h2>
-          <p className="text-lg font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-4xl mx-auto">
+          <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/70 font-medium max-w-4xl mx-auto">
             From global hospitality leaders and banking institutions to iconic F&B brands â€” 14 trusted partners across the industry.
           </p>
         </div>
@@ -648,7 +651,9 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
 
         {/* Why Partner With Us */}
         <div id="why-partner" className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 mb-24 md:mb-32">
-          <div className="text-center mb-24 md:mb-32">
+          {/* Heading sits closer to its own cards than sections sit to each
+              other, so it reads as belonging to them. */}
+          <div className="text-center mb-14 md:mb-16">
             <div className="inline-flex items-center gap-2 mb-4">
               <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
               <span className="text-xs font-bold uppercase tracking-widest text-gray-400" >Why Choose Us</span>
@@ -661,7 +666,7 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
               We believe every brand has a unique story, and we help you tell it through operational excellence anchored in first-hand experience.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {whyPartnerReasons.map((r, i) => (
               <div key={i} className="relative overflow-hidden bg-white/80 backdrop-blur-lg p-10 md:p-12 rounded-[40px] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.03)] border border-white hover:-translate-y-2 transition-transform duration-500 group">
                 <div className="absolute inset-0 bg-cover bg-center opacity-[0.08] transition-opacity duration-500 group-hover:opacity-[0.15]" style={{ backgroundImage: `url(${r.bgImage})` }} />
@@ -679,7 +684,7 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
 
         {/* Core Values */}
         <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 mb-24 md:mb-32">
-          <div className="text-center mb-24 md:mb-32">
+          <div className="text-center mb-14 md:mb-16">
             <div className="inline-flex items-center gap-2 mb-4">
               <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
               <span className="text-xs font-bold uppercase tracking-widest text-gray-400" >Our Principles</span>
@@ -689,7 +694,7 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
               Our Core <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Values</span>
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-8 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
             {coreValues.map((v, i) => (
               <div key={i} className="relative overflow-hidden bg-white p-8 md:p-10 rounded-[32px] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.05)] border border-white hover:-translate-y-2 transition-all duration-500 group">
                 <div className="absolute inset-0 bg-cover bg-center opacity-[0.08] transition-opacity duration-500 group-hover:opacity-[0.15]" style={{ backgroundImage: `url(${v.bgImage})` }} />
@@ -707,11 +712,6 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
 
         {/* Success Partners */}
         <PartnersSection />
-
-        {/* Footer / Bottom Image */}
-        <div className="w-full flex justify-center mt-16 md:mt-24 mb-16 px-6">
-           
-        </div>
       </div>
       <Footer />
     </div>
