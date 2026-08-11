@@ -7,7 +7,9 @@
  * chatting — but cannot open up availability or manage the catalogue. Adding
  * to the enum is additive; existing ADMIN and COMPANY rows are untouched.
  */
-require("dotenv").config();
+// Resolved against this file, not the shell's directory, so the script works
+// whether it's run from the repo root or from inside backend/.
+require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
 
 const db = require("../src/config/db");
 

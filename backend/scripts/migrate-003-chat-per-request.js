@@ -9,7 +9,9 @@
  * matched (a company with no requests at all) are removed, since there is no
  * longer anywhere for them to live.
  */
-require("dotenv").config();
+// Resolved against this file, not the shell's directory, so the script works
+// whether it's run from the repo root or from inside backend/.
+require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
 
 const db = require("../src/config/db");
 

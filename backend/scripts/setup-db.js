@@ -10,7 +10,9 @@
  *
  * Existing tables are left alone, so this is safe to re-run.
  */
-require("dotenv").config();
+// Resolved against this file, not the shell's directory, so the script works
+// whether it's run from the repo root or from inside backend/.
+require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
 
 const fs = require("fs");
 const path = require("path");

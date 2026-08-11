@@ -6,7 +6,9 @@
  * Safe to run more than once: every step checks before it changes anything,
  * and no existing table is dropped.
  */
-require("dotenv").config();
+// Resolved against this file, not the shell's directory, so the script works
+// whether it's run from the repo root or from inside backend/.
+require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
 
 const fs = require("fs");
 const path = require("path");

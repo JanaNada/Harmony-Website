@@ -6,7 +6,9 @@
  * Creates the user if the email is new, otherwise updates the existing row.
  * Credentials are passed as arguments so they never live in the repo.
  */
-require("dotenv").config();
+// Resolved against this file, not the shell's directory, so the script works
+// whether it's run from the repo root or from inside backend/.
+require("dotenv").config({ path: require("path").join(__dirname, "..", ".env") });
 
 const bcrypt = require("bcrypt");
 const db = require("../src/config/db");
