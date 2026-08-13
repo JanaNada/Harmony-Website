@@ -16,13 +16,17 @@ const GRAD_FRIEND = `linear-gradient(90deg, ${C_ORANGE}, ${C_PINK}, ${C_BLUE}, $
 export function ServicesOverview({
   onOpen,
   onBook,
+  hiddenServices,
+  isStaff,
 }: {
   onOpen: (id: ServiceId) => void;
   onBook: () => void;
+  hiddenServices: string[];
+  isStaff?: boolean;
 }) {
   const { countFor } = useBrief();
   const tech = SERVICE_BY_ID.technology;
-  const pillars = SERVICES.filter((s) => s.id !== "technology");
+  const pillars = SERVICES.filter((s) => s.id !== "technology" && !hiddenServices.includes(s.id));
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative scroll-smooth">
@@ -65,14 +69,16 @@ export function ServicesOverview({
                 {tech.intro}
               </p>
 
-              <button
-                onClick={() => onOpen("technology")}
-                className="mt-8 inline-flex items-center gap-2 text-lg font-bold text-white px-6 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)] group"
-                style={{ background: C_ORANGE }}
-              >
-                Explore F&amp;B Technology
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </button>
+              {!hiddenServices.includes("technology") && (
+                <button
+                  onClick={() => onOpen("technology")}
+                  className="mt-8 inline-flex items-center gap-2 text-lg font-bold text-white px-6 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)] group"
+                  style={{ background: C_ORANGE }}
+                >
+                  Explore F&amp;B Technology
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              )}
             </div>
           </div>
 
@@ -186,24 +192,26 @@ export function ServicesOverview({
         </div>
 
         {/* --- 4. BOTTOM CALL-TO-ACTION --- */}
-        <div className="w-full py-16 md:py-24 px-4 md:px-8 relative overflow-hidden">
-          <div className="absolute top-[-50%] left-[0%] w-[500px] h-[500px] bg-[#F5841F]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
-          <div className="absolute bottom-[-50%] right-[0%] w-[500px] h-[500px] bg-[#E91E8C]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
+        {!isStaff && (
+          <div className="w-full py-16 md:py-24 px-4 md:px-8 relative overflow-hidden">
+            <div className="absolute top-[-50%] left-[0%] w-[500px] h-[500px] bg-[#F5841F]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
+            <div className="absolute bottom-[-50%] right-[0%] w-[500px] h-[500px] bg-[#E91E8C]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
 
-          <div className="relative z-10 w-full text-center bg-white/60 backdrop-blur-xl p-10 md:p-16 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)] border border-white">
-            <h2 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-8 tracking-tight leading-[1.15]">
-              Ready to unlock your full potential?
-            </h2>
-            <button
-              onClick={onBook}
-              className="inline-flex items-center gap-3 text-lg font-bold text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(245,132,31,0.5)] group"
-              style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
-            >
-              Book an Appointment
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </button>
+            <div className="relative z-10 w-full text-center bg-white/60 backdrop-blur-xl p-10 md:p-16 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)] border border-white">
+              <h2 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-8 tracking-tight leading-[1.15]">
+                Ready to unlock your full potential?
+              </h2>
+              <button
+                onClick={onBook}
+                className="inline-flex items-center gap-3 text-lg font-bold text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(245,132,31,0.5)] group"
+                style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
+              >
+                Book an Appointment
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

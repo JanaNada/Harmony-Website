@@ -124,13 +124,15 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
         <div className="flex-1 md:hidden" />
 
         {/* Primary CTA - the whole site points here */}
-        <button
-          onClick={() => go("booking")}
-          className="hidden md:inline-flex text-lg font-bold text-white px-7 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)] flex-shrink-0"
-          style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
-        >
-          Book Appointment
-        </button>
+        {current !== "admin" && !isStaffRole(user?.role) && (
+          <button
+            onClick={() => go("booking")}
+            className="hidden md:inline-flex text-lg font-bold text-white px-7 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)] flex-shrink-0"
+            style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
+          >
+            Book Appointment
+          </button>
+        )}
 
         {/* Signed out this signs you in; signed in it takes you to your own
             area - the staff portal for staff, the client profile for companies. */}
@@ -177,13 +179,15 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
               </button>
             ))}
           </div>
-          <button
-            onClick={() => { go("booking"); setMobileOpen(false); }}
-            className="mt-4 text-lg font-bold text-white py-3.5 rounded-full shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)]"
-            style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
-          >
-            Book Appointment
-          </button>
+          {current !== "admin" && !isStaffRole(user?.role) && (
+            <button
+              onClick={() => { go("booking"); setMobileOpen(false); }}
+              className="mt-4 text-lg font-bold text-white py-3.5 rounded-full shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)]"
+              style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
+            >
+              Book Appointment
+            </button>
+          )}
           {!loading && (
             <button
               onClick={() => { goToAccount(); setMobileOpen(false); }}

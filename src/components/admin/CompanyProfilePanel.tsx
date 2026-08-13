@@ -133,6 +133,17 @@ export function CompanyProfilePanel({
                   <Phone className="w-4 h-4" />
                   {company.contactPhone ?? "No phone"}
                 </a>
+                {company.contactPhone && (
+                  <a
+                    href={`https://wa.me/${company.contactPhone.replace(/\D/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 px-5 py-3 rounded-full font-bold text-sm bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 hover:-translate-y-0.5 transition-all"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    WhatsApp
+                  </a>
+                )}
                 <a
                   href={`mailto:${company.email}`}
                   title={company.email}

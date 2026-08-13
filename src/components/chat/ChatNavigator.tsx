@@ -42,19 +42,19 @@ interface Entry {
  * service added there shows up here without anyone remembering to update a
  * second list.
  */
-function buildNode(key: string, signedIn: boolean, briefCount: number): Node {
+function buildNode(key: string, signedIn: boolean, isStaff: boolean, briefCount: number): Node {
   if (key === "root") {
     return {
       text: "Hi. I can take you anywhere on the site — what are you after?",
       options: [
         { label: "Explore the services", next: "services", icon: Target, color: C_ORANGE },
-        { label: "Book an appointment", go: "booking", icon: CalendarDays, color: C_PINK },
+        ...(isStaff ? [] : [{ label: "Book an appointment", go: "booking" as Page, icon: CalendarDays, color: C_PINK }]),
         { label: "Who is Harmony?", next: "company", icon: Building2, color: "#3AADE0" },
-        { label: "See our work", go: "stories", icon: Images, color: "#78BE1F" },
-        { label: "Talk to a person", go: "contact", icon: Phone, color: C_ORANGE },
+        { label: "See our work", go: "stories" as Page, icon: Images, color: "#78BE1F" },
+        { label: "Talk to a person", go: "contact" as Page, icon: Phone, color: C_ORANGE },
         signedIn
-          ? { label: "My profile", go: "dashboard", icon: User, color: "#7C5CFF" }
-          : { label: "Sign in", go: "login", icon: LogIn, color: "#7C5CFF" },
+          ? { label: "My profile", go: "dashboard" as Page, icon: User, color: "#7C5CFF" }
+          : { label: "Sign in", go: "login" as Page, icon: LogIn, color: "#7C5CFF" },
       ],
     };
   }
@@ -78,7 +78,7 @@ function buildNode(key: string, signedIn: boolean, briefCount: number): Node {
     const id = key.slice("service:".length) as ServiceId;
     const svc = SERVICE_BY_ID[id];
 
-    if (!svc) return buildNode("services", signedIn, briefCount);
+    if (!svc) return buildNode("services", signedIn, isStaff, briefCount);
 
     return {
       text: `${svc.label} — ${svc.promise}`,
@@ -91,7 +91,7 @@ function buildNode(key: string, signedIn: boolean, briefCount: number): Node {
           go: id,
           color: svc.color,
         })),
-        { label: "Book this service", go: "booking", color: C_PINK, icon: CalendarDays },
+        ...(isStaff ? [] : [{ label: "Book this service", go: "booking" as Page, color: C_PINK, icon: CalendarDays }]),
         { label: "Back to all services", next: "services", color: "#666" },
       ],
     };
@@ -109,7 +109,7 @@ function buildNode(key: string, signedIn: boolean, briefCount: number): Node {
     };
   }
 
-  return buildNode("root", signedIn, briefCount);
+  return buildNode("root", signedIn, isStaff, briefCount);
 }
 
 export function ChatNavigator({ go }: { go: (p: Page) => void }) {
@@ -122,21 +122,22 @@ export function ChatNavigator({ go }: { go: (p: Page) => void }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const signedIn = !!user;
+  const isStaff = user?.role === "ADMIN" || user?.role === "COORDINATOR";
 
   // Seed the opening message the first time it's opened.
   useEffect(() => {
     if (open && entries.length === 0) {
-      const node = buildNode("root", signedIn, count);
+      const node = buildNode("root", signedIn, isStaff, count);
       setEntries([{ from: "bot", text: node.text, options: node.options }]);
     }
-  }, [open, entries.length, signedIn, count]);
+  }, [open, entries.length, signedIn, isStaff, count]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [entries.length]);
 
   const pushNode = (key: string, chosenLabel: string) => {
-    const node = buildNode(key, signedIn, count);
+    const node = buildNode(key, signedIn, isStaff, count);
     setHistory((h) => [...h, key]);
     setEntries((e) => [
       ...e,
@@ -159,7 +160,7 @@ export function ChatNavigator({ go }: { go: (p: Page) => void }) {
         {
           from: "bot",
           text: "Taking you there now. Anything else?",
-          options: buildNode("root", signedIn, count).options,
+          options: buildNode("root", signedIn, isStaff, count).options,
         },
       ]);
       setHistory((h) => [...h, "root"]);
@@ -169,14 +170,14 @@ export function ChatNavigator({ go }: { go: (p: Page) => void }) {
   const goBack = () => {
     if (history.length < 2) return;
     const previous = history[history.length - 2];
-    const node = buildNode(previous, signedIn, count);
+    const node = buildNode(previous, signedIn, isStaff, count);
     setHistory((h) => h.slice(0, -1));
     setEntries((e) => [...e, { from: "bot", text: node.text, options: node.options }]);
   };
 
   const restart = () => {
     setHistory(["root"]);
-    const node = buildNode("root", signedIn, count);
+    const node = buildNode("root", signedIn, isStaff, count);
     setEntries([{ from: "bot", text: node.text, options: node.options }]);
   };
 

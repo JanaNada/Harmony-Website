@@ -227,6 +227,33 @@ const deleteSubservice = async (req, res) => {
   }
 };
 
+const getHiddenServices = async (req, res) => {
+  try {
+    const [rows] = await db.query("SELECT service_id FROM hidden_services");
+    return res.status(200).json({ success: true, hidden: rows.map(r => r.service_id) });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Failed to fetch hidden services" });
+  }
+};
+
+const hideService = async (req, res) => {
+  try {
+    await db.query("INSERT IGNORE INTO hidden_services (service_id) VALUES (?)", [req.params.id]);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Failed to hide service" });
+  }
+};
+
+const unhideService = async (req, res) => {
+  try {
+    await db.query("DELETE FROM hidden_services WHERE service_id = ?", [req.params.id]);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Failed to unhide service" });
+  }
+};
+
 module.exports = {
   listCatalog,
   createService,
@@ -235,4 +262,7 @@ module.exports = {
   createSubservice,
   updateSubservice,
   deleteSubservice,
+  getHiddenServices,
+  hideService,
+  unhideService,
 };

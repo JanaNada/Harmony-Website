@@ -56,15 +56,13 @@ export function MarketingStory() {
         </div>
 
         {/* Image */}
-        <div className="relative min-h-[400px] lg:min-h-[500px] order-first lg:order-last flex items-center justify-center p-8 lg:p-12">
-          <div className="w-full h-full max-w-[400px] max-h-[500px] rounded-3xl overflow-hidden shadow-2xl relative">
-            <img
-              src="https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=1000&q=80"
-              alt="An ice cream served with a chocolate spoon"
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-black/20 via-transparent to-transparent" />
-          </div>
+        <div className="relative min-h-[400px] lg:min-h-full order-first lg:order-last overflow-hidden">
+          <img
+            src="/imports/chocolate_spoon_ice_cream.jpg"
+            alt="An ice cream served with a chocolate spoon"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t lg:bg-gradient-to-r from-black/20 via-transparent to-transparent" />
         </div>
       </div>
     </div>

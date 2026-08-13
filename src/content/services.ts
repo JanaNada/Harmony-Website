@@ -39,7 +39,7 @@ export interface ModuleGroup {
 export interface GapQuestion {
   id: string;
   label: string;
-  type: "choice" | "select" | "text" | "date";
+  type: "choice" | "select" | "text" | "date" | "multichoice";
   options?: string[];
   placeholder?: string;
   required?: boolean;
@@ -273,11 +273,19 @@ export const SERVICES: Service[] = [
       },
     ],
     questions: [
-      { id: "need", label: "What do you need?", type: "choice", options: ["Hiring people", "Training the team I have", "Both"], required: true },
-      { id: "sector", label: "Which sector?", type: "select", options: ["Food & Beverage", "Hotels & Hospitality", "Retail", "Entertainment & Leisure", "Corporate & Workplace", "Other"], required: true },
-      { id: "roles", label: "Which roles, and how many?", type: "text", placeholder: "2 line cooks, 1 floor supervisor", required: true },
-      { id: "urgency", label: "How soon?", type: "choice", options: ["Immediately", "Within a month", "Planning ahead"] },
-      { id: "location", label: "Where?", type: "text", placeholder: "Cairo" },
+      { id: "positionTitle", label: "Position Title", type: "text", required: true },
+      { id: "department", label: "Department", type: "text" },
+      { id: "employmentType", label: "Employment Type", type: "choice", options: ["Full-Time", "Part-Time", "Temporary", "Internship"], required: true },
+      { id: "workLocation", label: "Work Location", type: "text" },
+      { id: "positionsNeeded", label: "Number of Positions Needed", type: "text" },
+      { id: "desiredStartDate", label: "Desired Start Date", type: "date" },
+      { id: "reportingTo", label: "Reporting To", type: "text" },
+      { id: "jobResponsibilities", label: "Job Responsibilities (Brief)", type: "text" },
+      { id: "requiredQualifications", label: "Required Qualifications", type: "text" },
+      { id: "proposedSalaryRange", label: "Proposed Salary Range", type: "text", placeholder: "$4,000 - $5,000" },
+      { id: "budgetApproved", label: "Is Budget Approved?", type: "choice", options: ["Yes", "No"] },
+      { id: "budgetCode", label: "Budget Code (if applicable)", type: "text" },
+      { id: "benefits", label: "Benefits & Compensation", type: "multichoice", options: ["Medical Insurance", "Social Insurance", "Transportation", "Meals", "Tips", "Paid Time Off", "Uniform"] },
     ],
   },
 

@@ -9,12 +9,19 @@ const {
   createSubservice,
   updateSubservice,
   deleteSubservice,
+  getHiddenServices,
+  hideService,
+  unhideService,
 } = require("../controllers/serviceCatalogController");
 
 const { authenticate, authorize } = require("../middleware/authMiddleware");
 
 // Reading the catalogue is open — the public site needs it to render services.
 router.get("/", listCatalog);
+router.get("/hidden", getHiddenServices);
+
+router.post("/hidden/:id", authenticate, authorize("ADMIN"), hideService);
+router.delete("/hidden/:id", authenticate, authorize("ADMIN"), unhideService);
 
 router.post("/services", authenticate, authorize("ADMIN"), createService);
 router.put("/services/:id", authenticate, authorize("ADMIN"), updateService);

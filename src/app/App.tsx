@@ -1,9 +1,10 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { ImageWithFallback } from "@/components";
+import { api } from "@/lib/api";
 import AdminDashboard from "./AdminDashboard";
 import CompanyDashboard from "./CompanyDashboard";
 import {
@@ -73,7 +74,7 @@ const C = {
 };
 const GRAD = `linear-gradient(90deg,${C.management},${C.events},${C.marketing},${C.recruitment})`;
 
-function HeroCircle({ go }: { go: (p: Page) => void }) {
+function HeroCircle({ go, hidden }: { go: (p: Page) => void, hidden: string[] }) {
   return (
     <div className="flex justify-center">
       <div className="relative w-80 h-80 rounded-full border-4 border-white shadow-2xl flex items-center justify-center overflow-hidden">
@@ -84,10 +85,21 @@ function HeroCircle({ go }: { go: (p: Page) => void }) {
         
         {/* Quadrant Buttons - Passing 'go' correctly to each */}
         <div className="grid grid-cols-2 w-full h-full">
-          <button onClick={() => go("business")} className="bg-[#FFB343] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">BUSINESS DEV</button>
-          <button onClick={() => go("events")} className="bg-[#E91E8C] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">EVENTS</button>
-          <button onClick={() => go("recruitment")} className="bg-[#3DAA68] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">RECRUITMENT</button>
-          <button onClick={() => go("marketing")} className="bg-[#2AAEDE] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">MARKETING</button>
+          {!hidden.includes("business") ? (
+            <button onClick={() => go("business")} className="bg-[#FFB343] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">BUSINESS DEV</button>
+          ) : <div className="bg-gray-100/50" />}
+          
+          {!hidden.includes("events") ? (
+            <button onClick={() => go("events")} className="bg-[#E91E8C] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">EVENTS</button>
+          ) : <div className="bg-gray-100/50" />}
+          
+          {!hidden.includes("recruitment") ? (
+            <button onClick={() => go("recruitment")} className="bg-[#3DAA68] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">RECRUITMENT</button>
+          ) : <div className="bg-gray-100/50" />}
+          
+          {!hidden.includes("marketing") ? (
+            <button onClick={() => go("marketing")} className="bg-[#2AAEDE] flex items-center justify-center text-white font-bold text-xs hover:opacity-90 transition-opacity">MARKETING</button>
+          ) : <div className="bg-gray-100/50" />}
         </div>
       </div>
     </div>
@@ -132,7 +144,7 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
       return;
     }
 
-    /* Signing in just signs you in â€” it doesn't hijack where you were going.
+    /* Signing in just signs you in — it doesn't hijack where you were going.
        Head back to whatever page sent you here; the nav's Profile button is
        how you reach your own area. */
     const returnTo = typeof window !== "undefined" ? sessionStorage.getItem("returnTo") : null;
@@ -197,7 +209,7 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>Password</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Lock size={16} /></div>
-                <input type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required
+                <input type="password" placeholder="••••••••" required
                   value={password} onChange={(e) => setPassword(e.target.value)}
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
                   className="w-full pl-11 pr-4 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
@@ -232,7 +244,7 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
             <button type="submit" disabled={busy}
               className="w-full py-3.5 mt-2 rounded-full text-lg font-bold text-white transition-all hover:shadow-lg hover:-translate-y-0.5 group flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{ background: `linear-gradient(135deg, #F5841F, #E91E8C)`, fontFamily:"'Montserrat',sans-serif" }}>
-              {busy ? "Signing inâ€¦" : mode === "login" ? "Sign In" : "Create Account"}
+              {busy ? "Signing in…" : mode === "login" ? "Sign In" : "Create Account"}
               {!busy && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
             </button>
           </form>
@@ -343,7 +355,7 @@ const TIMELINE_FRIEND = [
   { year:"2017", label:"Events Division",  desc:"Launched dedicated events arm, delivering 50+ large-scale corporate and private events.", color:C_FRIEND.marketing },
   { year:"2019", label:"Digital & Marketing",desc:"Introduced full-stack marketing services as brands demanded stronger digital presence.", color:C_FRIEND.recruitment },
   { year:"2021", label:"2,500 Trained",    desc:"Milestone: trained over 2,500 hospitality professionals across the region.", color:C_FRIEND.management },
-  { year:"2024", label:"4 Continents",     desc:"Active across MENA, Europe, Asia, and the Americas â€” 30+ projects and growing.", color:C_FRIEND.events },
+  { year:"2024", label:"4 Continents",     desc:"Active across MENA, Europe, Asia, and the Americas — 30+ projects and growing.", color:C_FRIEND.events },
 ];
 
 function TimelineSection() {
@@ -351,7 +363,7 @@ function TimelineSection() {
      stack on top of the neighbouring margin and open a bigger gap here than
      between the other sections. */
   return (
-    <section id="timeline" className="mb-24 md:mb-32 overflow-hidden">
+    <section id="timeline" className="mb-24 md:mb-32 overflow-x-hidden">
       <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
         <div className="text-center mb-14 md:mb-16">
           <div className="inline-flex items-center gap-2 mb-4">
@@ -365,7 +377,7 @@ function TimelineSection() {
         </div>
 
         {/* Desktop flowing SVG timeline */}
-        <div className="hidden md:block relative" style={{height:"400px", marginTop: "20px"}}>
+        <div className="hidden md:block relative" style={{height:"400px", marginTop: "120px"}}>
           <svg viewBox="0 0 1100 200" className="absolute inset-0 w-full" preserveAspectRatio="none" aria-hidden="true">
             <defs>
               <linearGradient id="tl-grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -404,10 +416,15 @@ function TimelineSection() {
               const xPercents=[5.5,20,36.4,54.5,71,94.5];
               const above=[true,false,true,false,true,false];
               return (
-                <div key={year} className="absolute" style={{left:`${xPercents[i]}%`, top:above[i]?"-15%":"65%", width:"200px", transform:"translateX(-50%)"}}>
-                  <div className={`${above[i]?"pb-2 text-bottom":"pt-2"}`}>
+                <div key={year} className="absolute flex flex-col" style={{
+                  left: `${xPercents[i]}%`, 
+                  top: above[i] ? "-30%" : "65%", 
+                  width: "200px", 
+                  transform: "translateX(-50%)"
+                }}>
+                  <div className={`${above[i] ? "pb-4" : "pt-4"}`}>
                     <div className="text-base md:text-lg font-black mb-0.5" style={{color}}>{year}</div>
-                    <div className="text-lg md:text-xl font-bold text-gray-900 mb-1" >{label}</div>
+                    <div className="text-lg md:text-xl font-bold text-gray-900 mb-1">{label}</div>
                     <div className="text-base text-gray-500 leading-tight">{desc}</div>
                   </div>
                 </div>
@@ -443,13 +460,13 @@ const PARTNERS_FRIEND = [
   { name:"Marriott",               cat:"Hospitality", domain:"marriott.com" },
   { name:"Dunkin'",                cat:"F&B",         domain:"dunkindonuts.com" },
   { name:"Hardee's",               cat:"F&B",         domain:"hardees.com" },
-  { name:"Krispy Kreme",           cat:"F&B",         domain:"krispykreme.com" },
+  { name:"Krispy Kreme",           cat:"F&B",         domain:"krispykreme.com", logo:"/krispy_kreme_logo.jpg" },
   { name:"Mori Sushi",             cat:"F&B",         domain:"mori-intl.net" },
-  { name:"Tamara",                 cat:"F&B",         domain:"tamarabistro.com" },
-  { name:"Grand Cafe",             cat:"F&B",         domain:"grandcafe-eg.com" },
+  { name:"Tamara",                 cat:"F&B",         domain:"tamarabistro.com", logo:"/tamara_logo.jpg" },
+  { name:"Grand Cafe",             cat:"F&B",         domain:"grandcafe-eg.com", logo:"/grand_cafe_logo.jpg" },
   { name:"Butcher's Burger",       cat:"F&B",         domain:"butchersburger.com" },
-  { name:"TBS",                    cat:"Retail",      domain:"tbsfresh.com" },
-  { name:"Vodafone",               cat:"Corporate",   domain:"vodafone.com" },
+  { name:"TBS",                    cat:"Retail",      domain:"tbsfresh.com", logo:"/tbs_logo.jpg" },
+  { name:"Vodafone",               cat:"Corporate",   domain:"vodafone.com.eg" },
   { name:"BLOM Bank",              cat:"Finance",     domain:"blombank.com" },
   { name:"GUC Cairo",              cat:"Education",   domain:"guc.edu.eg" },
 ];
@@ -474,7 +491,7 @@ function PartnersSection() {
             Trusted by <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Industry Giants</span>
           </h2>
           <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/70 font-medium max-w-4xl mx-auto">
-            From global hospitality leaders and banking institutions to iconic F&B brands â€” 14 trusted partners across the industry.
+            From global hospitality leaders and banking institutions to iconic F&B brands — 14 trusted partners across the industry.
           </p>
         </div>
 
@@ -489,23 +506,22 @@ function PartnersSection() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {shown.map(({name,cat:c, domain})=>(
+          {shown.map(({name,cat:c, domain, logo})=>(
             <div key={name}
               className="group relative overflow-hidden bg-white rounded-2xl px-4 py-5 text-center border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-default"
             >
-              <div className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-[0.08] transition-opacity duration-300 group-hover:opacity-[0.15]" 
-                   style={{ backgroundImage: `url(https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=128)`, backgroundSize: '50%', backgroundPosition: 'center' }} />
-              <div className="relative z-10">
+              <div className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-100 transition-opacity duration-300" 
+                   style={{ backgroundImage: logo ? `url(${logo})` : `url(https://unavatar.io/${domain}?fallback=false), url(https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=256)`, backgroundSize: '50%', backgroundPosition: 'center' }} />
+              <div className="relative z-10 bg-white/70 backdrop-blur-sm py-2 px-1 rounded-xl mt-8">
                 <div className="w-8 h-0.5 rounded-full mx-auto mb-3 transition-all duration-300"
                   style={{background:"#d1d5db"}}
                   onMouseEnter={e=>(e.currentTarget.style.background=CAT_COLOR_FRIEND[c]||C_FRIEND.management)}
                   onMouseLeave={e=>(e.currentTarget.style.background="#d1d5db")}
                 />
-                <div className="text-2xl font-bold text-gray-300 leading-tight transition-all duration-300 group-hover:text-gray-800"
-                  >
+                <div className="text-2xl font-extrabold text-gray-900 leading-tight transition-all duration-300">
                   {name}
                 </div>
-                <div className="text-xs mt-1.5 font-medium text-gray-300 transition-all duration-300 group-hover:text-gray-400">{c}</div>
+                <div className="text-xs mt-1.5 font-bold text-gray-800 uppercase tracking-wider transition-all duration-300">{c}</div>
               </div>
             </div>
           ))}
@@ -725,7 +741,7 @@ function MissionPage({ go }: { go: (p: Page) => void }) {
     { icon: Settings, title: "Operational Excellence", text: "We repair weak spots and elevate strengths through strategic planning and precise analysis.", color: "#F5841F", image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop&auto=format" },
     { icon: Users, title: "Human Capital Development", text: "We build high-performing teams through expert recruitment and hands-on training for long-term stability.", color: "#E91E8C", image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=600&fit=crop&auto=format" },
     { icon: ShieldCheck, title: "Quality & Safety", text: "We deliver world-class F&B and facility services, strictly adhering to the highest international safety and hygiene standards.", color: "#3AADE0", image: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&h=600&fit=crop&auto=format" },
-    { icon: Lightbulb, title: "Creative Innovation", text: "We blend concept creation with artistic executionâ€”from menu engineering to digital marketingâ€”to deliver memorable customer experiences.", color: "#78BE1F", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop&auto=format" },
+    { icon: Lightbulb, title: "Creative Innovation", text: "We blend concept creation with artistic execution—from menu engineering to digital marketing—to deliver memorable customer experiences.", color: "#78BE1F", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop&auto=format" },
     { icon: Handshake, title: "Client-Centric Approach", text: "We handle the complex operations and logistics so you can focus on your core business. We build long-term partnerships by understanding your unique brand story.", color: "#F5841F", image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=600&fit=crop&auto=format" }
   ];
 
@@ -847,9 +863,9 @@ function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_500px] gap-16 items-start">
           <div>
             <h1 className="text-5xl md:text-6xl font-extrabold leading-[1.1] tracking-tight text-[#1a1a1a] mb-6">Let's build something great.</h1>
-            <p className="text-xl md:text-2xl text-[#1a1a1a]/70 font-medium leading-[1.8] mb-10 max-w-2xl">Whether you have a clear brief or just a big ambition â€” reach out.</p>
+            <p className="text-xl md:text-2xl text-[#1a1a1a]/70 font-medium leading-[1.8] mb-10 max-w-2xl">Whether you have a clear brief or just a big ambition — reach out.</p>
             <div className="space-y-5">
-              {[{ Icon: Mail, text: "hello@harmonyclubhouse.com" }, { Icon: Phone, text: "+20 100 000 0000" }, { Icon: MapPin, text: "Cairo, Egypt â€” 4 Continents" }].map(({ Icon, text }) => (
+              {[{ Icon: Mail, text: "hello@harmonyclubhouse.com" }, { Icon: Phone, text: "+20 100 000 0000" }, { Icon: MapPin, text: "Cairo, Egypt — 4 Continents" }].map(({ Icon, text }) => (
                 <div key={text} className="flex items-center gap-8">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${C_ORANGE}15` }}>
                     <Icon size={16} style={{ color: C_ORANGE }} />
@@ -913,7 +929,7 @@ function ContactPage() {
   );
 }
 
-// â”€â”€â”€ Root App â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Root App ─────────────────────────────────────────────────────────────────────────────────────
 
 
 const FOOTER_SOCIAL_ICONS = [
@@ -926,12 +942,20 @@ const FOOTER_SOCIAL_ICONS = [
 
 const FOOTER_SERVICES = [
   { id: "management", color: "#F5841F", label: "Management", features: ["Pre-opening planning & setup", "Operations audit & restructuring", "Menu engineering", "P&L optimization"] },
-  { id: "events", color: "#E91E8C", label: "Events & Catering", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & dÃ©cor coordination", "Guest management"] },
+  { id: "events", color: "#E91E8C", label: "Events & Catering", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & décor coordination", "Guest management"] },
   { id: "marketing", color: "#3AADE0", label: "Marketing", features: ["Brand identity & positioning", "Social media strategy", "Influencer & PR campaigns", "Photography direction"] },
   { id: "recruitment", color: "#78BE1F", label: "Recruitment", features: ["Executive placement", "Chef & culinary sourcing", "FOH & BOH recruitment", "Event & seasonal staffing"] }
 ];
 
 function Footer() {
+  const [hiddenServices, setHiddenServices] = useState<string[]>([]);
+  
+  useEffect(() => {
+    api.get<{ hidden: string[] }>("/catalog/hidden")
+      .then(d => setHiddenServices(d.hidden || []))
+      .catch(() => {});
+  }, []);
+
   return (
     <footer className="relative bg-[#FAF7F2] border-t border-gray-100 w-full overflow-hidden shrink-0">
       
@@ -963,7 +987,7 @@ function Footer() {
               </p>
             </div>
             
-            {FOOTER_SERVICES.map(s => (
+            {FOOTER_SERVICES.filter(s => !hiddenServices.includes(s.id)).map(s => (
               <div key={s.id}>
                 <div className="text-xs font-extrabold mb-4 uppercase tracking-widest" style={{ color: s.color }}>{s.label}</div>
                 {s.features.map(f => (
@@ -978,15 +1002,18 @@ function Footer() {
               <span>&copy; 2026 Harmony Club House. All rights reserved.</span>
               <div className="flex gap-8">
                 {FOOTER_SOCIAL_ICONS.map(({ Icon, label, color }) => (
-                  <button
+                  <a
                     key={label}
+                    href={`https://${label.toLowerCase().replace(/[^a-z]/g, '')}.com/harmonyclubhouse`}
+                    target="_blank"
+                    rel="noreferrer"
                     aria-label={label}
                     className="w-10 h-10 rounded-full bg-white/50 backdrop-blur-sm shadow-sm border border-black/5 flex items-center justify-center text-[#1a1a1a]/40 transition-all duration-300 hover:scale-110 hover:bg-white hover:shadow-md"
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = color; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = ""; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = color; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = ""; }}
                   >
                     <Icon size={16} />
-                  </button>
+                  </a>
                 ))}
               </div>
             </div>
@@ -1017,8 +1044,8 @@ function SessionNotice({ children }: { children: React.ReactNode }) {
 
 /**
  * The dashboard is only rendered for a signed-in ADMIN. Anyone else is sent to
- * the sign-in page. The server enforces this too â€” every /api/admin route sits
- * behind the JWT cookie â€” so this guard is about UX, not about being the lock.
+ * the sign-in page. The server enforces this too — every /api/admin route sits
+ * behind the JWT cookie — so this guard is about UX, not about being the lock.
  */
 function AdminRoute() {
   const { user, loading } = useAuth();
@@ -1030,8 +1057,8 @@ function AdminRoute() {
     if (!loading && !allowed) router.replace(pageToPath("login"));
   }, [loading, allowed, router]);
 
-  if (loading) return <SessionNotice>Checking your sessionâ€¦</SessionNotice>;
-  if (!allowed) return <SessionNotice>Taking you to sign inâ€¦</SessionNotice>;
+  if (loading) return <SessionNotice>Checking your session…</SessionNotice>;
+  if (!allowed) return <SessionNotice>Taking you to sign in…</SessionNotice>;
   return <AdminDashboard />;
 }
 
@@ -1045,8 +1072,8 @@ function CompanyRoute() {
     if (!loading && !allowed) router.replace(pageToPath("login"));
   }, [loading, allowed, router]);
 
-  if (loading) return <SessionNotice>Checking your sessionâ€¦</SessionNotice>;
-  if (!allowed) return <SessionNotice>Taking you to sign inâ€¦</SessionNotice>;
+  if (loading) return <SessionNotice>Checking your session…</SessionNotice>;
+  if (!allowed) return <SessionNotice>Taking you to sign in…</SessionNotice>;
   return <CompanyDashboard />;
 }
 
@@ -1057,21 +1084,47 @@ function CompanyRoute() {
 export default function App() {
   const router = useRouter();
   const pathname = usePathname();
-
+  const { user } = useAuth();
   // The URL is the source of truth, so Back/Forward and refresh all work.
   const page = pathToPage(pathname);
+  const [hiddenServices, setHiddenServices] = useState<string[]>([]);
+  
+  useEffect(() => {
+    api.get<{ hidden: string[] }>("/catalog/hidden")
+      .then(d => setHiddenServices(d.hidden || []))
+      .catch(() => {});
+  }, []);
+
   const go = (p: Page) => router.push(pageToPath(p));
 
   return (
     <>
+      {page === "home" && (
+        <div className="flex-1 overflow-y-auto bg-[#FAF7F2]">
+          <div className="min-h-screen pt-24 pb-16 px-6 relative flex flex-col justify-center items-center">
+            <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
+              <div className="absolute top-[20%] left-[10%] w-[40vw] h-[40vw] bg-[#E91E8C]/15 blur-[120px] rounded-full mix-blend-multiply" />
+              <div className="absolute bottom-[10%] right-[10%] w-[50vw] h-[50vw] bg-[#F5841F]/15 blur-[150px] rounded-full mix-blend-multiply" />
+            </div>
+            <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center">
+              <div className="mb-10 text-center w-full max-w-2xl">
+                <img src={welcomeImg} alt="Welcome to Harmony" className="w-full h-auto drop-shadow-2xl hover:scale-105 transition-transform duration-700" />
+              </div>
+              <HeroCircle go={go} hidden={hiddenServices} />
+            </div>
+          </div>
+        </div>
+      )}
       {page === "services" && (
-        <ServicesOverview onOpen={(id) => go(id)} onBook={() => go("booking")} />
+        <ServicesOverview onOpen={(id) => go(id)} onBook={() => go("booking")} hiddenServices={hiddenServices} isStaff={isStaffRole(user?.role)} />
       )}
       {isServicePage(page) && (
         <SectorPage
           key={page}
           service={SERVICE_BY_ID[page]}
           onBook={() => go("booking")}
+          hiddenServices={hiddenServices}
+          isStaff={isStaffRole(user?.role)}
           story={page === "marketing" ? <MarketingStory /> : undefined}
         />
       )}

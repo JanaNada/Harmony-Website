@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Plus, Trash2, Check, X, ChevronDown, ChevronRight, Power, Palette } from "lucide-react";
-import { api } from "@/lib/api";
 import { ImagePicker } from "./ImagePicker";
+import { SERVICES, SERVICE_LABEL } from "@/content/services";
+import { api } from "@/lib/api";
 
 export interface Subservice {
   id: number;
@@ -54,12 +55,17 @@ export function ServiceBuilder() {
 
   const [draft, setDraft] = useState(EMPTY_DRAFT);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [expandedCore, setExpandedCore] = useState<string | null>(null);
   const [subDraft, setSubDraft] = useState(EMPTY_SUB_DRAFT);
+  
+  const [hiddenServices, setHiddenServices] = useState<string[]>([]);
 
   const load = useCallback(async () => {
     try {
       const data = await api.get<{ services: CatalogService[] }>("/catalog");
       setServices(data.services);
+      const hiddenData = await api.get<{ hidden: string[] }>("/catalog/hidden");
+      setHiddenServices(hiddenData.hidden || []);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load services");
@@ -91,6 +97,15 @@ export function ServiceBuilder() {
     run(async () => {
       await api.post(`/catalog/services/${serviceId}/subservices`, subDraft);
       setSubDraft(EMPTY_SUB_DRAFT);
+    });
+
+  const toggleHidden = (serviceId: string, isHidden: boolean) =>
+    run(async () => {
+      if (isHidden) {
+        await api.del(`/catalog/hidden/${serviceId}`);
+      } else {
+        await api.post(`/catalog/hidden/${serviceId}`);
+      }
     });
 
   return (
@@ -192,12 +207,90 @@ export function ServiceBuilder() {
         </div>
 
         {/* Existing */}
-        <div className="flex-1 space-y-5 w-full min-w-0">
-          <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest">
-            {services.length} service{services.length === 1 ? "" : "s"}
-          </h3>
+        <div className="flex-1 space-y-8 w-full min-w-0">
+          
+          {/* Hardcoded Core Services */}
+          <div>
+            <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-5">
+              Core Services (Built-in)
+            </h3>
+            <div className="space-y-4">
+              {SERVICES.map((s) => {
+                const isHidden = hiddenServices.includes(s.id);
+                return (
+                  <div key={s.id} className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: s.dim, color: s.color }}>
+                          <s.icon className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-xl text-gray-900">{s.label}</h4>
+                          <p className="text-sm font-bold text-gray-400">{s.tagline}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setExpandedCore(expandedCore === s.id ? null : s.id)}
+                          className="px-4 py-2 rounded-xl text-sm font-bold text-gray-500 bg-gray-50 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                        >
+                          <ChevronDown className={`w-4 h-4 transition-transform ${expandedCore === s.id ? "rotate-180" : ""}`} />
+                          Subservices
+                        </button>
+                        <button
+                          onClick={() => toggleHidden(s.id, isHidden)}
+                          title={isHidden ? "Show on site" : "Remove from site"}
+                          className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 ${
+                            isHidden ? "bg-green-50 text-green-600 hover:bg-green-100" : "bg-red-50 text-red-600 hover:bg-red-100"
+                          }`}
+                        >
+                          <Power className="w-4 h-4" />
+                          {isHidden ? "Show" : "Remove"}
+                        </button>
+                      </div>
+                    </div>
 
-          {services.length === 0 && (
+                    {/* Subservices List */}
+                    {!isHidden && expandedCore === s.id && (
+                      <div className="mt-4 pt-4 border-t border-gray-100 pl-2">
+                        <h5 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Subservices (Modules)</h5>
+                        <div className="flex flex-col gap-2">
+                          {s.groups.flatMap(g => g.modules).map(m => {
+                            const isModHidden = hiddenServices.includes(m.id);
+                            return (
+                              <div key={m.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                                <div className="flex items-center gap-3">
+                                  <m.icon className="w-5 h-5 text-gray-400" />
+                                  <div>
+                                    <p className="text-sm font-bold text-gray-900">{m.label}</p>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() => toggleHidden(m.id, isModHidden)}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                                    isModHidden ? "bg-green-50 text-green-600 hover:bg-green-100" : "bg-red-50 text-red-600 hover:bg-red-100"
+                                  }`}
+                                >
+                                  {isModHidden ? "Show" : "Remove"}
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-5">
+              Custom Services ({services.length})
+            </h3>
+
+            {services.length === 0 && (
             <div className="bg-white/50 rounded-[2rem] p-12 text-center border border-white">
               <p className="text-gray-500 font-bold">No services yet.</p>
             </div>
@@ -355,6 +448,7 @@ export function ServiceBuilder() {
               </div>
             );
           })}
+          </div>
         </div>
       </div>
     </div>

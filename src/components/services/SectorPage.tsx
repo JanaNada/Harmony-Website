@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Check, Plus, ArrowRight, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Check, Plus, ArrowRight, ChevronDown, Eye } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
+import { api } from "@/lib/api";
 import type { Service, ServiceModule } from "@/content/services";
 
 /* ── A single selectable module ─────────────────────────────────────────────
@@ -15,10 +16,14 @@ export function ModuleCard({
   module: m,
   color,
   dim,
+  metrics,
+  onView,
 }: {
   module: ServiceModule;
   color: string;
   dim: string;
+  metrics: Record<string, number>;
+  onView: (id: string) => void;
 }) {
   const { has, toggle } = useBrief();
   const [open, setOpen] = useState(false);
@@ -73,19 +78,27 @@ export function ModuleCard({
 
         {/* Status + the expand control */}
         <div className="flex items-end justify-between gap-3 mt-4">
-          <span
-            className={`text-sm font-bold uppercase tracking-widest transition-colors ${
-              on ? "" : "text-[#1a1a1a]/30 group-hover:text-[#1a1a1a]/50"
-            }`}
-            style={on ? { color } : undefined}
-          >
-            {on ? "Added to your brief" : "Add to brief"}
-          </span>
+          <div className="flex flex-col gap-1.5">
+            <span
+              className={`text-sm font-bold uppercase tracking-widest transition-colors ${
+                on ? "" : "text-[#1a1a1a]/30 group-hover:text-[#1a1a1a]/50"
+              }`}
+              style={on ? { color } : undefined}
+            >
+              {on ? "Added to your brief" : "Add to brief"}
+            </span>
+            <span className="text-xs font-bold text-[#1a1a1a]/40 flex items-center gap-1.5">
+              <Eye size={12} /> {metrics[m.id] || 0} views
+            </span>
+          </div>
 
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
+              if (!open) {
+                onView(m.id);
+              }
               setOpen((v) => !v);
             }}
             aria-expanded={open}
@@ -133,16 +146,48 @@ export function SectorPage({
   service,
   onBook,
   story,
+  hiddenServices = [],
+  isStaff,
 }: {
   service: Service;
   onBook: () => void;
   /** Optional editorial block shown under the intro (e.g. the ice-cream story). */
   story?: React.ReactNode;
+  hiddenServices?: string[];
+  isStaff?: boolean;
 }) {
   const { addMany, removeMany, countFor, has } = useBrief();
   const chosen = countFor(service.id);
-  const allIds = service.groups.flatMap((g) => g.modules.map((m) => m.id));
-  const allOn = allIds.every((id) => has(id));
+  
+  // Filter out any modules that are hidden
+  const visibleGroups = service.groups.map(g => ({
+    ...g,
+    modules: g.modules.filter(m => !hiddenServices.includes(m.id))
+  })).filter(g => g.modules.length > 0);
+
+  const allIds = visibleGroups.flatMap((g) => g.modules.map((m) => m.id));
+  const allOn = allIds.length > 0 && allIds.every((id) => has(id));
+
+  const [metrics, setMetrics] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    api.get<{ metrics: Record<string, number> }>("/metrics/views")
+      .then((d) => setMetrics(d.metrics || {}))
+      .catch(console.error);
+  }, []);
+
+  const handleView = (id: string) => {
+    const viewKey = `viewed_${id}`;
+    if (!sessionStorage.getItem(viewKey)) {
+      sessionStorage.setItem(viewKey, "true");
+      setMetrics((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+      api.post(`/metrics/views/${id}`).catch(console.error);
+    }
+  };
+
+  useEffect(() => {
+    handleView(service.id);
+  }, [service.id]);
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative">
@@ -160,19 +205,25 @@ export function SectorPage({
         <div className="w-full w-full max-w-[1600px] mx-auto mb-24 md:mb-32">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-3 mb-6">
-                <span
-                  className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: service.dim, color: service.color }}
-                >
-                  <service.icon size={17} />
-                </span>
-                <span
-                  className="text-xs font-bold uppercase tracking-widest"
-                  style={{ color: service.color }}
-                >
-                  {service.tagline}
-                </span>
+              <div className="inline-flex items-center gap-4 mb-6">
+                <div className="inline-flex items-center gap-3">
+                  <span
+                    className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{ background: service.dim, color: service.color }}
+                  >
+                    <service.icon size={17} />
+                  </span>
+                  <span
+                    className="text-xs font-bold uppercase tracking-widest"
+                    style={{ color: service.color }}
+                  >
+                    {service.tagline}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-sm font-bold text-[#1a1a1a]/40 bg-white/50 px-3 py-1.5 rounded-full border border-black/5 shadow-sm">
+                  <Eye size={14} />
+                  {metrics[service.id] || 0} views
+                </div>
               </div>
 
               <h1 className="font-extrabold text-5xl md:text-6xl leading-[1.1] tracking-tight mb-6 text-[#1a1a1a]">
@@ -243,7 +294,7 @@ export function SectorPage({
           </div>
 
           <div className="flex flex-col gap-14 md:gap-16">
-            {service.groups.map((group) => (
+            {visibleGroups.map((group, idx) => (
               <div key={group.title}>
                 <div className="mb-6 md:mb-8 max-w-4xl">
                   <div className="flex items-center gap-3 mb-2.5">
@@ -260,7 +311,7 @@ export function SectorPage({
                 {/* items-start so expanding one card doesn't stretch its neighbours */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-5 items-start">
                   {group.modules.map((m) => (
-                    <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} />
+                    <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} metrics={metrics} onView={handleView} />
                   ))}
                 </div>
               </div>
@@ -269,36 +320,38 @@ export function SectorPage({
         </div>
 
         {/* ── Close ──────────────────────────────────────────────────── */}
-        <div className="w-full px-4 md:px-8 mt-20 md:mt-24 mb-24 md:mb-32">
-          <div className="w-full rounded-[40px] p-10 md:p-14 text-center relative overflow-hidden border border-white/60 bg-white/70 backdrop-blur-xl shadow-[0_25px_60px_-25px_rgba(0,0,0,0.1)]">
-            <div
-              className="absolute -top-1/2 left-1/4 w-[420px] h-[420px] blur-[130px] rounded-full pointer-events-none mix-blend-multiply opacity-20"
-              style={{ background: service.color }}
-            />
-            <div className="relative z-10">
-              <h3 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-4 tracking-tight leading-[1.15]">
-                {chosen > 0
-                  ? chosen === 1
-                    ? "One thing picked. Let's talk about it."
-                    : `${chosen} things picked. Let's talk about them.`
-                  : "Not sure what you need?"}
-              </h3>
-              <p className="text-lg font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-3xl mx-auto mb-8">
-                {chosen > 0
-                  ? "A few quick questions and we'll put the right person in the room."
-                  : "Book anyway. Tell us the problem and we'll work out which parts apply."}
-              </p>
-              <button
-                onClick={onBook}
-                className="inline-flex items-center gap-2.5 text-lg font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-12px_rgba(0,0,0,0.35)] group"
+        {!isStaff && (
+          <div className="w-full px-4 md:px-8 mt-20 md:mt-24 mb-24 md:mb-32">
+            <div className="w-full rounded-[40px] p-10 md:p-14 text-center relative overflow-hidden border border-white/60 bg-white/70 backdrop-blur-xl shadow-[0_25px_60px_-25px_rgba(0,0,0,0.1)]">
+              <div
+                className="absolute -top-1/2 left-1/4 w-[420px] h-[420px] blur-[130px] rounded-full pointer-events-none mix-blend-multiply opacity-20"
                 style={{ background: service.color }}
-              >
-                Book an appointment
-                <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform" />
-              </button>
+              />
+              <div className="relative z-10">
+                <h3 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-4 tracking-tight leading-[1.15]">
+                  {chosen > 0
+                    ? chosen === 1
+                      ? "One thing picked. Let's talk about it."
+                      : `${chosen} things picked. Let's talk about them.`
+                    : "Not sure what you need?"}
+                </h3>
+                <p className="text-lg font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-3xl mx-auto mb-8">
+                  {chosen > 0
+                    ? "A few quick questions and we'll put the right person in the room."
+                    : "Book anyway. Tell us the problem and we'll work out which parts apply."}
+                </p>
+                <button
+                  onClick={onBook}
+                  className="inline-flex items-center gap-2.5 text-lg font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-12px_rgba(0,0,0,0.35)] group"
+                  style={{ background: service.color }}
+                >
+                  Book an appointment
+                  <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
