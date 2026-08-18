@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslate } from "@tolgee/react";
 import { ChevronDown, Menu, X, User } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { SERVICES } from "@/content/services";
@@ -8,7 +9,8 @@ import { isStaffRole, useAuth } from "@/app/auth";
 import { api } from "@/lib/api";
 import { Sparkles } from "lucide-react";
 import type { Page } from "@/app/routes";
-
+import LanguageToggle from "@/components/LanguageToggle";
+import { arabicServiceTranslations } from "@/content/translations/ar-services";
 const C_ORANGE = "#F5841F";
 const C_PINK = "#E91E8C";
 
@@ -18,6 +20,11 @@ const C_PINK = "#E91E8C";
  */
 export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useTranslate();
+  const serviceText = (key: string, fallback: string) =>
+    typeof document !== "undefined" && document.documentElement.lang === "ar"
+      ? arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback
+      : t(key, fallback);
   const { user, loading } = useAuth();
   
   const [hiddenServices, setHiddenServices] = useState<string[]>([]);
@@ -62,10 +69,10 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
   };
 
   const tabs: { label: string; page: Page }[] = [
-    { label: "About Us", page: "about" },
-    { label: "Mission & Vision", page: "mission" },
-    { label: "Service", page: "services" },
-    { label: "Portfolio", page: "stories" },
+    { label: t("nav_about", "About Us"), page: "about" },
+    { label: t("nav_mission", "Mission & Vision"), page: "mission" },
+    { label: t("nav_services", "Services"), page: "services" },
+    { label: t("nav_portfolio", "Portfolio"), page: "stories" },
   ];
 
   const isActive = (page: Page) => current === page && current !== "contact";
@@ -119,10 +126,10 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
                         </span>
                         <span className="min-w-0">
                           <span className="block text-lg font-extrabold text-[#1a1a1a] leading-tight mb-0.5">
-                            {s.label}
+                            {serviceText(`service_${s.id}_label`, s.label)}
                           </span>
                           <span className="block text-[11.5px] font-semibold text-[#1a1a1a]/45 leading-snug">
-                            {s.tagline}
+                            {serviceText(`service_${s.id}_tagline`, s.tagline)}
                           </span>
                         </span>
                       </button>
@@ -141,10 +148,10 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
                         </span>
                         <span className="min-w-0">
                           <span className="block text-lg font-extrabold text-[#1a1a1a] leading-tight mb-0.5">
-                            {s.title}
+                            {t(`custom_service_${s.id}_title`, s.title)}
                           </span>
                           <span className="block text-[11.5px] font-semibold text-[#1a1a1a]/45 leading-snug">
-                            {s.tagline || ""}
+                            {t(`custom_service_${s.id}_tagline`, s.tagline || "")}
                           </span>
                         </span>
                       </button>
@@ -183,9 +190,11 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
             className="hidden md:inline-flex text-lg font-bold text-white px-7 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)] flex-shrink-0"
             style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
           >
-            Book Appointment
+            {t("nav_book", "Book Appointment")}
           </button>
         )}
+
+        <LanguageToggle />
 
         {/* Signed out this signs you in; signed in it takes you to your own
             area - the staff portal for staff, the client profile for companies. */}
@@ -195,7 +204,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
             className="text-lg font-bold text-[#1a1a1a] px-5 py-2.5 rounded-full hover:bg-black/5 transition-all inline-flex items-center gap-2 flex-shrink-0"
           >
             {user && <User size={17} />}
-            {user ? "Profile" : "Sign In"}
+            {user ? t("nav_profile", "Profile") : t("nav_signin", "Sign In")}
           </button>
         )}
 
@@ -228,7 +237,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
                 className="text-left text-[14.5px] font-bold text-[#1a1a1a]/55 hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2.5"
               >
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: s.color }} />
-                {s.label}
+                {serviceText(`service_${s.id}_label`, s.label)}
               </button>
             ))}
             {customServices.filter(s => !hiddenServices.includes(s.id.toString()) && s.isActive).map(s => (
@@ -242,7 +251,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
                 <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: s.accentColor ? s.accentColor + "15" : "#F5841F15", color: s.accentColor || "#F5841F" }}>
                   <Sparkles size={14} />
                 </span>
-                <span className="font-bold text-[#1a1a1a] text-[15px]">{s.title}</span>
+                <span className="font-bold text-[#1a1a1a] text-[15px]">{t(`custom_service_${s.id}_title`, s.title)}</span>
               </button>
             ))}
             </div>
@@ -252,7 +261,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
               className="mt-4 text-lg font-bold text-white py-3.5 rounded-full shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)]"
               style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
             >
-              Book Appointment
+              {t("nav_book", "Book Appointment")}
             </button>
           )}
           {!loading && (
@@ -261,9 +270,10 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
               className="text-lg font-bold text-[#1a1a1a] py-3 rounded-full border border-black/10 inline-flex items-center justify-center gap-2"
             >
               {user && <User size={17} />}
-              {user ? "Profile" : "Sign In"}
+              {user ? t("nav_profile", "Profile") : t("nav_signin", "Sign In")}
             </button>
           )}
+          <LanguageToggle />
         </div>
       )}
     </header>

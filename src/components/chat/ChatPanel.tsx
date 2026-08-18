@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslate } from "@tolgee/react";
 import { Send } from "lucide-react";
 import { api, formatDateTime, type ChatMessage } from "@/lib/api";
 
@@ -13,6 +14,7 @@ const POLL_MS = 3000;
  * newest id it already holds, so a long thread isn't re-fetched each tick.
  */
 export function ChatPanel({ requestId, title = "Chat" }: { requestId: number; title?: string }) {
+  const { t } = useTranslate();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export function ChatPanel({ requestId, title = "Chat" }: { requestId: number; ti
       }
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Chat unavailable");
+      setError(err instanceof Error ? err.message : t("chat_unavailable", "Chat unavailable"));
     } finally {
       inFlightRef.current = false;
     }
@@ -76,7 +78,7 @@ export function ChatPanel({ requestId, title = "Chat" }: { requestId: number; ti
       setDraft("");
       await poll();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not send");
+      setError(err instanceof Error ? err.message : t("chat_send_error", "Could not send"));
     } finally {
       setSending(false);
     }
@@ -86,13 +88,13 @@ export function ChatPanel({ requestId, title = "Chat" }: { requestId: number; ti
     <div className="flex flex-col h-full min-h-0 bg-white/70 rounded-[2rem] border border-white overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
         <h4 className="font-black text-gray-900">{title}</h4>
-        <span className="text-xs font-bold text-gray-400">{messages.length} messages</span>
+        <span className="text-xs font-bold text-gray-400">{messages.length} {t("chat_messages", "messages")}</span>
       </div>
 
       <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-4">
         {messages.length === 0 && !error && (
           <p className="text-sm text-gray-400 font-medium text-center py-8">
-            No messages yet. Say hello.
+            {t("chat_empty", "No messages yet. Say hello.")}
           </p>
         )}
 
@@ -119,14 +121,14 @@ export function ChatPanel({ requestId, title = "Chat" }: { requestId: number; ti
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Write a message..."
+          placeholder={t("chat_placeholder", "Write a message...")}
           className="flex-1 px-4 py-3 rounded-full bg-gray-50 border border-gray-200 text-sm font-medium outline-none focus:border-[#F5841F] transition-colors"
         />
         <button
           type="submit"
           disabled={!draft.trim() || sending}
           className="w-12 h-12 rounded-full bg-gray-900 text-white flex items-center justify-center flex-shrink-0 disabled:opacity-40 hover:scale-105 transition-transform"
-          aria-label="Send message"
+          aria-label={t("chat_send", "Send message")}
         >
           <Send className="w-4 h-4" />
         </button>

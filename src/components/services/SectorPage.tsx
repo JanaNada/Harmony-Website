@@ -6,11 +6,21 @@ import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
 import { api } from "@/lib/api";
 import type { Service, ServiceModule } from "@/content/services";
+import { useTranslate } from "@tolgee/react";
+import { arabicServiceTranslations } from "@/content/translations/ar-services";
 
-/* ── A single selectable module ─────────────────────────────────────────────
-   The whole card toggles selection; the arrow in the corner opens the detail
-   instead, so learning more never costs you an accidental add.
-   ────────────────────────────────────────────────────────────────────────── */
+function serviceText(
+  translate: (key: string, fallback: string) => string,
+  key: string,
+  fallback: string,
+) {
+  if (typeof document !== "undefined" && document.documentElement.lang === "ar") {
+    return arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback;
+  }
+  return translate(key, fallback);
+}
+
+/* ── A single selectable module ───────────────────────────────────────────── */
 
 export function ModuleCard({
   module: m,
@@ -25,9 +35,11 @@ export function ModuleCard({
   metrics: Record<string, number>;
   onView: (id: string) => void;
 }) {
+  const { t } = useTranslate();
   const { has, toggle } = useBrief();
   const [open, setOpen] = useState(false);
   const on = has(m.id);
+  const translationId = m.id.replace(/-/g, "_");
 
   return (
     <div
@@ -70,10 +82,10 @@ export function ModuleCard({
         </div>
 
         <h4 className="font-bold text-2xl text-[#1a1a1a] mb-2 leading-[1.3]">
-          {m.label}
+          {serviceText(t, `mod_${translationId}_label`, m.label)}
         </h4>
         <p className="text-base leading-[1.65] text-[#1a1a1a]/55 font-medium flex-1">
-          {m.desc}
+          {serviceText(t, `mod_${translationId}_desc`, m.desc)}
         </p>
 
         {/* Status + the expand control */}
@@ -85,10 +97,10 @@ export function ModuleCard({
               }`}
               style={on ? { color } : undefined}
             >
-              {on ? "Added to your brief" : "Add to brief"}
+              {on ? t('status_added_brief', 'Added to your brief') : t('status_add_brief', 'Add to brief')}
             </span>
             <span className="text-xs font-bold text-[#1a1a1a]/40 flex items-center gap-1.5">
-              <Eye size={12} /> {metrics[m.id] || 0} views
+              <Eye size={12} /> {metrics[m.id] || 0} {t('metric_views', 'views')}
             </span>
           </div>
 
@@ -131,7 +143,7 @@ export function ModuleCard({
               />
             </div>
             <p className="text-sm leading-[1.75] text-[#1a1a1a]/65 font-medium">
-              {m.long}
+              {serviceText(t, `mod_${translationId}_long`, m.long)}
             </p>
           </div>
         </div>
@@ -151,15 +163,14 @@ export function SectorPage({
 }: {
   service: Service;
   onBook: () => void;
-  /** Optional editorial block shown under the intro (e.g. the ice-cream story). */
   story?: React.ReactNode;
   hiddenServices?: string[];
   isStaff?: boolean;
 }) {
+  const { t } = useTranslate();
   const { addMany, removeMany, countFor, has } = useBrief();
   const chosen = countFor(service.id);
   
-  // Filter out any modules that are hidden
   const visibleGroups = service.groups.map(g => ({
     ...g,
     modules: g.modules.filter(m => !hiddenServices.includes(m.id))
@@ -191,7 +202,6 @@ export function SectorPage({
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative">
-      {/* Ambient wash, tinted to the service */}
       <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div
           className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] blur-[130px] rounded-full mix-blend-multiply opacity-[0.18]"
@@ -201,8 +211,7 @@ export function SectorPage({
       </div>
 
       <div className="relative z-10 pt-16 md:pt-20 pb-40 px-6">
-        {/* ── Hero ─────────────────────────────────────────────────────── */}
-        <div className="w-full w-full max-w-[1600px] mx-auto mb-24 md:mb-32">
+        <div className="w-full max-w-[1600px] mx-auto mb-24 md:mb-32">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-7">
               <div className="inline-flex items-center gap-4 mb-6">
@@ -217,25 +226,25 @@ export function SectorPage({
                     className="text-xs font-bold uppercase tracking-widest"
                     style={{ color: service.color }}
                   >
-                    {service.tagline}
+                    {serviceText(t, `service_${service.id}_tagline`, service.tagline)}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-sm font-bold text-[#1a1a1a]/40 bg-white/50 px-3 py-1.5 rounded-full border border-black/5 shadow-sm">
                   <Eye size={14} />
-                  {metrics[service.id] || 0} views
+                  {metrics[service.id] || 0} {t('metric_views', 'views')}
                 </div>
               </div>
 
               <h1 className="font-extrabold text-5xl md:text-6xl leading-[1.1] tracking-tight mb-6 text-[#1a1a1a]">
-                {service.label}
+                {serviceText(t, `service_${service.id}_label`, service.label)}
               </h1>
 
               <p className="text-2xl md:text-3xl leading-[1.8] font-medium text-[#1a1a1a]/85 mb-6">
-                {service.promise}
+                {serviceText(t, `service_${service.id}_promise`, service.promise)}
               </p>
 
               <p className="text-xl font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-4xl">
-                {service.intro}
+                {serviceText(t, `service_${service.id}_intro`, service.intro)}
               </p>
             </div>
 
@@ -255,27 +264,24 @@ export function SectorPage({
           </div>
         </div>
 
-        {story && <div className="w-full w-full max-w-[1600px] mx-auto mb-24 md:mb-32">{story}</div>}
+        {story && <div className="w-full max-w-[1600px] mx-auto mb-24 md:mb-32">{story}</div>}
 
-        {/* Explore More Indicator */}
         <div 
           onClick={() => document.getElementById('modules-grid')?.scrollIntoView({ behavior: 'smooth' })}
           className="w-full flex flex-col items-center justify-center mt-12 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
         >
-          <span className="uppercase tracking-[0.2em] font-bold text-sm text-[#1a1a1a]/60 mb-2">Explore More Services</span>
+          <span className="uppercase tracking-[0.2em] font-bold text-sm text-[#1a1a1a]/60 mb-2">{t('explore_more_services', 'Explore More Services')}</span>
           <ChevronDown className="animate-bounce text-[#F5841F]" size={24} />
         </div>
 
-        {/* ── Pick what you need ───────────────────────────────────────── */}
         <div id="modules-grid" className="w-full max-w-[1600px] mx-auto">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-10 md:mb-14">
             <div className="max-w-4xl">
               <h2 className="font-extrabold text-4xl md:text-5xl tracking-tight text-[#1a1a1a] mb-4 leading-[1.15]">
-                Pick what you need
+                {t('pick_what_you_need', 'Pick what you need')}
               </h2>
               <p className="text-2xl text-[#1a1a1a]/55 leading-[1.75] font-medium">
-                Take one, take several, or take everything — you're not buying a package.
-                Add what's relevant and we'll build the meeting around it.
+                {t('pick_subtext', "Take one, take several, or take everything — you're not buying a package. Add what's relevant and we'll build the meeting around it.")}
               </p>
             </div>
 
@@ -289,7 +295,7 @@ export function SectorPage({
                 background: allOn ? service.dim : "transparent",
               }}
             >
-              {allOn ? "Deselect everything" : "I want the full service"}
+              {allOn ? t('deselect_everything', 'Deselect everything') : t('want_full_service', 'I want the full service')}
             </button>
           </div>
 
@@ -300,15 +306,14 @@ export function SectorPage({
                   <div className="flex items-center gap-3 mb-2.5">
                     <span className="h-px w-7" style={{ background: service.color }} />
                     <h3 className="font-extrabold text-2xl md:text-3xl text-[#1a1a1a] tracking-tight">
-                      {group.title}
+                      {serviceText(t, `group_${service.id}_${idx}_title`, group.title)}
                     </h3>
                   </div>
                   <p className="text-xl text-[#1a1a1a]/55 leading-[1.7] font-medium pl-10">
-                    {group.blurb}
+                    {serviceText(t, `group_${service.id}_${idx}_blurb`, group.blurb)}
                   </p>
                 </div>
 
-                {/* items-start so expanding one card doesn't stretch its neighbours */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-5 items-start">
                   {group.modules.map((m) => (
                     <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} metrics={metrics} onView={handleView} />
@@ -319,7 +324,6 @@ export function SectorPage({
           </div>
         </div>
 
-        {/* ── Close ──────────────────────────────────────────────────── */}
         {!isStaff && (
           <div className="w-full px-4 md:px-8 mt-20 md:mt-24 mb-24 md:mb-32">
             <div className="w-full rounded-[40px] p-10 md:p-14 text-center relative overflow-hidden border border-white/60 bg-white/70 backdrop-blur-xl shadow-[0_25px_60px_-25px_rgba(0,0,0,0.1)]">
@@ -331,21 +335,21 @@ export function SectorPage({
                 <h3 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-4 tracking-tight leading-[1.15]">
                   {chosen > 0
                     ? chosen === 1
-                      ? "One thing picked. Let's talk about it."
-                      : `${chosen} things picked. Let's talk about them.`
-                    : "Not sure what you need?"}
+                      ? t('chosen_one', "One thing picked. Let's talk about it.")
+                      : t('chosen_multiple', `${chosen} things picked. Let's talk about them.`)
+                    : t('not_sure_need', "Not sure what you need?")}
                 </h3>
                 <p className="text-lg font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-3xl mx-auto mb-8">
                   {chosen > 0
-                    ? "A few quick questions and we'll put the right person in the room."
-                    : "Book anyway. Tell us the problem and we'll work out which parts apply."}
+                    ? t('chosen_sub_yes', "A few quick questions and we'll put the right person in the room.")
+                    : t('chosen_sub_no', "Book anyway. Tell us the problem and we'll work out which parts apply.")}
                 </p>
                 <button
                   onClick={onBook}
                   className="inline-flex items-center gap-2.5 text-lg font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-12px_rgba(0,0,0,0.35)] group"
                   style={{ background: service.color }}
                 >
-                  Book an appointment
+                  {t('book_an_appointment', 'Book an appointment')}
                   <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
@@ -356,9 +360,3 @@ export function SectorPage({
     </div>
   );
 }
-
-
-
-
-
-

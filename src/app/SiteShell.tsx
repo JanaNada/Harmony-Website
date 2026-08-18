@@ -9,7 +9,7 @@ import { ChatNavigator } from "@/components/chat/ChatNavigator";
 import { SiteNav } from "@/components/SiteNav";
 import { ContactButton } from "@/components/ContactButton";
 import { type Page, pageToPath, pathToPage } from "./routes";
-
+import LanguageToggle from "@/components/LanguageToggle";
 /**
  * Everything that must outlive a page change.
  *
