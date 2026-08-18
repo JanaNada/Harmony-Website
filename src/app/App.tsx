@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -46,9 +46,11 @@ import { SERVICES, SERVICE_BY_ID, type ServiceId } from "@/content/services";
 import { type Page, isKnownPage, pageToPath, pathToPage } from "./routes";
 import { isStaffRole, useAuth } from "./auth";
 import { BookingPage } from "@/components/brief/BookingPage";
+import { api } from "@/lib/api";
 import { ServicesOverview } from "@/components/services/ServicesOverview";
 import { SectorPage } from "@/components/services/SectorPage";
 import { MarketingStory } from "@/components/services/MarketingStory";
+import { CatalogServicePage, type CatalogService } from "@/components/services/CatalogServicePage";
 
 // Image paths - move images from src/imports to public/imports
 const logoImg = "/imports/image-10.png";
@@ -104,6 +106,10 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [userType, setUserType] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -112,32 +118,56 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
     if (busy) return;
 
     setError(null);
-
-    // Self-service registration isn't wired up yet. Until it is, this must not
-    // fall through to the dashboard.
-    if (mode === "signup") {
-      setError("Account creation isn't available yet â€” please contact us to get set up.");
-      return;
-    }
-
-    /* Pasted credentials routinely carry a stray space or newline, which would
-       otherwise read as a wrong password. Surrounding whitespace is never part
-       of what someone meant to type. */
     setBusy(true);
-    const result = await login(email.trim(), password.trim());
-    setBusy(false);
 
-    if (!result.ok) {
-      setError(result.message ?? "Sign in failed.");
-      return;
+    try {
+      if (mode === "signup") {
+        // Basic validation
+        if (!companyName.trim() || !contactName.trim() || !contactPhone.trim() || !email.trim() || !password.trim()) {
+          setError("Company name, contact name, contact phone, email and password are required.");
+          setBusy(false);
+          return;
+        }
+
+        // Call the backend register endpoint via the proxied /api route
+        await api.post<{ success: boolean; message?: string }>("/auth/register", {
+          companyName: companyName.trim(),
+          contactName: contactName.trim(),
+          contactPhone: contactPhone.trim(),
+          email: email.trim(),
+          password: password.trim(),
+        });
+
+        // After successful registration the backend sets the httpOnly cookie.
+        // Ask the auth provider to sign the user in (this will also refresh client state).
+        const loginResult = await login(email.trim(), password.trim());
+        if (!loginResult.ok) {
+          setError(loginResult.message ?? "Registration succeeded but login failed.");
+          setBusy(false);
+          return;
+        }
+
+        const returnTo = typeof window !== "undefined" ? sessionStorage.getItem("returnTo") : null;
+        if (returnTo) sessionStorage.removeItem("returnTo");
+        go(isKnownPage(returnTo) ? (returnTo as Page) : "about");
+
+      } else {
+        const result = await login(email.trim(), password.trim());
+        if (!result.ok) {
+          setError(result.message ?? "Sign in failed.");
+          setBusy(false);
+          return;
+        }
+
+        const returnTo = typeof window !== "undefined" ? sessionStorage.getItem("returnTo") : null;
+        if (returnTo) sessionStorage.removeItem("returnTo");
+        go(isKnownPage(returnTo) ? (returnTo as Page) : "about");
+      }
+    } catch (err: any) {
+      setError(err?.message ?? "An error occurred. Is the API running?");
+    } finally {
+      setBusy(false);
     }
-
-    /* Signing in just signs you in â€” it doesn't hijack where you were going.
-       Head back to whatever page sent you here; the nav's Profile button is
-       how you reach your own area. */
-    const returnTo = typeof window !== "undefined" ? sessionStorage.getItem("returnTo") : null;
-    if (returnTo) sessionStorage.removeItem("returnTo");
-    go(isKnownPage(returnTo) ? (returnTo as Page) : "about");
   };
 
   return (
@@ -168,13 +198,40 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
         <div className="bg-white/80 backdrop-blur-2xl p-8 md:p-10 rounded-[40px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] border border-white">
           <form onSubmit={handleSignIn} className="space-y-8">
             
-            {/* Sign Up Only: Name */}
+            {/* Sign Up Only: Company Name */}
             {mode === "signup" && (
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>Full Name</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>Company Name</label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Building size={16} /></div>
+                  <input type="text" placeholder="Acme Restaurant" required
+                    value={companyName} onChange={(e) => setCompanyName(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
+                </div>
+              </div>
+            )}
+
+            {/* Sign Up Only: Contact Name */}
+            {mode === "signup" && (
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>Contact Name</label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><User size={16} /></div>
                   <input type="text" placeholder="Ahmed Hassan" required
+                    value={contactName} onChange={(e) => setContactName(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
+                </div>
+              </div>
+            )}
+
+            {/* Sign Up Only: Contact Phone */}
+            {mode === "signup" && (
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>Contact Phone</label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Phone size={16} /></div>
+                  <input type="tel" placeholder="+971 50 123 4567" required
+                    value={contactPhone} onChange={(e) => setContactPhone(e.target.value)}
                     className="w-full pl-11 pr-4 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
                 </div>
               </div>
@@ -210,8 +267,8 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>I am a...</label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Briefcase size={16} /></div>
-                  <select required className="w-full pl-11 pr-10 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all text-gray-700 focus:border-[#F5841F] bg-white/50 appearance-none cursor-pointer">
-                    <option value="" disabled selected>Select your objective</option>
+                  <select required value={userType} onChange={(e) => setUserType(e.target.value)} className="w-full pl-11 pr-10 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all text-gray-700 focus:border-[#F5841F] bg-white/50 appearance-none cursor-pointer">
+                    <option value="" disabled>Select your objective</option>
                     <option value="restaurant">Restaurant / F&B Owner</option>
                     <option value="recruiter">Recruiter / Seeking Talent</option>
                     <option value="event">Client (Planning an Event)</option>
@@ -1006,6 +1063,8 @@ const SERVICE_IDS = SERVICES.map((s) => s.id);
 const isServicePage = (p: Page): p is ServiceId =>
   (SERVICE_IDS as string[]).includes(p);
 
+const isCatalogPage = (p: Page): p is `catalog:${number}` => /^catalog:\d+$/.test(p);
+
 /** Full-screen status message, used while the session is being resolved. */
 function SessionNotice({ children }: { children: React.ReactNode }) {
   return (
@@ -1057,15 +1116,71 @@ function CompanyRoute() {
 export default function App() {
   const router = useRouter();
   const pathname = usePathname();
+  const [catalogServices, setCatalogServices] = useState<CatalogService[]>([]);
+  const [catalogLoaded, setCatalogLoaded] = useState(false);
 
   // The URL is the source of truth, so Back/Forward and refresh all work.
   const page = pathToPage(pathname);
   const go = (p: Page) => router.push(pageToPath(p));
 
+  const fetchCatalog = () => {
+    api
+      .get<{ services: CatalogService[] }>("/catalog")
+      .then((d) => { setCatalogServices(d.services); setCatalogLoaded(true); })
+      .catch(() => { setCatalogServices([]); setCatalogLoaded(true); });
+  };
+
+  useEffect(() => { fetchCatalog(); }, []);
+
+  // Active DB services — used as the source of truth for what shows on the page
+  const activeCatalogServices = catalogServices.filter((s) => s.isActive);
+
+  // Extra services are DB-only services (not matching a hardcoded static service title)
+  const staticIds = new Set(SERVICES.map((s) => s.label.toLowerCase()));
+  const extraCatalogServices = activeCatalogServices.filter((s) => !staticIds.has(s.title.toLowerCase()));
+
+  // The set of hardcoded service titles that are active in the DB
+  const activeStaticTitles = new Set(
+    activeCatalogServices
+      .filter((s) => staticIds.has(s.title.toLowerCase()))
+      .map((s) => s.title.toLowerCase())
+  );
+
+  const catalogService = isCatalogPage(page)
+    ? catalogServices.find((s) => s.id === Number(page.slice("catalog:".length)))
+    : null;
+
+  const dbServiceForPage =
+  isServicePage(page)
+    ? activeCatalogServices.find(
+        (s) => s.title.toLowerCase() === SERVICE_BY_ID[page].label.toLowerCase()
+      )
+    : null;
+
+  const openCatalogBooking = (service: CatalogService) => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(
+        "bookingCatalogService",
+        JSON.stringify({
+          id: service.id,
+          title: service.title,
+          subservices: service.subservices.filter((s) => s.isActive).map((s) => s.title),
+        })
+      );
+    }
+    go("booking");
+  };
+
   return (
     <>
       {page === "services" && (
-        <ServicesOverview onOpen={(id) => go(id)} onBook={() => go("booking")} />
+        <ServicesOverview
+          onOpen={(id) => go(id)}
+          onOpenCatalog={(id) => go(`catalog:${id}`)}
+          extraServices={extraCatalogServices}
+          activeStaticTitles={catalogLoaded ? activeStaticTitles : null}
+          onBook={() => go("booking")}
+        />
       )}
       {isServicePage(page) && (
         <SectorPage
@@ -1074,6 +1189,28 @@ export default function App() {
           onBook={() => go("booking")}
           story={page === "marketing" ? <MarketingStory /> : undefined}
         />
+      )}
+      {/* {isServicePage(page) && dbServiceForPage && (
+        <CatalogServicePage
+          key={`catalog-${dbServiceForPage.id}`}
+          service={dbServiceForPage}
+          onBook={openCatalogBooking}
+        />
+      )}
+
+      {isServicePage(page) && !dbServiceForPage && (
+        <SectorPage
+          key={page}
+          service={SERVICE_BY_ID[page]}
+          onBook={() => go("booking")}
+          story={page === "marketing" ? <MarketingStory /> : undefined}
+        />
+      )} */}
+      {isCatalogPage(page) && catalogService && (
+        <CatalogServicePage service={catalogService} onBook={openCatalogBooking} />
+      )}
+      {isCatalogPage(page) && !catalogService && (
+        <SessionNotice>Service not found.</SessionNotice>
       )}
       {page === "booking" && (
         <BookingPage onBrowse={() => go("services")} onSignIn={() => go("login")} />

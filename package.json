@@ -10,7 +10,8 @@
     "dev:vite": "vite",
     "build": "next build",
     "build:vite": "vite build",
-    "start": "next start"
+    "start": "next start",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",

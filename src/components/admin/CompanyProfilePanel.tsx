@@ -19,10 +19,13 @@ import { ChatPanel } from "@/components/chat/ChatPanel";
  */
 export function CompanyProfilePanel({
   companyId,
+  requestId,
   onClose,
   onChanged,
 }: {
   companyId: number;
+  /** Calendar opens one appointment; Clients intentionally opens the full company history. */
+  requestId?: number;
   onClose: () => void;
   onChanged?: () => void;
 }) {
@@ -82,6 +85,9 @@ export function CompanyProfilePanel({
 
   const company = profile?.company;
   const pendingReschedules = profile?.reschedules.filter((r) => r.status === "PENDING") ?? [];
+  const displayedRequests = requestId
+    ? profile?.requests.filter((request) => request.id === requestId) ?? []
+    : profile?.requests ?? [];
 
   return (
     <div className="fixed inset-0 z-[100] flex justify-end">
@@ -169,13 +175,13 @@ export function CompanyProfilePanel({
                 </div>
               )}
 
-              {profile.requests.length === 0 && (
+              {displayedRequests.length === 0 && (
                 <p className="text-gray-400 font-medium text-center py-10">
                   This company hasn't requested anything yet.
                 </p>
               )}
 
-              {profile.requests.map((r) => (
+              {displayedRequests.map((r) => (
                 <div key={r.id} className="bg-white rounded-[2rem] p-6 border border-white shadow-sm">
                   <div className="flex items-start justify-between gap-4 mb-3">
                     <div className="min-w-0">

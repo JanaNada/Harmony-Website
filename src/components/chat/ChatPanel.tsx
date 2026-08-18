@@ -120,7 +120,7 @@ export function ChatPanel({ requestId, title = "Chat" }: { requestId: number; ti
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           placeholder="Write a message..."
-          className="flex-1 px-4 py-3 rounded-full bg-gray-50 border border-gray-200 text-sm font-medium outline-none focus:border-[#F5841F] transition-colors"
+          className="flex-1 px-4 py-3 rounded-full bg-gray-50 border border-gray-200 text-sm font-medium text-gray-900 placeholder:text-gray-400 outline-none focus:border-[#F5841F] transition-colors"
         />
         <button
           type="submit"

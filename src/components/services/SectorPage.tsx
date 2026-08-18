@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Check, Plus, ArrowRight, ChevronDown } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
+import { useAuth, isStaffRole } from "@/app/auth";
 import type { Service, ServiceModule } from "@/content/services";
 
 /* ── A single selectable module ─────────────────────────────────────────────
@@ -15,10 +16,13 @@ export function ModuleCard({
   module: m,
   color,
   dim,
+  disabled,
 }: {
   module: ServiceModule;
   color: string;
   dim: string;
+  /** When true, the card can be inspected but not added/removed from the brief. */
+  disabled?: boolean;
 }) {
   const { has, toggle } = useBrief();
   const [open, setOpen] = useState(false);
@@ -27,16 +31,24 @@ export function ModuleCard({
   return (
     <div
       role="button"
-      tabIndex={0}
-      onClick={() => toggle(m.id)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          toggle(m.id);
-        }
-      }}
+      tabIndex={disabled ? -1 : 0}
+      onClick={disabled ? undefined : () => toggle(m.id)}
+      onKeyDown={
+        disabled
+          ? undefined
+          : (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggle(m.id);
+              }
+            }
+      }
       aria-pressed={on}
-      className={`group relative text-left rounded-[26px] border transition-all duration-300 flex flex-col cursor-pointer overflow-hidden ${
+      className={`group relative text-left rounded-[26px] border transition-all duration-300 flex flex-col overflow-hidden ${
+        disabled
+          ? "cursor-not-allowed opacity-75"
+          : "cursor-pointer"
+      } ${
         on
           ? "bg-white shadow-[0_18px_40px_-18px_rgba(0,0,0,0.16)] -translate-y-0.5"
           : "bg-white/60 border-white/70 hover:bg-white hover:shadow-[0_14px_30px_-16px_rgba(0,0,0,0.12)] hover:-translate-y-0.5"
@@ -140,6 +152,8 @@ export function SectorPage({
   story?: React.ReactNode;
 }) {
   const { addMany, removeMany, countFor, has } = useBrief();
+  const { user } = useAuth();
+  const isStaff = isStaffRole(user?.role);
   const chosen = countFor(service.id);
   const allIds = service.groups.flatMap((g) => g.modules.map((m) => m.id));
   const allOn = allIds.every((id) => has(id));
@@ -228,18 +242,20 @@ export function SectorPage({
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() => (allOn ? removeMany(allIds) : addMany(allIds))}
-              className="text-[13.5px] font-bold px-6 py-3.5 rounded-full border transition-all duration-300 hover:scale-[1.03] flex-shrink-0 self-start"
-              style={{
-                borderColor: `${service.color}45`,
-                color: service.color,
-                background: allOn ? service.dim : "transparent",
-              }}
-            >
-              {allOn ? "Deselect everything" : "I want the full service"}
-            </button>
+            {!isStaff && (
+              <button
+                type="button"
+                onClick={() => (allOn ? removeMany(allIds) : addMany(allIds))}
+                className="text-[13.5px] font-bold px-6 py-3.5 rounded-full border transition-all duration-300 hover:scale-[1.03] flex-shrink-0 self-start"
+                style={{
+                  borderColor: `${service.color}45`,
+                  color: service.color,
+                  background: allOn ? service.dim : "transparent",
+                }}
+              >
+                {allOn ? "Deselect everything" : "I want the full service"}
+              </button>
+            )}
           </div>
 
           <div className="flex flex-col gap-14 md:gap-16">
@@ -260,7 +276,7 @@ export function SectorPage({
                 {/* items-start so expanding one card doesn't stretch its neighbours */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-5 items-start">
                   {group.modules.map((m) => (
-                    <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} />
+                    <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} disabled={isStaff} />
                   ))}
                 </div>
               </div>
@@ -288,14 +304,16 @@ export function SectorPage({
                   ? "A few quick questions and we'll put the right person in the room."
                   : "Book anyway. Tell us the problem and we'll work out which parts apply."}
               </p>
-              <button
-                onClick={onBook}
-                className="inline-flex items-center gap-2.5 text-lg font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-12px_rgba(0,0,0,0.35)] group"
-                style={{ background: service.color }}
-              >
-                Book an appointment
-                <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform" />
-              </button>
+              {!isStaff && (
+                <button
+                  onClick={onBook}
+                  className="inline-flex items-center gap-2.5 text-lg font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-12px_rgba(0,0,0,0.35)] group"
+                  style={{ background: service.color }}
+                >
+                  Book an appointment
+                  <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              )}
             </div>
           </div>
         </div>

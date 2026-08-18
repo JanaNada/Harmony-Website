@@ -6,7 +6,7 @@ export const SERVICE_TYPE_BY_ID: Record<ServiceId, string> = {
   events: "EVENTS",
   marketing: "MARKETING",
   recruitment: "RECRUITMENT",
-  technology: "TECHNOLOGY",
+  technology: "FNB",
 };
 
 export const SERVICE_LABEL: Record<string, string> = {
@@ -29,6 +29,23 @@ export const SERVICE_COLOR: Record<string, string> = {
   FNB: "#F5841F",
   CATERING: "#E91E8C",
   OTHER: "#8A8A8A",
+};
+
+/** Human-readable labels and colours for request statuses. */
+export const STATUS_LABEL: Record<string, string> = {
+  PENDING: "Pending",
+  IN_REVIEW: "In Review",
+  APPROVED: "Approved",
+  REJECTED: "Rejected",
+  COMPLETED: "Completed",
+};
+
+export const STATUS_COLOR: Record<string, string> = {
+  PENDING: "#F5841F",
+  IN_REVIEW: "#3AADE0",
+  APPROVED: "#78BE1F",
+  REJECTED: "#E91E8C",
+  COMPLETED: "#6B7280",
 };
 
 export class ApiError extends Error {

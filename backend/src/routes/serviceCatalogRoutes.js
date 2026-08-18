@@ -6,6 +6,11 @@ const {
   createService,
   updateService,
   deleteService,
+  createSection,
+  updateSection,
+  deleteSection,
+  moveSection,
+  moveSubservice,
   createSubservice,
   updateSubservice,
   deleteSubservice,
@@ -20,8 +25,14 @@ router.post("/services", authenticate, authorize("ADMIN"), createService);
 router.put("/services/:id", authenticate, authorize("ADMIN"), updateService);
 router.delete("/services/:id", authenticate, authorize("ADMIN"), deleteService);
 
+router.post("/services/:serviceId/sections", authenticate, authorize("ADMIN"), createSection);
+router.put("/sections/:id", authenticate, authorize("ADMIN"), updateSection);
+router.delete("/sections/:id", authenticate, authorize("ADMIN"), deleteSection);
+router.post("/sections/:id/move", authenticate, authorize("ADMIN"), moveSection);
+
 router.post("/services/:serviceId/subservices", authenticate, authorize("ADMIN"), createSubservice);
 router.put("/subservices/:id", authenticate, authorize("ADMIN"), updateSubservice);
 router.delete("/subservices/:id", authenticate, authorize("ADMIN"), deleteSubservice);
+router.post("/subservices/:id/move", authenticate, authorize("ADMIN"), moveSubservice);
 
 module.exports = router;
