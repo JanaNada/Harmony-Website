@@ -46,10 +46,10 @@ const registerCompany = async (req, res) => {
       password,
     } = req.body;
 
-    if (!companyName || !contactName || !email || !password) {
+    if (!companyName || !contactName || !contactPhone || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "Company name, contact name, email, and password are required",
+        message: "Company name, contact name, contact phone, email, and password are required",
       });
     }
 
@@ -101,7 +101,7 @@ const registerCompany = async (req, res) => {
         userId,
         companyName,
         contactName,
-        contactPhone || null,
+        contactPhone,
       ]
     );
 
@@ -128,7 +128,7 @@ const registerCompany = async (req, res) => {
         id: companyResult.insertId,
         companyName,
         contactName,
-        contactPhone: contactPhone || null,
+        contactPhone,
       },
     });
 

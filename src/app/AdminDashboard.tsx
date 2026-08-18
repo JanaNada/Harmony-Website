@@ -25,30 +25,7 @@ const C_BLUE = "#3AADE0";
 const C_GREEN = "#78BE1F";
 const GRAD = `linear-gradient(90deg, ${C_ORANGE}, ${C_PINK}, ${C_BLUE}, ${C_GREEN})`;
 
-type Tab = "overview" | "projects" | "clients" | "services" | "calendar" | "settings" | "pending";
-
-/**
- * Companies waiting on a meeting. Shared by the Overview stat and the Pending
- * tab so the number you click and the list you land on can't disagree.
- */
-function usePendingRequests() {
-  const [requests, setRequests] = useState<PendingRequest[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
-  const reload = React.useCallback(async () => {
-    try {
-      const data = await api.get<{ requests: PendingRequest[] }>("/scheduling/pending");
-      setRequests(data.requests);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load pending requests");
-    }
-  }, []);
-
-  React.useEffect(() => { reload(); }, [reload]);
-
-  return { requests, error, reload };
-}
+type Tab = "overview" | "projects" | "clients" | "services" | "calendar" | "settings";
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
@@ -59,17 +36,19 @@ export default function AdminDashboard() {
      catalogue, or manage staff. */
   const isAdmin = user?.role === "ADMIN";
   const router = useRouter();
-  const { requests: pending, reload: reloadPending } = usePendingRequests();
-  const [stats, setStats] = useState({ companies: 0, upcomingMeetings: 0 });
+  const [stats, setStats] = useState({ companies: 0, upcomingMeetings: 0, pendingRequests: 0 });
 
   React.useEffect(() => {
-    api.get<{ companies: number; upcomingMeetings: number }>("/scheduling/stats")
-      .then((d) => setStats({ companies: d.companies, upcomingMeetings: d.upcomingMeetings }))
+    api.get<{ companies: number; upcomingMeetings: number; pendingRequests: number }>("/scheduling/stats")
+      .then((d) => setStats({ companies: d.companies, upcomingMeetings: d.upcomingMeetings, pendingRequests: d.pendingRequests }))
       .catch(() => {});
-  }, [pending.length]);
+  }, []);
 
   // Which company's profile is open in the slide-over, if any.
   const [openCompanyId, setOpenCompanyId] = useState<number | null>(null);
+  const [openRequestId, setOpenRequestId] = useState<number | null>(null);
+  const openCompany = (companyId: number) => { setOpenRequestId(null); setOpenCompanyId(companyId); };
+  const openAppointment = (companyId: number, requestId: number) => { setOpenRequestId(requestId); setOpenCompanyId(companyId); };
 
   const handleSignOut = async () => {
     await logout();
@@ -111,7 +90,6 @@ export default function AdminDashboard() {
           
           <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Operations</span>
           <NavItem icon={KanbanSquare} label="Projects" active={activeTab === "projects"} onClick={() => setActiveTab("projects")} color={C_PINK} />
-          <NavItem icon={ClipboardList} label={`Pending Meetings${pending.length ? ` (${pending.length})` : ""}`} active={activeTab === "pending"} onClick={() => setActiveTab("pending")} color={C_ORANGE} />
           <NavItem icon={Calendar} label="Calendar" active={activeTab === "calendar"} onClick={() => setActiveTab("calendar")} color={C_BLUE} />
           
           <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Client Data</span>
@@ -147,20 +125,17 @@ export default function AdminDashboard() {
           {activeTab === "overview" && (
             <OverviewTab
               setActiveTab={setActiveTab}
-              pendingCount={pending.length}
+              pendingCount={stats.pendingRequests}
               companyCount={stats.companies}
               meetingCount={stats.upcomingMeetings}
-              onOpenCompany={setOpenCompanyId}
+              onOpenCompany={openCompany}
             />
           )}
-          {activeTab === "pending" && (
-            <PendingVerificationsTab requests={pending} onOpenCompany={setOpenCompanyId} />
-          )}
-          {activeTab === "projects" && <ProjectsTab onOpenCompany={setOpenCompanyId} />}
-          {activeTab === "clients" && <ClientsTab onOpenCompany={setOpenCompanyId} />}
+          {activeTab === "projects" && <ProjectsTab onOpenCompany={openCompany} />}
+          {activeTab === "clients" && <ClientsTab onOpenCompany={openCompany} />}
           {activeTab === "services" && (isAdmin ? <ServiceBuilder /> : <AccessDenied />)}
           {activeTab === "calendar" && (
-            <AvailabilityCalendar onOpenCompany={setOpenCompanyId} canEdit={isAdmin} />
+            <AvailabilityCalendar onOpenAppointment={openAppointment} canEdit={isAdmin} />
           )}
           {activeTab === "settings" && (isAdmin ? <StaffAccess /> : <AccessDenied />)}
         </div>
@@ -169,8 +144,9 @@ export default function AdminDashboard() {
       {openCompanyId !== null && (
         <CompanyProfilePanel
           companyId={openCompanyId}
+          requestId={openRequestId ?? undefined}
           onClose={() => setOpenCompanyId(null)}
-          onChanged={reloadPending}
+          onChanged={() => {}}
         />
       )}
     </div>
@@ -229,7 +205,7 @@ function OverviewTab({ setActiveTab, pendingCount, companyCount, meetingCount, o
           <div className="flex flex-wrap gap-8">
             <StatPill title="Total Site Views" value={String(totalViews)} color={C_PINK} onClick={() => {}} />
             <StatPill title="Active Companies" value={String(companyCount ?? 0)} color={C_BLUE} onClick={() => setActiveTab("clients")} />
-            <StatPill title="Pending Verifications" value={String(pendingCount ?? 0)} color={C_ORANGE} onClick={() => setActiveTab("pending")} />
+            <StatPill title="Pending Requests" value={String(pendingCount ?? 0)} color={C_ORANGE} onClick={() => setActiveTab("projects")} />
             <StatPill title="Upcoming Meetings" value={String(meetingCount ?? 0)} color={C_GREEN} onClick={() => setActiveTab("calendar")} />
           </div>
 
@@ -358,11 +334,16 @@ function PendingVerificationsTab({
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {requests.map((r) => (
+          {requests.map((r) => {
+            const overdue = !!r.meetingAt && new Date(r.meetingAt).getTime() < Date.now();
+
+            return (
             <button
               key={r.id}
               onClick={() => onOpenCompany(r.companyId)}
-              className="text-left bg-white/70 backdrop-blur-xl p-7 rounded-[2.5rem] border border-white shadow-[0_15px_35px_-10px_rgba(0,0,0,0.06)] hover:bg-white hover:-translate-y-1 transition-all group"
+              className={`text-left bg-white/70 backdrop-blur-xl p-7 rounded-[2.5rem] border shadow-[0_15px_35px_-10px_rgba(0,0,0,0.06)] hover:bg-white hover:-translate-y-1 transition-all group ${
+                overdue ? "border-red-200" : "border-white"
+              }`}
             >
               <div className="flex items-start justify-between gap-4 mb-4">
                 <div className="min-w-0">
@@ -381,11 +362,16 @@ function PendingVerificationsTab({
                 <ArrowRight className="w-5 h-5 text-gray-300 group-hover:text-[#F5841F] group-hover:translate-x-1 transition-all flex-shrink-0 mt-1" />
               </div>
 
-              <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 mb-4">
-                <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <span className="text-sm font-bold text-gray-900">
+              <div className={`flex items-center gap-2 p-3 rounded-xl mb-4 ${overdue ? "bg-red-50" : "bg-gray-50"}`}>
+                <Clock className={`w-4 h-4 flex-shrink-0 ${overdue ? "text-red-500" : "text-gray-400"}`} />
+                <span className={`text-sm font-bold ${overdue ? "text-red-700" : "text-gray-900"}`}>
                   {r.meetingAt ? formatDateTime(r.meetingAt) : "No meeting time chosen"}
                 </span>
+                {overdue && (
+                  <span className="ml-auto text-[10px] font-black uppercase tracking-wider text-red-600">
+                    Overdue
+                  </span>
+                )}
               </div>
 
               <div className="flex flex-wrap gap-4 text-sm font-bold text-gray-500">
@@ -399,7 +385,8 @@ function PendingVerificationsTab({
                 </span>
               </div>
             </button>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
@@ -419,7 +406,4 @@ function AccessDenied() {
     </div>
   );
 }
-
-
-
 

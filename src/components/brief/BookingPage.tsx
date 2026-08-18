@@ -14,6 +14,20 @@ import {
 } from "@/content/services";
 
 type Answers = Record<string, string>;
+interface CompanyProfilePrefill {
+  user: { email: string };
+  company: {
+    companyName: string;
+    contactName: string;
+    contactPhone: string | null;
+  } | null;
+}
+
+interface CatalogBookingLead {
+  id: number;
+  title: string;
+  subservices?: string[];
+}
 
 /* Three steps, in this order on purpose: the visitor confirms what they picked,
    answers only the questions their picks left open, and gives contact details
@@ -40,6 +54,7 @@ export function BookingPage({
   const [slotId, setSlotId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [catalogLead, setCatalogLead] = useState<CatalogBookingLead | null>(null);
 
   /* Which service the request is filed under. The brief can span several, so
      the first one picked leads and the rest ride along in the description. */
@@ -53,6 +68,42 @@ export function BookingPage({
       .then((d) => setSlots(d.slots.filter((s) => s.status === "OPEN" && new Date(s.startsAt) > new Date())))
       .catch(() => setSlots([]));
   }, [primaryService]);
+  useEffect(() => {
+    if (!user || user.role !== "COMPANY") return;
+
+    let cancelled = false;
+    api
+      .get<CompanyProfilePrefill>("/company-dashboard/profile")
+      .then((data) => {
+        if (cancelled) return;
+        setContact((prev) => ({
+          ...prev,
+          name: prev.name || data.company?.contactName || "",
+          email: prev.email || data.user?.email || user.email || "",
+          phone: prev.phone || data.company?.contactPhone || "",
+          company: prev.company || data.company?.companyName || "",
+        }));
+      })
+      .catch(() => {
+        // Keep the form usable even if prefill fails.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = sessionStorage.getItem("bookingCatalogService");
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw) as CatalogBookingLead;
+      if (parsed?.title) setCatalogLead(parsed);
+    } catch {
+      setCatalogLead(null);
+    }
+  }, []);
 
   /** Free slots grouped by day, so the picker reads like a calendar. */
   const slotsByDay = useMemo(() => {
@@ -85,16 +136,24 @@ export function BookingPage({
     const extras = Object.entries(answers).map(([k, v]) => `${k}: ${v}`).join("\n");
 
     try {
+      const catalogTitle = catalogLead ? `${catalogLead.title} enquiry` : "General enquiry";
+      const catalogLine = catalogLead
+        ? `Requested service: ${catalogLead.title}${catalogLead.subservices?.length ? ` (${catalogLead.subservices.join(", ")})` : ""}`
+        : null;
+
       await api.post("/service-requests", {
         serviceType,
-        title: picks ? picks.slice(0, 240) : "General enquiry",
+        title: picks ? picks.slice(0, 240) : catalogTitle.slice(0, 240),
         description:
-          [contact.note, picks && `Selected: ${picks}`, extras].filter(Boolean).join("\n\n") ||
+          [contact.note, picks && `Selected: ${picks}`, !picks && catalogLine, extras].filter(Boolean).join("\n\n") ||
           "No further detail provided.",
         slotId: slotId ?? undefined,
         location: answers.city || undefined,
       });
 
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("bookingCatalogService");
+      }
       setSent(true);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Could not send your request.");
@@ -322,7 +381,7 @@ export function BookingPage({
                     value={contact.note}
                     onChange={(e) => setContact({ ...contact, note: e.target.value })}
                     placeholder={count > 0 ? "Optional" : "What are you trying to do?"}
-                    className="w-full text-[14.5px] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-4 outline-none focus:border-black/25 transition-colors resize-none placeholder:text-[#1a1a1a]/25"
+                    className="w-full text-[14.5px] text-[#1a1a1a] bg-[#FAF7F2] border border-black/[0.07] rounded-2xl px-5 py-4 outline-none focus:border-black/25 transition-colors resize-none placeholder:text-[#1a1a1a]/25"
                   />
                 </div>
               </div>

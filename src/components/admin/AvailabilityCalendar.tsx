@@ -34,10 +34,10 @@ const isSameDay = (a: Date, b: Date) => dayKey(a) === dayKey(b);
  * clicking a day opens that day's schedule beside the grid.
  */
 export function AvailabilityCalendar({
-  onOpenCompany,
+  onOpenAppointment,
   canEdit = true,
 }: {
-  onOpenCompany: (companyId: number) => void;
+  onOpenAppointment: (companyId: number, requestId: number) => void;
   /** Coordinators can read the calendar but not publish or remove times. */
   canEdit?: boolean;
 }) {
@@ -54,8 +54,8 @@ export function AvailabilityCalendar({
 
   const load = useCallback(async () => {
     try {
-      const data = await api.get<{ slots: Slot[] }>("/scheduling/slots");
-      setSlots(data.slots);
+      const slotData = await api.get<{ slots: Slot[] }>("/scheduling/slots");
+      setSlots(slotData.slots);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load the calendar");
@@ -273,18 +273,18 @@ export function AvailabilityCalendar({
               <div className="space-y-3">
                 {selectedSlots.map((slot) => {
                   const style = STATUS_STYLE[slot.status];
-                  const clickable = slot.companyId !== null;
+                  const clickable = slot.companyId !== null && slot.requestId !== null;
 
                   return (
                     <div
                       key={slot.id}
-                      onClick={() => clickable && onOpenCompany(slot.companyId!)}
+                      onClick={() => clickable && onOpenAppointment(slot.companyId!, slot.requestId!)}
                       role={clickable ? "button" : undefined}
                       tabIndex={clickable ? 0 : undefined}
                       onKeyDown={(e) => {
                         if (clickable && (e.key === "Enter" || e.key === " ")) {
                           e.preventDefault();
-                          onOpenCompany(slot.companyId!);
+                          onOpenAppointment(slot.companyId!, slot.requestId!);
                         }
                       }}
                       className={`rounded-2xl border-2 p-4 transition-all ${style.bg} ${style.border} ${

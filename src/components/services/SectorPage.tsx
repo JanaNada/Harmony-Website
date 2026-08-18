@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Check, Plus, ArrowRight, ChevronDown, Eye } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
+import { useAuth, isStaffRole } from "@/app/auth";
 import { api } from "@/lib/api";
 import type { Service, ServiceModule } from "@/content/services";
 
@@ -16,12 +17,15 @@ export function ModuleCard({
   module: m,
   color,
   dim,
+  disabled,
   metrics,
   onView,
 }: {
   module: ServiceModule;
   color: string;
   dim: string;
+  /** When true, the card can be inspected but not added/removed from the brief. */
+  disabled?: boolean;
   metrics: Record<string, number>;
   onView: (id: string) => void;
 }) {
@@ -32,16 +36,24 @@ export function ModuleCard({
   return (
     <div
       role="button"
-      tabIndex={0}
-      onClick={() => toggle(m.id)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          toggle(m.id);
-        }
-      }}
+      tabIndex={disabled ? -1 : 0}
+      onClick={disabled ? undefined : () => toggle(m.id)}
+      onKeyDown={
+        disabled
+          ? undefined
+          : (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggle(m.id);
+              }
+            }
+      }
       aria-pressed={on}
-      className={`group relative text-left rounded-[26px] border transition-all duration-300 flex flex-col cursor-pointer overflow-hidden ${
+      className={`group relative text-left rounded-[26px] border transition-all duration-300 flex flex-col overflow-hidden ${
+        disabled
+          ? "cursor-not-allowed opacity-75"
+          : "cursor-pointer"
+      } ${
         on
           ? "bg-white shadow-[0_18px_40px_-18px_rgba(0,0,0,0.16)] -translate-y-0.5"
           : "bg-white/60 border-white/70 hover:bg-white hover:shadow-[0_14px_30px_-16px_rgba(0,0,0,0.12)] hover:-translate-y-0.5"
@@ -157,6 +169,8 @@ export function SectorPage({
   isStaff?: boolean;
 }) {
   const { addMany, removeMany, countFor, has } = useBrief();
+  const { user } = useAuth();
+  const isStaff = isStaffRole(user?.role);
   const chosen = countFor(service.id);
   
   // Filter out any modules that are hidden
@@ -279,18 +293,20 @@ export function SectorPage({
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={() => (allOn ? removeMany(allIds) : addMany(allIds))}
-              className="text-[13.5px] font-bold px-6 py-3.5 rounded-full border transition-all duration-300 hover:scale-[1.03] flex-shrink-0 self-start"
-              style={{
-                borderColor: `${service.color}45`,
-                color: service.color,
-                background: allOn ? service.dim : "transparent",
-              }}
-            >
-              {allOn ? "Deselect everything" : "I want the full service"}
-            </button>
+            {!isStaff && (
+              <button
+                type="button"
+                onClick={() => (allOn ? removeMany(allIds) : addMany(allIds))}
+                className="text-[13.5px] font-bold px-6 py-3.5 rounded-full border transition-all duration-300 hover:scale-[1.03] flex-shrink-0 self-start"
+                style={{
+                  borderColor: `${service.color}45`,
+                  color: service.color,
+                  background: allOn ? service.dim : "transparent",
+                }}
+              >
+                {allOn ? "Deselect everything" : "I want the full service"}
+              </button>
+            )}
           </div>
 
           <div className="flex flex-col gap-14 md:gap-16">
@@ -311,7 +327,7 @@ export function SectorPage({
                 {/* items-start so expanding one card doesn't stretch its neighbours */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-5 items-start">
                   {group.modules.map((m) => (
-                    <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} metrics={metrics} onView={handleView} />
+                    <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} disabled={isStaff} metrics={metrics} onView={handleView} />
                   ))}
                 </div>
               </div>
@@ -320,26 +336,26 @@ export function SectorPage({
         </div>
 
         {/* ── Close ──────────────────────────────────────────────────── */}
-        {!isStaff && (
-          <div className="w-full px-4 md:px-8 mt-20 md:mt-24 mb-24 md:mb-32">
-            <div className="w-full rounded-[40px] p-10 md:p-14 text-center relative overflow-hidden border border-white/60 bg-white/70 backdrop-blur-xl shadow-[0_25px_60px_-25px_rgba(0,0,0,0.1)]">
-              <div
-                className="absolute -top-1/2 left-1/4 w-[420px] h-[420px] blur-[130px] rounded-full pointer-events-none mix-blend-multiply opacity-20"
-                style={{ background: service.color }}
-              />
-              <div className="relative z-10">
-                <h3 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-4 tracking-tight leading-[1.15]">
-                  {chosen > 0
-                    ? chosen === 1
-                      ? "One thing picked. Let's talk about it."
-                      : `${chosen} things picked. Let's talk about them.`
-                    : "Not sure what you need?"}
-                </h3>
-                <p className="text-lg font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-3xl mx-auto mb-8">
-                  {chosen > 0
-                    ? "A few quick questions and we'll put the right person in the room."
-                    : "Book anyway. Tell us the problem and we'll work out which parts apply."}
-                </p>
+        <div className="w-full px-4 md:px-8 mt-20 md:mt-24 mb-24 md:mb-32">
+          <div className="w-full rounded-[40px] p-10 md:p-14 text-center relative overflow-hidden border border-white/60 bg-white/70 backdrop-blur-xl shadow-[0_25px_60px_-25px_rgba(0,0,0,0.1)]">
+            <div
+              className="absolute -top-1/2 left-1/4 w-[420px] h-[420px] blur-[130px] rounded-full pointer-events-none mix-blend-multiply opacity-20"
+              style={{ background: service.color }}
+            />
+            <div className="relative z-10">
+              <h3 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-4 tracking-tight leading-[1.15]">
+                {chosen > 0
+                  ? chosen === 1
+                    ? "One thing picked. Let's talk about it."
+                    : `${chosen} things picked. Let's talk about them.`
+                  : "Not sure what you need?"}
+              </h3>
+              <p className="text-lg font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-3xl mx-auto mb-8">
+                {chosen > 0
+                  ? "A few quick questions and we'll put the right person in the room."
+                  : "Book anyway. Tell us the problem and we'll work out which parts apply."}
+              </p>
+              {!isStaff && (
                 <button
                   onClick={onBook}
                   className="inline-flex items-center gap-2.5 text-lg font-bold text-white px-9 py-4 rounded-full transition-transform duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-12px_rgba(0,0,0,0.35)] group"
@@ -348,10 +364,10 @@ export function SectorPage({
                   Book an appointment
                   <ArrowRight size={17} className="group-hover:translate-x-1 transition-transform" />
                 </button>
-              </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

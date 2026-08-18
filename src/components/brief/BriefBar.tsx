@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ArrowRight, X, ChevronUp, ChevronDown } from "lucide-react";
 import { useBrief } from "@/state/BriefContext";
+import { useAuth, isStaffRole } from "@/app/auth";
 import { findModule, SERVICE_BY_ID } from "@/content/services";
 
 /* Sticky bar: the visitor's selection follows them across the whole site.
@@ -10,6 +11,8 @@ import { findModule, SERVICE_BY_ID } from "@/content/services";
 
 export function BriefBar({ onBook }: { onBook: () => void }) {
   const { selected, count, toggle, clear, activeServices, countFor } = useBrief();
+  const { user } = useAuth();
+  const isStaff = isStaffRole(user?.role);
   const [open, setOpen] = useState(false);
 
   if (count === 0) return null;
@@ -112,13 +115,15 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
             </span>
           </button>
 
-          <button
-            onClick={onBook}
-            className="text-sm font-extrabold text-[#1a1a1a] bg-white px-6 md:px-8 py-3.5 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_10px_25px_-8px_rgba(0,0,0,0.35)] inline-flex items-center gap-2 flex-shrink-0 group"
-          >
-            Book<span className="hidden sm:inline"> appointment</span>
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </button>
+          {!isStaff && (
+            <button
+              onClick={onBook}
+              className="text-sm font-extrabold text-[#1a1a1a] bg-white px-6 md:px-8 py-3.5 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_10px_25px_-8px_rgba(0,0,0,0.35)] inline-flex items-center gap-2 flex-shrink-0 group"
+            >
+              Book<span className="hidden sm:inline"> appointment</span>
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          )}
         </div>
       </div>
     </div>

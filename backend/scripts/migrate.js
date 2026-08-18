@@ -25,6 +25,15 @@ async function columnExists(table, column) {
   return rows.length > 0;
 }
 
+async function addColumnIfMissing(table, column, definition) {
+  if (await columnExists(table, column)) {
+    console.log(`  ok  ${table}.${column} already present`);
+    return;
+  }
+  await db.query(`ALTER TABLE \`${table}\` ADD COLUMN \`${column}\` ${definition}`);
+  console.log(`  ok  added ${table}.${column}`);
+}
+
 async function main() {
   const sql = fs.readFileSync(MIGRATION, "utf8");
 
@@ -54,6 +63,12 @@ async function main() {
     );
     console.log("  ok  added service_requests.slot_id");
   }
+
+  // Older projects may have the legacy `services` table without these fields.
+  await addColumnIfMissing("services", "tagline", "varchar(255) DEFAULT NULL");
+  await addColumnIfMissing("services", "image_url", "varchar(512) DEFAULT NULL");
+  await addColumnIfMissing("services", "accent_color", "varchar(16) DEFAULT NULL");
+  await addColumnIfMissing("services", "sort_order", "int NOT NULL DEFAULT 0");
 
   console.log("\nMigration complete.");
   await db.end();

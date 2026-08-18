@@ -49,3 +49,5 @@ next-env.d.ts
 mysql-installer-community-*.msi
 scratch/
 backend/scratch/
+
+cline-rules.md

@@ -8,9 +8,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "./auth";
 import { ChatPanel } from "@/components/chat/ChatPanel";
-import {
-  api, formatDateTime, formatDay, SERVICE_COLOR, SERVICE_LABEL, type RescheduleRequest,
-} from "@/lib/api";
+import { CompanyCalendar } from "@/components/company/CompanyCalendar";
+import { api, formatDateTime, formatDay, SERVICE_COLOR, SERVICE_LABEL, type RescheduleRequest } from "@/lib/api";
 
 const C_ORANGE = "#F5841F";
 const C_PINK = "#E91E8C";
@@ -18,7 +17,7 @@ const C_BLUE = "#3AADE0";
 const C_GREEN = "#78BE1F";
 const GRAD = `linear-gradient(90deg, ${C_ORANGE}, ${C_PINK}, ${C_BLUE}, ${C_GREEN})`;
 
-type Tab = "overview" | "appointments" | "profile";
+type Tab = "overview" | "appointments" | "profile" | "calendar";
 
 interface MyRequest {
   id: number;
@@ -43,12 +42,6 @@ interface Profile {
   } | null;
 }
 
-/**
- * The company's own portal, built on the same shell as the admin side.
- *
- * Every signed-in user gets one. If their company details haven't been filled
- * in yet, the profile tab asks for them rather than the page failing.
- */
 export default function CompanyDashboard() {
   const { user, logout } = useAuth();
   const router = useRouter();
@@ -102,10 +95,8 @@ export default function CompanyDashboard() {
   const displayName = company?.companyName ?? "Your profile";
 
   return (
-    // flex-1 rather than h-screen: this sits below the site nav, not instead of it.
     <div className="flex flex-1 min-h-0 bg-[#FAF7F2] overflow-hidden relative w-full">
-
-      {/* Ambient glows, matching the admin portal */}
+      {/* Ambient glows */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[20%] w-[40vw] h-[40vw] bg-[#3AADE0]/10 blur-[120px] rounded-full mix-blend-multiply" />
         <div className="absolute bottom-[-10%] right-[10%] w-[50vw] h-[50vw] bg-[#E91E8C]/6 blur-[150px] rounded-full mix-blend-multiply" />
@@ -126,7 +117,6 @@ export default function CompanyDashboard() {
             </div>
           </div>
         </div>
-
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-2">Core</span>
           <NavItem icon={LayoutDashboard} label="Overview" active={activeTab === "overview"} onClick={() => setActiveTab("overview")} color={C_ORANGE} />
@@ -140,25 +130,28 @@ export default function CompanyDashboard() {
             color={C_BLUE}
             badge={pending.length || undefined}
           />
+          <NavItem
+            icon={CalendarClock}
+            label="Calendar"
+            active={activeTab === "calendar"}
+            onClick={() => setActiveTab("calendar")}
+            color={C_BLUE}
+          />
 
           <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Account</span>
           <NavItem icon={User} label="Profile" active={activeTab === "profile"} onClick={() => setActiveTab("profile")} color={C_PINK} />
-        </nav>
-
-        <div className="p-4 border-t border-white/40">
-          {user && (
-            <p className="px-4 pb-2 text-xs font-bold text-gray-400 truncate" title={user.email}>
-              {user.email}
-            </p>
-          )}
-          <button onClick={handleSignOut} className="flex items-center w-full px-4 py-3 text-sm font-bold text-red-600 rounded-xl hover:bg-red-50 transition-all">
-            <LogOut className="w-4 h-4 mr-3" />
-            Sign Out
+          
+          <button
+            onClick={handleSignOut}
+            className="w-full mt-6 px-4 py-3 rounded-xl transition-all duration-300 font-bold text-sm flex items-center gap-3 text-red-500 hover:bg-red-50"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="flex-1 text-left">Sign Out</span>
           </button>
-        </div>
+        </nav>
       </aside>
 
-      {/* Main */}
+      {/* Main Content */}
       <main className="relative z-10 flex-1 p-8 lg:p-12 pb-32 overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           {error && (
@@ -190,6 +183,10 @@ export default function CompanyDashboard() {
 
           {activeTab === "profile" && (
             <ProfileTab profile={profile} onSaved={load} />
+          )}
+
+          {activeTab === "calendar" && (
+            <CalendarTab requests={requests} />
           )}
         </div>
       </main>
@@ -226,7 +223,7 @@ function StatPill({ title, value, color, onClick, small }: any) {
     <Wrapper
       onClick={onClick}
       className={`text-left bg-white/80 backdrop-blur-xl rounded-[2rem] p-6 border border-white shadow-xl shadow-black/5 flex-1 min-w-[200px] transition-all duration-500 group ${
-        onClick ? "hover:-translate-y-2 hover:shadow-2xl cursor-pointer" : ""
+        onClick ? "hover:-translate-y-2 hover:shadow-2xl cursor-pointer" : "cursor-default"
       }`}
     >
       <h3 className="text-gray-500 font-bold text-sm mb-2 group-hover:text-gray-900 transition-colors">{title}</h3>
@@ -235,7 +232,6 @@ function StatPill({ title, value, color, onClick, small }: any) {
   );
 }
 
-/** The banner a company must act on: a proposed new meeting time. */
 function RescheduleCard({ r, onRespond, busyId }: any) {
   return (
     <div className="bg-white rounded-[2.5rem] p-8 border-2 border-[#F5841F]/30 shadow-lg">
@@ -297,12 +293,13 @@ function OverviewTab({ profile, pendingReschedules, onGoToAppointments, onRespon
 
       <div className="flex flex-wrap gap-8 mb-10">
         <StatPill title="Appointments" value={String(stats?.total ?? 0)} color={C_BLUE} onClick={onGoToAppointments} />
-        <StatPill title="Awaiting Us" value={String(stats?.pending ?? 0)} color={C_ORANGE} onClick={onGoToAppointments} />
+        <StatPill title="Waiting on Harmony" value={String(stats?.pending ?? 0)} color={C_ORANGE} onClick={onGoToAppointments} />
         <StatPill
           title="Next Meeting"
           value={stats?.nextMeetingAt ? formatDay(stats.nextMeetingAt) : "None"}
           color={C_GREEN}
           small={!!stats?.nextMeetingAt}
+          onClick={onGoToAppointments}
         />
       </div>
 
@@ -331,10 +328,12 @@ function OverviewTab({ profile, pendingReschedules, onGoToAppointments, onRespon
   );
 }
 
+const fixEnquirySpelling = (text: string) => text.replace(/\binquiry\b/gi, "enquiry");
+
 function AppointmentsTab({ requests, pendingReschedules, chatFor, setChatFor, onRespond, busyId }: any) {
   return (
     <div className="animate-in fade-in duration-700">
-      <div className="mb-10">
+      <div className="mb-7">
         <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Appointments</h1>
         <p className="text-gray-500 mt-2 text-lg">
           Everything you've booked with us, and the conversation for each one.
@@ -358,11 +357,11 @@ function AppointmentsTab({ requests, pendingReschedules, chatFor, setChatFor, on
       ) : (
         <div className="space-y-5">
           {requests.map((r: MyRequest) => (
-            <div key={r.id} className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] p-7 border border-white shadow-lg">
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div className="min-w-0">
+            <div key={r.id} className="relative bg-white/70 backdrop-blur-xl rounded-[2.5rem] p-5 md:p-6 border border-white shadow-lg">
+              <div className="min-w-0 pr-0 md:pr-56">
+                {(SERVICE_LABEL[r.serviceType] ?? r.serviceType) ? (
                   <span
-                    className="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider mb-2"
+                    className="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider mb-1"
                     style={{
                       background: `${SERVICE_COLOR[r.serviceType] ?? "#888"}18`,
                       color: SERVICE_COLOR[r.serviceType] ?? "#888",
@@ -370,31 +369,31 @@ function AppointmentsTab({ requests, pendingReschedules, chatFor, setChatFor, on
                   >
                     {SERVICE_LABEL[r.serviceType] ?? r.serviceType}
                   </span>
-                  <h3 className="text-2xl font-black text-gray-900">{r.title}</h3>
-                  <p className="text-sm font-bold text-gray-400 mt-1">{r.status}</p>
-                  {r.meetingAt && (
-                    <p className="flex items-center gap-2 mt-3 text-sm font-bold text-gray-700">
-                      <Clock className="w-4 h-4 text-gray-400" /> {formatDateTime(r.meetingAt)}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  onClick={() => setChatFor(chatFor === r.id ? null : r.id)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all flex-shrink-0 ${
-                    chatFor === r.id
-                      ? "bg-gray-900 text-white"
-                      : "bg-[#E91E8C]/10 text-[#E91E8C] hover:-translate-y-0.5"
-                  }`}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  {chatFor === r.id ? "Hide chat" : "Chat with Harmony"}
-                </button>
+                ) : null}
+                <h3 className="text-2xl font-black text-gray-900 leading-tight">{fixEnquirySpelling(r.title)}</h3>
+                <p className="text-sm font-bold text-gray-400 mt-1">{r.status}</p>
+                {r.meetingAt && (
+                  <p className="flex items-center gap-2 mt-3 text-sm font-bold text-gray-700">
+                    <Clock className="w-4 h-4 text-gray-400" /> {formatDateTime(r.meetingAt)}
+                  </p>
+                )}
               </div>
+
+              <button
+                onClick={() => setChatFor(chatFor === r.id ? null : r.id)}
+                className={`absolute top-5 right-5 md:top-6 md:right-6 flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all ${
+                  chatFor === r.id
+                    ? "bg-gray-900 text-white"
+                    : "bg-[#E91E8C]/10 text-[#E91E8C] hover:-translate-y-0.5"
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                {chatFor === r.id ? "Hide chat" : "Chat with Harmony"}
+              </button>
 
               {chatFor === r.id && (
                 <div className="mt-6 h-[420px]">
-                  <ChatPanel requestId={r.id} title={`Chat about "${r.title}"`} />
+                  <ChatPanel requestId={r.id} title={`Chat about "${fixEnquirySpelling(r.title)}"`} />
                 </div>
               )}
             </div>
@@ -405,7 +404,6 @@ function AppointmentsTab({ requests, pendingReschedules, chatFor, setChatFor, on
   );
 }
 
-/** Company details, editable by the company itself. */
 function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: () => void }) {
   const company = profile?.company;
   const [editing, setEditing] = useState(false);
@@ -413,7 +411,6 @@ function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: ()
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // A user with no company row yet starts straight in the form.
   useEffect(() => {
     if (!profile) return;
     setForm({
@@ -576,5 +573,30 @@ function ReadRow({ icon: Icon, label, value, color, href }: any) {
     <a href={href} className={`${className} hover:bg-gray-100`}>{content}</a>
   ) : (
     <div className={className}>{content}</div>
+  );
+}
+
+function CalendarTab({ requests }: { requests: MyRequest[] }) {
+  const events = requests
+    .filter((r) => r.meetingAt)
+    .map((r: any) => ({
+      id: r.id,
+      title: r.title,
+      serviceType: r.serviceType,
+      status: r.status,
+      meetingAt: r.meetingAt,
+    }));
+
+  return (
+    <div className="animate-in fade-in duration-700">
+      <div className="mb-8">
+        <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Calendar</h1>
+        <p className="text-gray-500 mt-2 text-lg">
+          Your upcoming meetings at a glance
+        </p>
+      </div>
+
+      <CompanyCalendar events={events} />
+    </div>
   );
 }

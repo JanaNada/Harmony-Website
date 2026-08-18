@@ -1,17 +1,20 @@
 import type { ServiceId } from "@/content/services";
 
+export type CatalogPage = `catalog:${number}`;
+
 /** Every screen the site can show. Service pages use their ServiceId directly. */
 export type Page =
   | "services" | "stories" | "about" | "mission"
   | "booking" | "contact" | "login" | "admin" | "dashboard"
-  | ServiceId;
+  | ServiceId
+  | CatalogPage;
 
 /**
  * The URL each page lives at. Typed as a complete Record so adding a new
  * ServiceId without giving it a path is a compile error rather than a
  * silently broken link.
  */
-export const PAGE_TO_PATH: Record<Page, string> = {
+const PAGE_TO_PATH: Record<Exclude<Page, CatalogPage>, string> = {
   about:       "/about",
   mission:     "/mission",
   services:    "/services",
@@ -28,8 +31,8 @@ export const PAGE_TO_PATH: Record<Page, string> = {
   technology:  "/services/technology",
 };
 
-const PATH_TO_PAGE = new Map<string, Page>(
-  (Object.keys(PAGE_TO_PATH) as Page[]).map((p) => [PAGE_TO_PATH[p], p]),
+const STATIC_PATH_TO_PAGE = new Map<string, Exclude<Page, CatalogPage>>(
+  (Object.keys(PAGE_TO_PATH) as Exclude<Page, CatalogPage>[]).map((p) => [PAGE_TO_PATH[p], p]),
 );
 
 /** "/" is an alias for the landing page so the bare domain still works. */
@@ -41,29 +44,30 @@ function normalise(pathname: string) {
   return trimmed === "" ? "/" : trimmed;
 }
 
-export const pageToPath = (page: Page | string) => {
-  if (PAGE_TO_PATH[page as Page]) return PAGE_TO_PATH[page as Page];
-  if (page && !isNaN(Number(page))) return `/services/${page}`;
-  return PAGE_TO_PATH.about;
+export const pageToPath = (page: Page) => {
+  if (page.startsWith("catalog:")) {
+    const id = page.slice("catalog:".length);
+    return `/services/catalog/${id}`;
+  }
+  return PAGE_TO_PATH[page as Exclude<Page, CatalogPage>];
 };
 
 export function pathToPage(pathname: string): Page | string {
   const path = normalise(pathname);
   if (path === "/") return HOME;
-  if (PATH_TO_PAGE.has(path)) return PATH_TO_PAGE.get(path)!;
-  if (path.startsWith("/services/")) {
-    const id = path.split("/")[2];
-    if (id && !isNaN(Number(id))) return id;
-  }
-  return HOME;
+  const catalogMatch = path.match(/^\/services\/catalog\/(\d+)$/);
+  if (catalogMatch) return `catalog:${Number(catalogMatch[1])}`;
+  return STATIC_PATH_TO_PAGE.get(path) ?? HOME;
 }
 
 /** Guards a stored page name before it's trusted as somewhere to navigate. */
 export function isKnownPage(page: string | null | undefined): page is Page {
-  return !!page && Object.prototype.hasOwnProperty.call(PAGE_TO_PATH, page);
+  if (!page) return false;
+  if (/^catalog:\d+$/.test(page)) return true;
+  return Object.prototype.hasOwnProperty.call(PAGE_TO_PATH, page);
 }
 
 export function isKnownPath(pathname: string) {
   const path = normalise(pathname);
-  return path === "/" || PATH_TO_PAGE.has(path);
+  return path === "/" || STATIC_PATH_TO_PAGE.has(path) || /^\/services\/catalog\/\d+$/.test(path);
 }
