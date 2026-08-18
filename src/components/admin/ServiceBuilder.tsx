@@ -79,6 +79,7 @@ export function ServiceBuilder() {
     try {
       await fn();
       await load();
+      window.dispatchEvent(new Event("catalogChanged"));
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -239,13 +240,13 @@ export function ServiceBuilder() {
                         </button>
                         <button
                           onClick={() => toggleHidden(s.id, isHidden)}
-                          title={isHidden ? "Show on site" : "Remove from site"}
+                          title={isHidden ? "Show on site" : "Hide from site"}
                           className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors flex items-center gap-2 ${
                             isHidden ? "bg-green-50 text-green-600 hover:bg-green-100" : "bg-red-50 text-red-600 hover:bg-red-100"
                           }`}
                         >
                           <Power className="w-4 h-4" />
-                          {isHidden ? "Show" : "Remove"}
+                          {isHidden ? "Show" : "Hide"}
                         </button>
                       </div>
                     </div>
@@ -271,7 +272,7 @@ export function ServiceBuilder() {
                                     isModHidden ? "bg-green-50 text-green-600 hover:bg-green-100" : "bg-red-50 text-red-600 hover:bg-red-100"
                                   }`}
                                 >
-                                  {isModHidden ? "Show" : "Remove"}
+                                  {isModHidden ? "Show" : "Hide"}
                                 </button>
                               </div>
                             );

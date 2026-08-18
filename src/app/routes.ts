@@ -41,12 +41,21 @@ function normalise(pathname: string) {
   return trimmed === "" ? "/" : trimmed;
 }
 
-export const pageToPath = (page: Page) => PAGE_TO_PATH[page];
+export const pageToPath = (page: Page | string) => {
+  if (PAGE_TO_PATH[page as Page]) return PAGE_TO_PATH[page as Page];
+  if (page && !isNaN(Number(page))) return `/services/${page}`;
+  return PAGE_TO_PATH.about;
+};
 
-export function pathToPage(pathname: string): Page {
+export function pathToPage(pathname: string): Page | string {
   const path = normalise(pathname);
   if (path === "/") return HOME;
-  return PATH_TO_PAGE.get(path) ?? HOME;
+  if (PATH_TO_PAGE.has(path)) return PATH_TO_PAGE.get(path)!;
+  if (path.startsWith("/services/")) {
+    const id = path.split("/")[2];
+    if (id && !isNaN(Number(id))) return id;
+  }
+  return HOME;
 }
 
 /** Guards a stored page name before it's trusted as somewhere to navigate. */

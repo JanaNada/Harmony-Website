@@ -1030,8 +1030,8 @@ function Footer() {
 }
 
 const SERVICE_IDS = SERVICES.map((s) => s.id);
-const isServicePage = (p: Page): p is ServiceId =>
-  (SERVICE_IDS as string[]).includes(p);
+const isServicePage = (p: Page | string): p is ServiceId =>
+  ["business", "events", "marketing", "recruitment", "technology"].includes(p as string);
 
 /** Full-screen status message, used while the session is being resolved. */
 function SessionNotice({ children }: { children: React.ReactNode }) {
@@ -1088,11 +1088,32 @@ export default function App() {
   // The URL is the source of truth, so Back/Forward and refresh all work.
   const page = pathToPage(pathname);
   const [hiddenServices, setHiddenServices] = useState<string[]>([]);
+  const [customServices, setCustomServices] = useState<any[]>([]);
   
   useEffect(() => {
-    api.get<{ hidden: string[] }>("/catalog/hidden")
-      .then(d => setHiddenServices(d.hidden || []))
-      .catch(() => {});
+    const fetchCatalog = () => {
+      Promise.all([
+        api.get<{ hidden: string[] }>("/catalog/hidden").catch(() => ({ hidden: [] })),
+        api.get<{ services: any[] }>("/catalog").catch(() => ({ services: [] }))
+      ]).then(([hiddenRes, catalogRes]) => {
+        setHiddenServices(hiddenRes.hidden || []);
+        
+        const titleMap: Record<string, string> = {
+          "Business Development": "business",
+          "Events": "events",
+          "Marketing": "marketing",
+          "Recruitment & Training": "recruitment",
+          "Technology": "technology"
+        };
+
+        const custom = (catalogRes.services || []).filter(s => !titleMap[s.title]);
+        setCustomServices(custom);
+      });
+    };
+
+    fetchCatalog();
+    window.addEventListener("catalogChanged", fetchCatalog);
+    return () => window.removeEventListener("catalogChanged", fetchCatalog);
   }, []);
 
   const go = (p: Page) => router.push(pageToPath(p));
@@ -1126,6 +1147,30 @@ export default function App() {
           hiddenServices={hiddenServices}
           isStaff={isStaffRole(user?.role)}
           story={page === "marketing" ? <MarketingStory /> : undefined}
+        />
+      )}
+      {!isServicePage(page) && customServices.find(s => s.id.toString() === page) && (
+        <SectorPage
+          key={page}
+          service={{
+            id: page as string,
+            label: customServices.find(s => s.id.toString() === page).title,
+            desc: customServices.find(s => s.id.toString() === page).tagline || "",
+            long: "",
+            image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2670&auto=format&fit=crop",
+            icon: require("lucide-react").Sparkles,
+            color: customServices.find(s => s.id.toString() === page).accentColor || "#F5841F",
+            dim: (customServices.find(s => s.id.toString() === page).accentColor || "#F5841F") + "15",
+            modules: customServices.find(s => s.id.toString() === page).subservices.map((sub: any) => ({
+              id: sub.id.toString(),
+              label: sub.title,
+              desc: sub.desc || "",
+              price: sub.price || ""
+            }))
+          }}
+          onBook={() => go("booking")}
+          hiddenServices={hiddenServices}
+          isStaff={isStaffRole(user?.role)}
         />
       )}
       {page === "booking" && (
