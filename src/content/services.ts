@@ -393,43 +393,104 @@ export function findModule(id: string) {
   return dynamicModules[id] || null;
 }
 
+// export function findService(id: string | number | undefined | null) {
+//   if (id === undefined || id === null) return null;
+//   const staticSvc = SERVICES.find((s) => s.id === id);
+//   if (staticSvc) return staticSvc;
+//   const dbSvc = dynamicServices.find((s) => s.id === id || String(s.id) === String(id));
+//   if (dbSvc) {
+//     const color = dbSvc.accentColor || C_ORANGE;
+//     const iconName = dbSvc.icon;
+//     let IconComponent = Box;
+//     if (iconName && (LucideIcons as any)[iconName]) {
+//       IconComponent = (LucideIcons as any)[iconName];
+//     }
+//     return {
+//       id: dbSvc.id,
+//       label: dbSvc.title,
+//       tagline: dbSvc.tagline || "",
+//       color: color,
+//       dim: `${color}15`,
+//       icon: IconComponent,
+//       image: dbSvc.imageUrl || "/imports/image-11.png",
+//       promise: dbSvc.description || "",
+//       intro: dbSvc.description || "",
+//       groups: dbSvc.sections.map((sec) => ({
+//         title: sec.title,
+//         blurb: "",
+//         modules: sec.subservices.filter(s => s.isActive).map((sub) => ({
+//           id: String(sub.id),
+//           label: sub.title,
+//           desc: sub.shortDescription || "",
+//           long: sub.description || "",
+//           image: sub.imageUrl || dbSvc.imageUrl || "/imports/image-11.png",
+//           icon: IconComponent,
+//         })),
+//       })),
+//       questions: [] as GapQuestion[],
+//     };
+//   }
+//   return null;
+// }
 export function findService(id: string | number | undefined | null) {
   if (id === undefined || id === null) return null;
+
   const staticSvc = SERVICES.find((s) => s.id === id);
   if (staticSvc) return staticSvc;
-  const dbSvc = dynamicServices.find((s) => s.id === id || String(s.id) === String(id));
+
+  const dbSvc = dynamicServices.find(
+    (s) => s.id === id || String(s.id) === String(id)
+  );
+
   if (dbSvc) {
+    // Reuse the existing gap questions for the matching service.
+    // The rest of the service content comes from the database catalog.
+    const staticMatch = SERVICES.find(
+      (s) => s.label.toLowerCase() === dbSvc.title.toLowerCase()
+    );
+
     const color = dbSvc.accentColor || C_ORANGE;
     const iconName = dbSvc.icon;
+
     let IconComponent = Box;
+
     if (iconName && (LucideIcons as any)[iconName]) {
       IconComponent = (LucideIcons as any)[iconName];
     }
+
     return {
       id: dbSvc.id,
       label: dbSvc.title,
       tagline: dbSvc.tagline || "",
-      color: color,
+      color,
       dim: `${color}15`,
       icon: IconComponent,
       image: dbSvc.imageUrl || "/imports/image-11.png",
       promise: dbSvc.description || "",
       intro: dbSvc.description || "",
+
       groups: dbSvc.sections.map((sec) => ({
         title: sec.title,
         blurb: "",
-        modules: sec.subservices.filter(s => s.isActive).map((sub) => ({
-          id: String(sub.id),
-          label: sub.title,
-          desc: sub.shortDescription || "",
-          long: sub.description || "",
-          image: sub.imageUrl || dbSvc.imageUrl || "/imports/image-11.png",
-          icon: IconComponent,
-        })),
+        modules: sec.subservices
+          .filter((s) => s.isActive)
+          .map((sub) => ({
+            id: String(sub.id),
+            label: sub.title,
+            desc: sub.shortDescription || "",
+            long: sub.description || "",
+            image:
+              sub.imageUrl ||
+              dbSvc.imageUrl ||
+              "/imports/image-11.png",
+            icon: IconComponent,
+          })),
       })),
-      questions: [] as GapQuestion[],
+
+      questions: staticMatch?.questions ?? [],
     };
   }
+
   return null;
 }
 
