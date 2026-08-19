@@ -286,30 +286,97 @@ const updateSection = async (req, res) => {
   }
 };
 
+// const deleteSection = async (req, res) => {
+//   try {
+//     const [subservices] = await db.query(
+//       "SELECT id FROM subservices WHERE section_id = ? LIMIT 1",
+//       [req.params.id]
+//     );
+//     if (subservices.length > 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "This section contains subservices. Move them to another section before deleting it.",
+//       });
+//     }
+
+//     const [result] = await db.query("DELETE FROM service_sections WHERE id = ?", [req.params.id]);
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ success: false, message: "Section not found" });
+//     }
+//     return res.status(200).json({ success: true });
+//   } catch (error) {
+//     console.error("deleteSection error:", error);
+//     return res.status(500).json({ success: false, message: "Failed to delete the section" });
+//   }
+// };
 const deleteSection = async (req, res) => {
+  let connection;
+
   try {
-    const [subservices] = await db.query(
-      "SELECT id FROM subservices WHERE section_id = ? LIMIT 1",
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    const [section] = await connection.query(
+      "SELECT id, service_id FROM service_sections WHERE id = ?",
       [req.params.id]
     );
-    if (subservices.length > 0) {
-      return res.status(400).json({
+
+    if (section.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({
         success: false,
-        message: "This section contains subservices. Move them to another section before deleting it.",
+        message: "Section not found",
       });
     }
 
-    const [result] = await db.query("DELETE FROM service_sections WHERE id = ?", [req.params.id]);
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: "Section not found" });
+    const serviceId = section[0].service_id;
+
+    // Delete all subservices belonging to this section first.
+    await connection.query(
+      "DELETE FROM subservices WHERE section_id = ?",
+      [req.params.id]
+    );
+
+    // Delete the section.
+    await connection.query(
+      "DELETE FROM service_sections WHERE id = ?",
+      [req.params.id]
+    );
+
+    // Normalize the remaining section sort order.
+    const [remainingSections] = await connection.query(
+      `SELECT id
+         FROM service_sections
+        WHERE service_id = ?
+        ORDER BY sort_order ASC, id ASC`,
+      [serviceId]
+    );
+
+    for (let i = 0; i < remainingSections.length; i += 1) {
+      await connection.query(
+        "UPDATE service_sections SET sort_order = ? WHERE id = ?",
+        [i, remainingSections[i].id]
+      );
     }
-    return res.status(200).json({ success: true });
+
+    await connection.commit();
+
+    return res.status(200).json({
+      success: true,
+    });
   } catch (error) {
+    if (connection) await connection.rollback();
+
     console.error("deleteSection error:", error);
-    return res.status(500).json({ success: false, message: "Failed to delete the section" });
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete the section",
+    });
+  } finally {
+    if (connection) connection.release();
   }
 };
-
 const moveSection = async (req, res) => {
   try {
     const direction = req.body.direction;
@@ -510,19 +577,79 @@ const updateSubservice = async (req, res) => {
   }
 };
 
+// const deleteSubservice = async (req, res) => {
+//   try {
+//     const [result] = await db.query("DELETE FROM subservices WHERE id = ?", [req.params.id]);
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ success: false, message: "Subservice not found" });
+//     }
+//     return res.status(200).json({ success: true });
+//   } catch (error) {
+//     console.error("deleteSubservice error:", error);
+//     return res.status(500).json({ success: false, message: "Failed to delete the subservice" });
+//   }
+// };
 const deleteSubservice = async (req, res) => {
+  let connection;
+
   try {
-    const [result] = await db.query("DELETE FROM subservices WHERE id = ?", [req.params.id]);
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: "Subservice not found" });
+    connection = await db.getConnection();
+    await connection.beginTransaction();
+
+    const [subservice] = await connection.query(
+      "SELECT id, section_id FROM subservices WHERE id = ?",
+      [req.params.id]
+    );
+
+    if (subservice.length === 0) {
+      await connection.rollback();
+      return res.status(404).json({
+        success: false,
+        message: "Subservice not found",
+      });
     }
-    return res.status(200).json({ success: true });
+
+    const sectionId = subservice[0].section_id;
+
+    await connection.query(
+      "DELETE FROM subservices WHERE id = ?",
+      [req.params.id]
+    );
+
+    // Normalize the remaining subservice order within this section.
+    const [remaining] = await connection.query(
+      `SELECT id
+         FROM subservices
+        WHERE section_id = ?
+        ORDER BY sort_order ASC, id ASC`,
+      [sectionId]
+    );
+
+    for (let i = 0; i < remaining.length; i += 1) {
+      await connection.query(
+        "UPDATE subservices SET sort_order = ? WHERE id = ?",
+        [i, remaining[i].id]
+      );
+    }
+
+    await connection.commit();
+
+    return res.status(200).json({
+      success: true,
+    });
   } catch (error) {
+    if (connection) await connection.rollback();
+
     console.error("deleteSubservice error:", error);
-    return res.status(500).json({ success: false, message: "Failed to delete the subservice" });
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete the subservice",
+    });
+  } finally {
+    if (connection) connection.release();
   }
 };
-
 module.exports = {
   listCatalog,
   createService,

@@ -141,6 +141,10 @@ export function ServiceBuilder() {
     setSubDrafts((drafts) => ({ ...drafts, [serviceId]: { ...EMPTY_SUB_DRAFT } }));
   });
 
+  const confirmDelete = (message: string) => {
+    return window.confirm(message);
+  };
+
   const saveSubserviceEdit = (subserviceId: number) => run(async () => {
     await api.put(`/catalog/subservices/${subserviceId}`, {
       ...subEditDraft,
@@ -247,7 +251,21 @@ export function ServiceBuilder() {
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <button onClick={() => startEditingSection(section.id, section.title)} className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"><Pencil className="w-4 h-4" /></button>
-                            <button onClick={() => run(() => api.del(`/catalog/sections/${section.id}`))} className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Delete section"><X className="w-4 h-4" /></button>
+                            <button
+                              onClick={() => {
+                                if (
+                                  confirmDelete(
+                                    `Delete "${section.title}"?\n\nThis will permanently delete the section and all subservices inside it.`
+                                  )
+                                ) {
+                                  run(() => api.del(`/catalog/sections/${section.id}`));
+                                }
+                              }}
+                              className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                              title="Delete section"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
                             <button disabled={idx === 0} onClick={() => run(() => api.post(`/catalog/sections/${section.id}/move`, { direction: "up" }))} className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"><ArrowUp className="w-4 h-4" /></button>
                             <button disabled={idx === sections.length - 1} onClick={() => run(() => api.post(`/catalog/sections/${section.id}/move`, { direction: "down" }))} className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"><ArrowDown className="w-4 h-4" /></button>
                           </div>
@@ -282,6 +300,21 @@ export function ServiceBuilder() {
                               <div className="flex items-center gap-2 flex-shrink-0">
                                 <button onClick={() => startEditingSubservice(service, sub)} className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors"><Pencil className="w-4 h-4" /></button>
                                 <button onClick={() => run(() => api.put(`/catalog/subservices/${sub.id}`, { isActive: !sub.isActive }))} title={sub.isActive ? "Hide from site" : "Show on site"} className={`w-9 h-9 rounded-xl flex items-center justify-center transition-colors ${sub.isActive ? "bg-[#78BE1F]/10 text-[#78BE1F]" : "bg-gray-100 text-gray-400"}`}><Power className="w-4 h-4" /></button>
+                                <button
+                                  onClick={() => {
+                                    if (
+                                      confirmDelete(
+                                        `Delete "${sub.title}"?\n\nThis will permanently delete this subservice.`
+                                      )
+                                    ) {
+                                      run(() => api.del(`/catalog/subservices/${sub.id}`));
+                                    }
+                                  }}
+                                  className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                                  title="Delete subservice"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
                                 <button disabled={subIndex === 0} onClick={() => run(() => api.post(`/catalog/subservices/${sub.id}/move`, { direction: "up" }))} className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:hover:bg-transparent" title="Move up"><ArrowUp className="w-4 h-4" /></button>
                                 <button disabled={subIndex === orderedSubservices.length - 1} onClick={() => run(() => api.post(`/catalog/subservices/${sub.id}/move`, { direction: "down" }))} className="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-30 disabled:hover:bg-transparent" title="Move down"><ArrowDown className="w-4 h-4" /></button>
                               </div>
