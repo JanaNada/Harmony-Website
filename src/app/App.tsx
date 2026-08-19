@@ -254,7 +254,7 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
               <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>Password</label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Lock size={16} /></div>
-                <input type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" required
+                <input type="password" placeholder="********" required
                   value={password} onChange={(e) => setPassword(e.target.value)}
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
                   className="w-full pl-11 pr-4 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
@@ -289,7 +289,7 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
             <button type="submit" disabled={busy}
               className="w-full py-3.5 mt-2 rounded-full text-lg font-bold text-white transition-all hover:shadow-lg hover:-translate-y-0.5 group flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
               style={{ background: `linear-gradient(135deg, #F5841F, #E91E8C)`, fontFamily:"'Montserrat',sans-serif" }}>
-              {busy ? "Signing inâ€¦" : mode === "login" ? "Sign In" : "Create Account"}
+              {busy ? "Signing in" : mode === "login" ? "Sign In" : "Create Account"}
               {!busy && <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />}
             </button>
           </form>
@@ -400,7 +400,7 @@ const TIMELINE_FRIEND = [
   { year:"2017", label:"Events Division",  desc:"Launched dedicated events arm, delivering 50+ large-scale corporate and private events.", color:C_FRIEND.marketing },
   { year:"2019", label:"Digital & Marketing",desc:"Introduced full-stack marketing services as brands demanded stronger digital presence.", color:C_FRIEND.recruitment },
   { year:"2021", label:"2,500 Trained",    desc:"Milestone: trained over 2,500 hospitality professionals across the region.", color:C_FRIEND.management },
-  { year:"2024", label:"4 Continents",     desc:"Active across MENA, Europe, Asia, and the Americas â€” 30+ projects and growing.", color:C_FRIEND.events },
+  { year:"2024", label:"4 Continents",     desc:"Active across MENA, Europe, Asia, and the Americas - 30+ projects and growing.", color:C_FRIEND.events },
 ];
 
 function TimelineSection() {
@@ -422,7 +422,7 @@ function TimelineSection() {
         </div>
 
         {/* Desktop flowing SVG timeline */}
-        <div className="hidden md:block relative" style={{height:"400px", marginTop: "20px"}}>
+        <div className="hidden md:block relative" style={{height:"400px", marginTop: "120px"}}>
           <svg viewBox="0 0 1100 200" className="absolute inset-0 w-full" preserveAspectRatio="none" aria-hidden="true">
             <defs>
               <linearGradient id="tl-grad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -531,7 +531,7 @@ function PartnersSection() {
             Trusted by <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #F5841F, #E91E8C)` }}>Industry Giants</span>
           </h2>
           <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/70 font-medium max-w-4xl mx-auto">
-            From global hospitality leaders and banking institutions to iconic F&B brands â€” 14 trusted partners across the industry.
+            From global hospitality leaders and banking institutions to iconic F&B brands - 14 trusted partners across the industry.
           </p>
         </div>
 
@@ -782,7 +782,7 @@ function MissionPage({ go }: { go: (p: Page) => void }) {
     { icon: Settings, title: "Operational Excellence", text: "We repair weak spots and elevate strengths through strategic planning and precise analysis.", color: "#F5841F", image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop&auto=format" },
     { icon: Users, title: "Human Capital Development", text: "We build high-performing teams through expert recruitment and hands-on training for long-term stability.", color: "#E91E8C", image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=800&h=600&fit=crop&auto=format" },
     { icon: ShieldCheck, title: "Quality & Safety", text: "We deliver world-class F&B and facility services, strictly adhering to the highest international safety and hygiene standards.", color: "#3AADE0", image: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=800&h=600&fit=crop&auto=format" },
-    { icon: Lightbulb, title: "Creative Innovation", text: "We blend concept creation with artistic executionâ€”from menu engineering to digital marketingâ€”to deliver memorable customer experiences.", color: "#78BE1F", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop&auto=format" },
+    { icon: Lightbulb, title: "Creative Innovation", text: "We blend concept creation with artistic execution — from menu engineering to digital marketing—to deliver memorable customer experiences.", color: "#78BE1F", image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&h=600&fit=crop&auto=format" },
     { icon: Handshake, title: "Client-Centric Approach", text: "We handle the complex operations and logistics so you can focus on your core business. We build long-term partnerships by understanding your unique brand story.", color: "#F5841F", image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=600&fit=crop&auto=format" }
   ];
 
@@ -904,9 +904,9 @@ function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_500px] gap-16 items-start">
           <div>
             <h1 className="text-5xl md:text-6xl font-extrabold leading-[1.1] tracking-tight text-[#1a1a1a] mb-6">Let's build something great.</h1>
-            <p className="text-xl md:text-2xl text-[#1a1a1a]/70 font-medium leading-[1.8] mb-10 max-w-2xl">Whether you have a clear brief or just a big ambition â€” reach out.</p>
+            <p className="text-xl md:text-2xl text-[#1a1a1a]/70 font-medium leading-[1.8] mb-10 max-w-2xl">Whether you have a clear brief or just a big ambition — reach out.</p>
             <div className="space-y-5">
-              {[{ Icon: Mail, text: "hello@harmonyclubhouse.com" }, { Icon: Phone, text: "+20 100 000 0000" }, { Icon: MapPin, text: "Cairo, Egypt â€” 4 Continents" }].map(({ Icon, text }) => (
+              {[{ Icon: Mail, text: "hello@harmonyclubhouse.com" }, { Icon: Phone, text: "+20 100 000 0000" }, { Icon: MapPin, text: "Cairo, Egypt — 4 Continents" }].map(({ Icon, text }) => (
                 <div key={text} className="flex items-center gap-8">
                   <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${C_ORANGE}15` }}>
                     <Icon size={16} style={{ color: C_ORANGE }} />
@@ -970,7 +970,7 @@ function ContactPage() {
   );
 }
 
-// â”€â”€â”€ Root App â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// --- Root App ------------------------
 
 
 const FOOTER_SOCIAL_ICONS = [
@@ -983,7 +983,7 @@ const FOOTER_SOCIAL_ICONS = [
 
 const FOOTER_SERVICES = [
   { id: "management", color: "#F5841F", label: "Management", features: ["Pre-opening planning & setup", "Operations audit & restructuring", "Menu engineering", "P&L optimization"] },
-  { id: "events", color: "#E91E8C", label: "Events & Catering", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & dÃ©cor coordination", "Guest management"] },
+  { id: "events", color: "#E91E8C", label: "Events & Catering", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & decor coordination", "Guest management"] },
   { id: "marketing", color: "#3AADE0", label: "Marketing", features: ["Brand identity & positioning", "Social media strategy", "Influencer & PR campaigns", "Photography direction"] },
   { id: "recruitment", color: "#78BE1F", label: "Recruitment", features: ["Executive placement", "Chef & culinary sourcing", "FOH & BOH recruitment", "Event & seasonal staffing"] }
 ];
@@ -1076,8 +1076,8 @@ function SessionNotice({ children }: { children: React.ReactNode }) {
 
 /**
  * The dashboard is only rendered for a signed-in ADMIN. Anyone else is sent to
- * the sign-in page. The server enforces this too â€” every /api/admin route sits
- * behind the JWT cookie â€” so this guard is about UX, not about being the lock.
+ * the sign-in page. The server enforces this too — every /api/admin route sits
+ * behind the JWT cookie — so this guard is about UX, not about being the lock.
  */
 function AdminRoute() {
   const { user, loading } = useAuth();
@@ -1089,8 +1089,8 @@ function AdminRoute() {
     if (!loading && !allowed) router.replace(pageToPath("login"));
   }, [loading, allowed, router]);
 
-  if (loading) return <SessionNotice>Checking your sessionâ€¦</SessionNotice>;
-  if (!allowed) return <SessionNotice>Taking you to sign inâ€¦</SessionNotice>;
+  if (loading) return <SessionNotice>Checking your session</SessionNotice>;
+  if (!allowed) return <SessionNotice>Taking you to sign in</SessionNotice>;
   return <AdminDashboard />;
 }
 
@@ -1104,8 +1104,8 @@ function CompanyRoute() {
     if (!loading && !allowed) router.replace(pageToPath("login"));
   }, [loading, allowed, router]);
 
-  if (loading) return <SessionNotice>Checking your sessionâ€¦</SessionNotice>;
-  if (!allowed) return <SessionNotice>Taking you to sign inâ€¦</SessionNotice>;
+  if (loading) return <SessionNotice>Checking your session</SessionNotice>;
+  if (!allowed) return <SessionNotice>Taking you to sign in</SessionNotice>;
   return <CompanyDashboard />;
 }
 

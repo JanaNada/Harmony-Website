@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Search, Building2, Phone, Mail, Clock, ArrowRight, CheckCircle2, Users,
+  Search, Building2, Phone, Mail, Clock, ArrowRight, CheckCircle2, Users, MessageCircle,
 } from "lucide-react";
 import {
   api, formatDateTime, SERVICE_COLOR, SERVICE_LABEL,
@@ -156,6 +156,18 @@ export function ClientsTab({ onOpenCompany }: { onOpenCompany: (id: number) => v
                   <Phone className="w-4 h-4" />
                   {c.contactPhone ?? "No phone"}
                 </a>
+                {c.contactPhone && (
+                  <a
+                    href={`https://wa.me/${c.contactPhone.replace(/\D/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full font-bold text-sm bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-all"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    WhatsApp
+                  </a>
+                )}
                 <a
                   href={`mailto:${c.email}`}
                   onClick={(e) => e.stopPropagation()}

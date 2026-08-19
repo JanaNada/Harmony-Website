@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Check, Plus, ArrowRight, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Check, Plus, ArrowRight, ChevronDown, Eye } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
 import { useAuth, isStaffRole } from "@/app/auth";
 import type { Service, ServiceModule } from "@/content/services";
+import { api } from "@/lib/api";
 
 /* ── A single selectable module ─────────────────────────────────────────────
    The whole card toggles selection; the arrow in the corner opens the detail
@@ -17,12 +18,16 @@ export function ModuleCard({
   color,
   dim,
   disabled,
+  metrics,
+  onView,
 }: {
   module: ServiceModule;
   color: string;
   dim: string;
   /** When true, the card can be inspected but not added/removed from the brief. */
   disabled?: boolean;
+  metrics: Record<string, number>;
+  onView: (id: string) => void;
 }) {
   const { has, toggle } = useBrief();
   const [open, setOpen] = useState(false);
@@ -85,19 +90,27 @@ export function ModuleCard({
 
         {/* Status + the expand control */}
         <div className="flex items-end justify-between gap-3 mt-4">
-          <span
-            className={`text-sm font-bold uppercase tracking-widest transition-colors ${
-              on ? "" : "text-[#1a1a1a]/30 group-hover:text-[#1a1a1a]/50"
-            }`}
-            style={on ? { color } : undefined}
-          >
-            {on ? "Added to your brief" : "Add to brief"}
-          </span>
+          <div className="flex flex-col gap-1.5">
+            <span
+              className={`text-sm font-bold uppercase tracking-widest transition-colors ${
+                on ? "" : "text-[#1a1a1a]/30 group-hover:text-[#1a1a1a]/50"
+              }`}
+              style={on ? { color } : undefined}
+            >
+              {on ? "Added to your brief" : "Add to brief"}
+            </span>
+            <span className="text-xs font-bold text-[#1a1a1a]/40 flex items-center gap-1.5">
+              <Eye size={12} /> {metrics[m.id] || 0} views
+            </span>
+          </div>
 
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
+              if (!open) {
+                onView(m.id);
+              }
               setOpen((v) => !v);
             }}
             aria-expanded={open}
@@ -158,6 +171,27 @@ export function SectorPage({
   const allIds = service.groups.flatMap((g) => g.modules.map((m) => m.id));
   const allOn = allIds.every((id) => has(id));
 
+  const [metrics, setMetrics] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    api.get<{ metrics: Record<string, number> }>("/metrics/views")
+      .then((d) => setMetrics(d.metrics || {}))
+      .catch(console.error);
+  }, []);
+
+  const handleView = (id: string) => {
+    const viewKey = `viewed_${id}`;
+    if (!sessionStorage.getItem(viewKey)) {
+      sessionStorage.setItem(viewKey, "true");
+      setMetrics((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+      api.post(`/metrics/views/${id}`).catch(console.error);
+    }
+  };
+
+  useEffect(() => {
+    handleView(service.id);
+  }, [service.id]);
+
   return (
     <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative">
       {/* Ambient wash, tinted to the service */}
@@ -174,19 +208,25 @@ export function SectorPage({
         <div className="w-full w-full max-w-[1600px] mx-auto mb-24 md:mb-32">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-7">
-              <div className="inline-flex items-center gap-3 mb-6">
-                <span
-                  className="w-9 h-9 rounded-xl flex items-center justify-center"
-                  style={{ background: service.dim, color: service.color }}
-                >
-                  <service.icon size={17} />
-                </span>
-                <span
-                  className="text-xs font-bold uppercase tracking-widest"
-                  style={{ color: service.color }}
-                >
-                  {service.tagline}
-                </span>
+              <div className="inline-flex items-center gap-4 mb-6">
+                <div className="inline-flex items-center gap-3">
+                  <span
+                    className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{ background: service.dim, color: service.color }}
+                  >
+                    <service.icon size={17} />
+                  </span>
+                  <span
+                    className="text-xs font-bold uppercase tracking-widest"
+                    style={{ color: service.color }}
+                  >
+                    {service.tagline}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-sm font-bold text-[#1a1a1a]/40 bg-white/50 px-3 py-1.5 rounded-full border border-black/5 shadow-sm">
+                  <Eye size={14} />
+                  {metrics[service.id] || 0} views
+                </div>
               </div>
 
               <h1 className="font-extrabold text-5xl md:text-6xl leading-[1.1] tracking-tight mb-6 text-[#1a1a1a]">
@@ -276,7 +316,7 @@ export function SectorPage({
                 {/* items-start so expanding one card doesn't stretch its neighbours */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-5 items-start">
                   {group.modules.map((m) => (
-                    <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} disabled={isStaff} />
+                    <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} disabled={isStaff} metrics={metrics} onView={handleView} />
                   ))}
                 </div>
               </div>

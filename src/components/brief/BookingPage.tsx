@@ -572,6 +572,28 @@ function Question({
         </div>
       )}
 
+      {q.type === "multichoice" && (
+        <div className="flex flex-wrap gap-2.5">
+          {q.options?.map((o) => {
+            const current = value ? value.split(", ") : [];
+            const on = current.includes(o);
+            return (
+              <Chip
+                key={o}
+                on={on}
+                onClick={() => {
+                  const next = on ? current.filter((x) => x !== o) : [...current, o];
+                  onChange(next.join(", "));
+                }}
+                color={color}
+              >
+                {o}
+              </Chip>
+            );
+          })}
+        </div>
+      )}
+
       {q.type === "select" && (
         <select
           value={value}

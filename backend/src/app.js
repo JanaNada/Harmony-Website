@@ -10,6 +10,8 @@ const schedulingRoutes = require("./routes/schedulingRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const serviceCatalogRoutes = require("./routes/serviceCatalogRoutes");
 const staffRoutes = require("./routes/staffRoutes");
+const hiringRequestRoutes = require("./routes/hiringRequestRoutes");
+const metricRoutes = require("./routes/metricRoutes");
 
 const { uploadImage, UPLOAD_DIR } = require("./controllers/uploadController");
 const { authenticate, authorize } = require("./middleware/authMiddleware");
@@ -32,5 +34,7 @@ app.use("/api/scheduling", schedulingRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/catalog", serviceCatalogRoutes);
 app.use("/api/staff", staffRoutes);
+app.use("/api/hiring-requests", hiringRequestRoutes);
+app.use("/api/metrics", metricRoutes);
 
 module.exports = app;

@@ -15,7 +15,7 @@ import {
 import {
   LayoutDashboard, Settings, Users, Calendar, TrendingUp,
   ShieldCheck, CheckCircle2, Phone, Mail, LogOut,
-  ArrowRight, KanbanSquare, SlidersHorizontal, Clock, Headset
+  ArrowRight, KanbanSquare, SlidersHorizontal, Clock, Headset, Eye, BarChart3,
 } from "lucide-react";
 
 const C_ORANGE = "#F5841F";
@@ -174,12 +174,19 @@ function NavItem({ icon: Icon, label, active, onClick, color }: any) {
 function OverviewTab({ setActiveTab, pendingCount, companyCount, meetingCount, onOpenCompany }: any) {
   // The five most recent requests, straight from the database.
   const [recent, setRecent] = useState<any[]>([]);
+  const [metrics, setMetrics] = useState<Record<string, number>>({});
 
   React.useEffect(() => {
     api.get<{ projects: any[] }>("/scheduling/projects")
       .then((d) => setRecent(d.projects.slice(0, 5)))
       .catch(() => setRecent([]));
+
+    api.get<{ metrics: Record<string, number> }>("/metrics/views")
+      .then((d) => setMetrics(d.metrics || {}))
+      .catch(() => setMetrics({}));
   }, []);
+
+  const totalViews = Object.values(metrics).reduce((a, b) => a + b, 0);
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -195,6 +202,7 @@ function OverviewTab({ setActiveTab, pendingCount, companyCount, meetingCount, o
         {/* Left Column (Main Stats & Activity Flowing together) */}
         <div className="flex-1 space-y-8">
           <div className="flex flex-wrap gap-8">
+            <StatPill title="Total Site Views" value={String(totalViews)} color={C_PINK} onClick={() => {}} />
             <StatPill title="Active Companies" value={String(companyCount ?? 0)} color={C_BLUE} onClick={() => setActiveTab("clients")} />
             <StatPill title="Pending Requests" value={String(pendingCount ?? 0)} color={C_ORANGE} onClick={() => setActiveTab("projects")} />
             <StatPill title="Upcoming Meetings" value={String(meetingCount ?? 0)} color={C_GREEN} onClick={() => setActiveTab("calendar")} />
@@ -239,7 +247,48 @@ function OverviewTab({ setActiveTab, pendingCount, companyCount, meetingCount, o
             )}
           </div>
         </div>
+            {/* Right Column (Service Traffic) */}
+        <div className="lg:w-[380px] flex-shrink-0">
+          <div className="bg-white/60 backdrop-blur-2xl rounded-[3rem] p-8 md:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] sticky top-8">
+            <h3 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
+              <BarChart3 className="text-[#3AADE0]" /> Service Traffic
+            </h3>
 
+            {Object.keys(metrics).length === 0 ? (
+              <p className="text-gray-400 font-bold">No views recorded yet.</p>
+            ) : (
+              <div className="space-y-5">
+                {Object.entries(metrics)
+                  .sort(([, a], [, b]) => b - a)
+                  .map(([serviceId, count]) => {
+                    const color = SERVICE_COLOR[serviceId] || "#888";
+                    const max = Math.max(...Object.values(metrics));
+                    const width = max > 0 ? `${(count / max) * 100}%` : "0%";
+
+                    return (
+                      <div key={serviceId} className="relative">
+                        <div className="flex justify-between items-end mb-2">
+                          <span className="text-sm font-bold text-gray-700 capitalize">
+                            {SERVICE_LABEL[serviceId] || serviceId}
+                          </span>
+                          <span className="text-sm font-black text-gray-900 flex items-center gap-1.5">
+                            <Eye className="w-3.5 h-3.5 text-gray-400" />
+                            {count}
+                          </span>
+                        </div>
+                        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-1000"
+                            style={{ width, background: color }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
