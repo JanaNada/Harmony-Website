@@ -6,9 +6,9 @@ import {
 } from "lucide-react";
 import { useBrief } from "@/state/BriefContext";
 import { useAuth } from "@/app/auth";
-import { api, formatDay, formatTime, SERVICE_TYPE_BY_ID, type Slot } from "@/lib/api";
+import { api, formatDay, formatTime, SERVICE_TYPE_BY_ID, getServiceType, type Slot } from "@/lib/api";
 import {
-  findModule, SERVICE_BY_ID,
+  findModule, findService, SERVICE_BY_ID,
   C_ORANGE, C_PINK, C_GREEN,
   type GapQuestion,
 } from "@/content/services";
@@ -59,10 +59,10 @@ export function BookingPage({
   /* Which service the request is filed under. The brief can span several, so
      the first one picked leads and the rest ride along in the description. */
   const primaryService = activeServices[0];
-  const serviceType = primaryService ? SERVICE_TYPE_BY_ID[primaryService] : "OTHER";
+  const serviceType = primaryService ? getServiceType(primaryService) : "OTHER";
 
   useEffect(() => {
-    const query = primaryService ? `?service=${SERVICE_TYPE_BY_ID[primaryService]}` : "";
+    const query = primaryService ? `?service=${getServiceType(primaryService)}` : "";
     api
       .get<{ slots: Slot[] }>(`/scheduling/slots${query}`)
       .then((d) => setSlots(d.slots.filter((s) => s.status === "OPEN" && new Date(s.startsAt) > new Date())))
@@ -171,7 +171,7 @@ export function BookingPage({
   const lastStep = steps.length - 1;
 
   const requiredMissing = questionServices
-    .flatMap((sid) => SERVICE_BY_ID[sid].questions.filter((q) => q.required))
+    .flatMap((sid) => findService(sid)?.questions.filter((q) => q.required) ?? [])
     .some((q) => !answers[q.id]);
 
   const canSubmit = contact.name.trim() && contact.email.trim() && !requiredMissing;
@@ -270,7 +270,8 @@ export function BookingPage({
 
               <div className="flex flex-col gap-8">
                 {activeServices.map((sid) => {
-                  const svc = SERVICE_BY_ID[sid];
+                  const svc = findService(sid);
+                  if (!svc) return null;
                   return (
                     <div key={sid}>
                       <div className="flex items-center gap-2.5 mb-3">
@@ -321,7 +322,8 @@ export function BookingPage({
 
               <div className="flex flex-col gap-10">
                 {questionServices.map((sid) => {
-                  const svc = SERVICE_BY_ID[sid];
+                  const svc = findService(sid);
+                  if (!svc) return null;
                   return (
                     <div key={sid}>
                       <div className="flex items-center gap-2.5 mb-6">

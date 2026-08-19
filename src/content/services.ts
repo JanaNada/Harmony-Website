@@ -5,8 +5,9 @@ import {
   Sparkles, Music, Lightbulb, Landmark, Coffee, Wine, UsersRound, Ticket,
   Gift, Package, Heart, Instagram, Video, Camera, Palette, Rocket, Star,
   Search, MessagesSquare, Briefcase, GraduationCap, ShieldCheck, LineChart,
-  type LucideIcon,
+  Box, type LucideIcon,
 } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 
 /* ────────────────────────────────────────────────────────────────────────────
    The content model.
@@ -350,8 +351,86 @@ export const ALL_MODULES: (ServiceModule & { serviceId: ServiceId })[] =
     s.groups.flatMap((g) => g.modules.map((m) => ({ ...m, serviceId: s.id }))),
   );
 
+import type { CatalogService } from "@/lib/api";
+
+let dynamicModules: Record<string, ServiceModule & { serviceId: string | number }> = {};
+
+export function setDynamicCatalog(services: CatalogService[]) {
+  const registry: Record<string, ServiceModule & { serviceId: string | number }> = {};
+  for (const s of services) {
+    const serviceId = s.id;
+    const iconName = s.icon;
+    let serviceIcon = Box;
+    if (iconName && (LucideIcons as any)[iconName]) {
+      serviceIcon = (LucideIcons as any)[iconName];
+    }
+    
+    for (const sub of s.subservices) {
+      registry[String(sub.id)] = {
+        id: String(sub.id),
+        label: sub.title,
+        desc: sub.shortDescription || "",
+        long: sub.description || "",
+        image: sub.imageUrl || s.imageUrl || "/imports/image-11.png",
+        icon: serviceIcon,
+        serviceId: serviceId,
+      };
+    }
+  }
+  dynamicModules = registry;
+}
+
+let dynamicServices: CatalogService[] = [];
+
+export function setDynamicServicesCatalog(services: CatalogService[]) {
+  dynamicServices = services;
+  setDynamicCatalog(services);
+}
+
 export function findModule(id: string) {
-  return ALL_MODULES.find((m) => m.id === id);
+  const staticMod = ALL_MODULES.find((m) => m.id === id);
+  if (staticMod) return staticMod;
+  return dynamicModules[id] || null;
+}
+
+export function findService(id: string | number | undefined | null) {
+  if (id === undefined || id === null) return null;
+  const staticSvc = SERVICES.find((s) => s.id === id);
+  if (staticSvc) return staticSvc;
+  const dbSvc = dynamicServices.find((s) => s.id === id || String(s.id) === String(id));
+  if (dbSvc) {
+    const color = dbSvc.accentColor || C_ORANGE;
+    const iconName = dbSvc.icon;
+    let IconComponent = Box;
+    if (iconName && (LucideIcons as any)[iconName]) {
+      IconComponent = (LucideIcons as any)[iconName];
+    }
+    return {
+      id: dbSvc.id,
+      label: dbSvc.title,
+      tagline: dbSvc.tagline || "",
+      color: color,
+      dim: `${color}15`,
+      icon: IconComponent,
+      image: dbSvc.imageUrl || "/imports/image-11.png",
+      promise: dbSvc.description || "",
+      intro: dbSvc.description || "",
+      groups: dbSvc.sections.map((sec) => ({
+        title: sec.title,
+        blurb: "",
+        modules: sec.subservices.filter(s => s.isActive).map((sub) => ({
+          id: String(sub.id),
+          label: sub.title,
+          desc: sub.shortDescription || "",
+          long: sub.description || "",
+          image: sub.imageUrl || dbSvc.imageUrl || "/imports/image-11.png",
+          icon: IconComponent,
+        })),
+      })),
+      questions: [] as GapQuestion[],
+    };
+  }
+  return null;
 }
 
 export function moduleCount(s: Service) {

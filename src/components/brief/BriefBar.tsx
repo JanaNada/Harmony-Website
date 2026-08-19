@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ArrowRight, X, ChevronUp, ChevronDown } from "lucide-react";
 import { useBrief } from "@/state/BriefContext";
 import { useAuth, isStaffRole } from "@/app/auth";
-import { findModule, SERVICE_BY_ID } from "@/content/services";
+import { findModule, findService, SERVICE_BY_ID } from "@/content/services";
 
 /* Sticky bar: the visitor's selection follows them across the whole site.
    Hidden when empty so the site stays calm until they've chosen something. */
@@ -18,11 +18,13 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
   if (count === 0) return null;
 
   // The bar wears the colours of whatever they've actually picked.
-  const colors = activeServices.map((sid) => SERVICE_BY_ID[sid].color);
+  const colors = activeServices.map((sid) => findService(sid)?.color).filter(Boolean) as string[];
   const gradient =
     colors.length === 1
       ? `linear-gradient(120deg, ${colors[0]}, ${colors[0]}CC)`
-      : `linear-gradient(120deg, ${colors.join(", ")})`;
+      : colors.length > 1
+      ? `linear-gradient(120deg, ${colors.join(", ")})`
+      : `linear-gradient(120deg, #F5841F, #F5841F)`;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[60] pointer-events-none">
@@ -44,7 +46,8 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
 
             <div className="flex flex-col gap-5">
               {activeServices.map((sid) => {
-                const svc = SERVICE_BY_ID[sid];
+                const svc = findService(sid);
+                if (!svc) return null;
                 return (
                   <div key={sid}>
                     <div className="flex items-center gap-2 mb-2.5">

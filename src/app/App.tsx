@@ -42,15 +42,15 @@ import {
   Briefcase,
 } from 'lucide-react';
 
-import { SERVICES, SERVICE_BY_ID, type ServiceId } from "@/content/services";
+import { SERVICES, SERVICE_BY_ID, setDynamicServicesCatalog, findService, type ServiceId } from "@/content/services";
 import { type Page, isKnownPage, pageToPath, pathToPage } from "./routes";
 import { isStaffRole, useAuth } from "./auth";
 import { BookingPage } from "@/components/brief/BookingPage";
-import { api } from "@/lib/api";
+import { CatalogServicePage } from "@/components/services/CatalogServicePage";
+import { api, type CatalogService } from "@/lib/api";
 import { ServicesOverview } from "@/components/services/ServicesOverview";
 import { SectorPage } from "@/components/services/SectorPage";
 import { MarketingStory } from "@/components/services/MarketingStory";
-import { CatalogServicePage, type CatalogService } from "@/components/services/CatalogServicePage";
 
 // Image paths - move images from src/imports to public/imports
 const logoImg = "/imports/image-10.png";
@@ -1117,7 +1117,6 @@ export default function App() {
   const router = useRouter();
   const pathname = usePathname();
   const [catalogServices, setCatalogServices] = useState<CatalogService[]>([]);
-  const [catalogLoaded, setCatalogLoaded] = useState(false);
 
   // The URL is the source of truth, so Back/Forward and refresh all work.
   const page = pathToPage(pathname);
@@ -1126,35 +1125,34 @@ export default function App() {
   const fetchCatalog = () => {
     api
       .get<{ services: CatalogService[] }>("/catalog")
-      .then((d) => { setCatalogServices(d.services); setCatalogLoaded(true); })
-      .catch(() => { setCatalogServices([]); setCatalogLoaded(true); });
+      .then((d) => {
+        setDynamicServicesCatalog(d.services);
+        setCatalogServices(d.services);
+      })
+      .catch(() => {
+        setCatalogServices([]);
+      });
   };
 
   useEffect(() => { fetchCatalog(); }, []);
 
-  // Active DB services — used as the source of truth for what shows on the page
+  // Active DB services — single source of truth for public service pages
   const activeCatalogServices = catalogServices.filter((s) => s.isActive);
-
-  // Extra services are DB-only services (not matching a hardcoded static service title)
-  const staticIds = new Set(SERVICES.map((s) => s.label.toLowerCase()));
-  const extraCatalogServices = activeCatalogServices.filter((s) => !staticIds.has(s.title.toLowerCase()));
-
-  // The set of hardcoded service titles that are active in the DB
-  const activeStaticTitles = new Set(
-    activeCatalogServices
-      .filter((s) => staticIds.has(s.title.toLowerCase()))
-      .map((s) => s.title.toLowerCase())
-  );
-
-  const catalogService = isCatalogPage(page)
-    ? catalogServices.find((s) => s.id === Number(page.slice("catalog:".length)))
-    : null;
 
   const dbServiceForPage =
   isServicePage(page)
     ? activeCatalogServices.find(
         (s) => s.title.toLowerCase() === SERVICE_BY_ID[page].label.toLowerCase()
       )
+    : null;
+
+  const resolvedService = isServicePage(page)
+    ? (dbServiceForPage ? findService(dbServiceForPage.id) : null)
+    : isCatalogPage(page)
+    ? (() => {
+        const s = catalogServices.find((s) => s.id === Number(page.slice("catalog:".length)));
+        return s && s.isActive ? findService(s.id) : null;
+      })()
     : null;
 
   const openCatalogBooking = (service: CatalogService) => {
@@ -1175,42 +1173,33 @@ export default function App() {
     <>
       {page === "services" && (
         <ServicesOverview
-          onOpen={(id) => go(id)}
-          onOpenCatalog={(id) => go(`catalog:${id}`)}
-          extraServices={extraCatalogServices}
-          activeStaticTitles={catalogLoaded ? activeStaticTitles : null}
+          onOpen={(pageKey) => go(pageKey as Page)}
+          catalogServices={activeCatalogServices.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))}
           onBook={() => go("booking")}
         />
       )}
       {isServicePage(page) && (
-        <SectorPage
-          key={page}
-          service={SERVICE_BY_ID[page]}
-          onBook={() => go("booking")}
-          story={page === "marketing" ? <MarketingStory /> : undefined}
-        />
+        resolvedService ? (
+          <SectorPage
+            key={page}
+            service={resolvedService as any}
+            onBook={() => go("booking")}
+            story={page === "marketing" ? <MarketingStory /> : undefined}
+          />
+        ) : (
+          <SessionNotice>Service not found.</SessionNotice>
+        )
       )}
-      {/* {isServicePage(page) && dbServiceForPage && (
-        <CatalogServicePage
-          key={`catalog-${dbServiceForPage.id}`}
-          service={dbServiceForPage}
-          onBook={openCatalogBooking}
-        />
-      )}
-
-      {isServicePage(page) && !dbServiceForPage && (
-        <SectorPage
-          key={page}
-          service={SERVICE_BY_ID[page]}
-          onBook={() => go("booking")}
-          story={page === "marketing" ? <MarketingStory /> : undefined}
-        />
-      )} */}
-      {isCatalogPage(page) && catalogService && (
-        <CatalogServicePage service={catalogService} onBook={openCatalogBooking} />
-      )}
-      {isCatalogPage(page) && !catalogService && (
-        <SessionNotice>Service not found.</SessionNotice>
+      {isCatalogPage(page) && (
+        resolvedService ? (
+          <SectorPage
+            key={page}
+            service={resolvedService as any}
+            onBook={() => go("booking")}
+          />
+        ) : (
+          <SessionNotice>Service not found.</SessionNotice>
+        )
       )}
       {page === "booking" && (
         <BookingPage onBrowse={() => go("services")} onSignIn={() => go("login")} />

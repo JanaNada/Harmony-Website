@@ -6,7 +6,7 @@ import { ImageWithFallback } from "@/components";
 import { SERVICES } from "@/content/services";
 import { isStaffRole, useAuth } from "@/app/auth";
 import type { Page } from "@/app/routes";
-import { api } from "@/lib/api";
+import { api, getServicePageKey } from "@/lib/api";
 import * as LucideIcons from "lucide-react";
 
 const C_ORANGE = "#F5841F";
@@ -19,19 +19,14 @@ const C_PINK = "#E91E8C";
 export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, loading } = useAuth();
-  const [extraServices, setExtraServices] = useState<any[]>([]);
-  const [activeStaticTitles, setActiveStaticTitles] = useState<Set<string> | null>(null);
+  const [catalogServices, setCatalogServices] = useState<any[]>([]);
 
   useEffect(() => {
     api.get<{ services: any[] }>("/catalog").then((res) => {
-      // Only keep active services
-      const active = res.services.filter((es) => es.isActive);
-      // Extra = DB-only services not in the hardcoded list
-      const dbOnly = active.filter((es) => !SERVICES.some((s) => s.label === es.title));
-      setExtraServices(dbOnly);
-      // Determine which static services are active in DB
-      const activeTitles = new Set(active.map((es: any) => es.title));
-      setActiveStaticTitles(activeTitles);
+      const active = res.services
+        .filter((es) => es.isActive)
+        .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+      setCatalogServices(active);
     }).catch(console.error);
   }, []);
 
@@ -92,43 +87,23 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
 
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover/svc:opacity-100 group-hover/svc:visible transition-all duration-200 z-50">
                   <div className="bg-white rounded-[22px] shadow-[0_25px_50px_-15px_rgba(0,0,0,0.18)] border border-black/[0.05] p-2.5 w-[290px]">
-                    {/* Hardcoded static services — only show if active in DB (or DB not yet loaded) */}
-                    {SERVICES.filter((s) => activeStaticTitles === null || activeStaticTitles.has(s.label)).map((s) => (
-                      <button
-                        key={s.id}
-                        onClick={() => go(s.id)}
-                        className="w-full text-left flex items-start gap-3 p-3 rounded-2xl hover:bg-black/[0.03] transition-colors group/item"
-                      >
-                        <span
-                          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover/item:scale-110"
-                          style={{ background: s.dim, color: s.color }}
-                        >
-                          <s.icon size={16} />
-                        </span>
-                        <span className="min-w-0">
-                          <span className="block text-lg font-extrabold text-[#1a1a1a] leading-tight mb-0.5">
-                            {s.label}
-                          </span>
-                          <span className="block text-[11.5px] font-semibold text-[#1a1a1a]/45 leading-snug">
-                            {s.tagline}
-                          </span>
-                        </span>
-                      </button>
-                    ))}
-                    {extraServices.map((es) => {
+                    {catalogServices.map((es) => {
                       let IconComponent = LucideIcons.Box as any;
                       if (es.icon && (LucideIcons as any)[es.icon]) {
                         IconComponent = (LucideIcons as any)[es.icon];
                       }
+                      const color = es.accentColor || C_ORANGE;
+                      const dim = `${color}15`;
+                      const targetPage = getServicePageKey(es);
                       return (
                         <button
-                          key={`catalog-${es.id}`}
-                          onClick={() => go(`catalog:${es.id}` as any)}
+                          key={es.id}
+                          onClick={() => go(targetPage as any)}
                           className="w-full text-left flex items-start gap-3 p-3 rounded-2xl hover:bg-black/[0.03] transition-colors group/item"
                         >
                           <span
                             className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300 group-hover/item:scale-110"
-                            style={{ background: `${es.accentColor || C_ORANGE}15`, color: es.accentColor || C_ORANGE }}
+                            style={{ background: dim, color: color }}
                           >
                             <IconComponent size={16} />
                           </span>
@@ -137,7 +112,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
                               {es.title}
                             </span>
                             <span className="block text-[11.5px] font-semibold text-[#1a1a1a]/45 leading-snug">
-                              {es.tagline}
+                              {es.tagline || ""}
                             </span>
                           </span>
                         </button>
@@ -217,26 +192,19 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
             </button>
           ))}
           <div className="pl-3 flex flex-col gap-3 border-l-2 border-black/[0.06]">
-            {SERVICES.filter((s) => activeStaticTitles === null || activeStaticTitles.has(s.label)).map((s) => (
-              <button
-                key={s.id}
-                onClick={() => { go(s.id); setMobileOpen(false); }}
-                className="text-left text-[14.5px] font-bold text-[#1a1a1a]/55 hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2.5"
-              >
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: s.color }} />
-                {s.label}
-              </button>
-            ))}
-            {extraServices.map((es) => (
-              <button
-                key={`mob-catalog-${es.id}`}
-                onClick={() => { go(`catalog:${es.id}` as any); setMobileOpen(false); }}
-                className="text-left text-[14.5px] font-bold text-[#1a1a1a]/55 hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2.5"
-              >
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: es.accentColor || C_ORANGE }} />
-                {es.title}
-              </button>
-            ))}
+            {catalogServices.map((es) => {
+              const targetPage = getServicePageKey(es);
+              return (
+                <button
+                  key={`mob-catalog-${es.id}`}
+                  onClick={() => { go(targetPage as any); setMobileOpen(false); }}
+                  className="text-left text-[14.5px] font-bold text-[#1a1a1a]/55 hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2.5"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: es.accentColor || C_ORANGE }} />
+                  {es.title}
+                </button>
+              );
+            })}
           </div>
           {!isStaff && (
             <button

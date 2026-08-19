@@ -6,60 +6,37 @@ import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
 import { useAuth, isStaffRole } from "@/app/auth";
 import {
-  SERVICES, SERVICE_BY_ID, C_ORANGE, C_PINK, C_BLUE, C_GREEN,
-  type ServiceId,
+  C_ORANGE, C_PINK, C_BLUE, C_GREEN,
 } from "@/content/services";
-
-interface CatalogSummary {
-  id: number;
-  title: string;
-  tagline: string | null;
-  description: string | null;
-  imageUrl: string | null;
-  accentColor: string | null;
-  icon?: string | null;
-}
+import { type CatalogService, getServicePageKey } from "@/lib/api";
 
 const GRAD_FRIEND = `linear-gradient(90deg, ${C_ORANGE}, ${C_PINK}, ${C_BLUE}, ${C_GREEN})`;
 
-/* The four pillars sit together as four boxes. F&B Technology is featured
-   above them, the way the division banner has always been presented. */
-
 export function ServicesOverview({
   onOpen,
-  onOpenCatalog,
-  extraServices,
-  activeStaticTitles,
   onBook,
+  catalogServices,
 }: {
-  onOpen: (id: ServiceId) => void;
-  onOpenCatalog: (id: number) => void;
-  extraServices: CatalogSummary[];
-  /** When null, catalog hasn't loaded yet — show all static services. Once set, only show active ones. */
-  activeStaticTitles: Set<string> | null;
+  onOpen: (pageKey: string) => void;
   onBook: () => void;
+  catalogServices: CatalogService[];
 }) {
   const { countFor } = useBrief();
   const { user } = useAuth();
   const isStaff = isStaffRole(user?.role);
-  const tech = SERVICE_BY_ID.technology;
 
-  // Filter static pillar services: if DB has loaded, only show ones that are active in DB.
-  // If DB hasn't loaded yet (activeStaticTitles is null), show all to avoid flash of empty content.
-  const pillars = SERVICES.filter((s) => {
-    if (s.id === "technology") return false;
-    if (activeStaticTitles === null) return true;
-    return activeStaticTitles.has(s.label.toLowerCase());
-  });
-
-  // Show F&B Technology hero only if it's active in DB (or catalog hasn't loaded yet)
-  const showTechHero = activeStaticTitles === null || activeStaticTitles.has(tech.label.toLowerCase());
-
-  const dbOnlyServices = extraServices.filter(
-    (es) => !SERVICES.some((s) => s.label === es.title)
+  // Find F&B Technology (Smartphone or matching title)
+  const tech = catalogServices.find(
+    (s) => s.title.toLowerCase() === "f&b technology" || s.icon === "Smartphone"
   );
-
-  const combined = [...pillars, ...dbOnlyServices];
+  
+  // Pillars are all active services except F&B Technology
+  const pillars = tech 
+    ? catalogServices.filter((s) => s.id !== tech.id) 
+    : catalogServices;
+  
+  // Show hero if tech exists
+  const showTechHero = !!tech;
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative scroll-smooth">
@@ -71,15 +48,15 @@ export function ServicesOverview({
       </div>
 
       <div className="relative z-10">
-        {showTechHero && (
+        {showTechHero && tech && (
         <div className="min-h-[70vh] pt-12 pb-8 flex flex-col justify-center px-6 w-full relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 items-center flex-1">
             <div className="order-2 lg:order-1 lg:col-span-5 relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-[#F5841F]/30 to-[#E91E8C]/20 blur-[40px] rounded-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
               <div className="relative w-full aspect-[4/3] rounded-[32px] overflow-hidden shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-white/60 bg-white">
                 <ImageWithFallback
-                  src={tech.image}
-                  alt={tech.label}
+                  src={tech.imageUrl || "/imports/image-11.png"}
+                  alt={tech.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                 />
               </div>
@@ -95,19 +72,19 @@ export function ServicesOverview({
               </div>
 
               <h2 className="font-extrabold text-5xl md:text-6xl text-[#1a1a1a] mb-5 leading-[1.1] tracking-tight">
-                {tech.label}
+                {tech.title}
               </h2>
 
               <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/70 font-medium">
-                {tech.intro}
+                {tech.description}
               </p>
 
               <button
-                onClick={() => onOpen("technology")}
+                onClick={() => onOpen(getServicePageKey(tech))}
                 className="mt-8 inline-flex items-center gap-2 text-lg font-bold text-white px-6 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)] group"
-                style={{ background: C_ORANGE }}
+                style={{ background: tech.accentColor || C_ORANGE }}
               >
-                Explore F&B Technology
+                Explore {tech.title}
                 <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -147,25 +124,19 @@ export function ServicesOverview({
 
           <div className="w-full w-full max-w-[1600px] mx-auto px-6 lg:px-12">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-8">
-              {combined.map((s) => {
-                const isHardcoded = typeof s.id === "string";
-                const picked = isHardcoded ? countFor(s.id as ServiceId) : 0;
-                
-                const label = isHardcoded ? (s as any).label : (s as any).title;
+              {pillars.map((s) => {
+                const picked = countFor(s.id);
+                const label = s.title;
                 const tagline = s.tagline;
-                const color = isHardcoded ? (s as any).color : ((s as any).accentColor || C_ORANGE);
-                const dim = isHardcoded ? (s as any).dim : `${color}15`;
-                const image = isHardcoded ? (s as any).image : ((s as any).imageUrl || "/imports/image-11.png");
-                const promise = isHardcoded ? (s as any).promise : (s as any).description;
+                const color = s.accentColor || C_ORANGE;
+                const dim = `${color}15`;
+                const image = s.imageUrl || "/imports/image-11.png";
+                const promise = s.description;
                 
                 let IconComponent = Box;
-                if (isHardcoded) {
-                  IconComponent = (s as any).icon;
-                } else {
-                  const iconName = (s as any).icon;
-                  if (iconName && (LucideIcons as any)[iconName]) {
-                    IconComponent = (LucideIcons as any)[iconName];
-                  }
+                const iconName = s.icon;
+                if (iconName && (LucideIcons as any)[iconName]) {
+                  IconComponent = (LucideIcons as any)[iconName];
                 }
 
                 return (
@@ -219,7 +190,7 @@ export function ServicesOverview({
                       </p>
 
                       <button
-                        onClick={() => isHardcoded ? onOpen(s.id as ServiceId) : onOpenCatalog(s.id as number)}
+                        onClick={() => onOpen(getServicePageKey(s))}
                         className="inline-flex items-center gap-2 text-lg font-bold hover:gap-3 transition-all mt-auto"
                         style={{ color: color }}
                       >

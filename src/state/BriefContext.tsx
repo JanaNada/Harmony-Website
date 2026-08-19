@@ -17,8 +17,8 @@ interface BriefState {
   clear: () => void;
   count: number;
   /** Services the visitor has touched, in site order. */
-  activeServices: ServiceId[];
-  countFor: (serviceId: ServiceId) => number;
+  activeServices: (string | number)[];
+  countFor: (serviceId: string | number) => number;
 }
 
 const Ctx = createContext<BriefState | null>(null);
@@ -51,15 +51,17 @@ export function BriefProvider({ children }: { children: ReactNode }) {
 
   const activeServices = useMemo(() => {
     const touched = new Set(
-      selected.map((id) => findModule(id)?.serviceId).filter(Boolean),
+      selected.map((id) => findModule(id)?.serviceId).filter((v) => v !== undefined && v !== null),
     );
-    // Keep canonical service order rather than click order.
-    return SERVICES.filter((s) => touched.has(s.id)).map((s) => s.id);
+    return Array.from(touched) as (string | number)[];
   }, [selected]);
 
   const countFor = useCallback(
-    (serviceId: ServiceId) =>
-      selected.filter((id) => findModule(id)?.serviceId === serviceId).length,
+    (serviceId: string | number) =>
+      selected.filter((id) => {
+        const sid = findModule(id)?.serviceId;
+        return sid === serviceId || String(sid) === String(serviceId);
+      }).length,
     [selected],
   );
 
