@@ -2,14 +2,25 @@
 
 import { useState } from "react";
 import { ArrowRight, X, ChevronUp, ChevronDown } from "lucide-react";
+import { useTolgee, useTranslate } from "@tolgee/react";
 import { useBrief } from "@/state/BriefContext";
 import { findModule, SERVICE_BY_ID } from "@/content/services";
+import { arabicServiceTranslations } from "@/content/translations/ar-services";
+
+function serviceTranslation(language: string, key: string, fallback: string) {
+  return language === "ar"
+    ? arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback
+    : fallback;
+}
 
 /* Sticky bar: the visitor's selection follows them across the whole site.
    Hidden when empty so the site stays calm until they've chosen something. */
 
 export function BriefBar({ onBook }: { onBook: () => void }) {
   const { selected, count, toggle, clear, activeServices, countFor } = useBrief();
+  const { t } = useTranslate();
+  const tolgee = useTolgee(["language"]);
+  const language = tolgee.getLanguage() ?? "en";
   const [open, setOpen] = useState(false);
 
   if (count === 0) return null;
@@ -29,13 +40,13 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
           <div className="bg-white rounded-t-[28px] border border-b-0 border-black/[0.06] shadow-[0_-20px_50px_-20px_rgba(0,0,0,0.18)] p-6 max-h-[45vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h3 className="font-extrabold text-lg text-[#1a1a1a]">
-                Your brief
+                {t("brief_title", "Your brief")}
               </h3>
               <button
                 onClick={clear}
                 className="text-sm font-bold text-[#1a1a1a]/40 hover:text-[#1a1a1a]/70 transition-colors"
               >
-                Clear all
+                {t("brief_clear_all", "Clear all")}
               </button>
             </div>
 
@@ -50,7 +61,7 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
                         style={{ background: svc.color }}
                       />
                       <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/45">
-                        {svc.label} · {countFor(sid)}
+                        {serviceTranslation(language, `service_${sid}_label`, svc.label)} · {countFor(sid)}
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -70,7 +81,7 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
                               }}
                             >
                               <span className="text-sm font-bold text-[#1a1a1a]/80">
-                                {mod.label}
+                                  {serviceTranslation(language, `mod_${mod.id.replace(/-/g, "_")}_label`, mod.label)}
                               </span>
                               <X
                                 size={14}
@@ -103,10 +114,12 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
             </span>
             <span className="min-w-0">
               <span className="block text-[14.5px] font-extrabold text-white truncate drop-shadow-sm">
-                {count === 1 ? "1 service selected" : `${count} services selected`}
+                {count === 1
+                  ? t("brief_one_selected", "1 service selected")
+                  : t("brief_many_selected", `${count} services selected`, { count })}
               </span>
               <span className="hidden sm:flex items-center gap-1 text-[12.5px] font-bold text-white/80 group-hover:text-white transition-colors">
-                {open ? "Hide" : "Review"} your brief
+                {open ? t("brief_hide", "Hide") : t("brief_review", "Review")} {t("brief_your", "your brief")}
                 {open ? <ChevronDown size={13} /> : <ChevronUp size={13} />}
               </span>
             </span>
@@ -116,7 +129,7 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
             onClick={onBook}
             className="text-sm font-extrabold text-[#1a1a1a] bg-white px-6 md:px-8 py-3.5 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_10px_25px_-8px_rgba(0,0,0,0.35)] inline-flex items-center gap-2 flex-shrink-0 group"
           >
-            Book<span className="hidden sm:inline"> appointment</span>
+            {t("brief_book", "Book appointment")}
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>

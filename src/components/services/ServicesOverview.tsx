@@ -3,7 +3,7 @@
 import { ArrowRight, ChevronRight, ChevronDown, Check } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
-import { useTranslate } from "@tolgee/react";
+import { useTolgee, useTranslate } from "@tolgee/react";
 import {
   SERVICES, SERVICE_BY_ID, C_ORANGE, C_PINK, C_BLUE, C_GREEN,
   type ServiceId,
@@ -24,8 +24,10 @@ export function ServicesOverview({
   isStaff?: boolean;
 }) {
   const { t } = useTranslate();
+  const tolgee = useTolgee(["language"]);
+  const language = tolgee.getLanguage() ?? "en";
   const serviceText = (key: string, fallback: string) =>
-    typeof document !== "undefined" && document.documentElement.lang === "ar"
+    language === "ar"
       ? arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback
       : t(key, fallback);
   const { countFor } = useBrief();

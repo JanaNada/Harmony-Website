@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslate } from "@tolgee/react";
+import { useTolgee, useTranslate } from "@tolgee/react";
 import { ChevronDown, Menu, X, User } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { SERVICES } from "@/content/services";
@@ -21,8 +21,10 @@ const C_PINK = "#E91E8C";
 export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { t } = useTranslate();
+  const tolgee = useTolgee(["language"]);
+  const language = tolgee.getLanguage() ?? "en";
   const serviceText = (key: string, fallback: string) =>
-    typeof document !== "undefined" && document.documentElement.lang === "ar"
+    language === "ar"
       ? arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback
       : t(key, fallback);
   const { user, loading } = useAuth();

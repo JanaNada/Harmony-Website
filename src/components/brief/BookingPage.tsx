@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useTranslate } from "@tolgee/react";
+import { useTolgee, useTranslate } from "@tolgee/react";
 import {
   ArrowRight, ArrowLeft, Check, CheckCircle2, X, CalendarDays, Clock, LogIn,
 } from "lucide-react";
@@ -17,8 +17,8 @@ import { arabicServiceTranslations } from "@/content/translations/ar-services";
 
 type Answers = Record<string, string>;
 
-function serviceTranslation(key: string, fallback: string) {
-  return typeof document !== "undefined" && document.documentElement.lang === "ar"
+function serviceTranslation(language: string, key: string, fallback: string) {
+  return language === "ar"
     ? arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback
     : fallback;
 }
@@ -35,6 +35,8 @@ export function BookingPage({
   onSignIn?: () => void;
 }) {
   const { t } = useTranslate();
+  const tolgee = useTolgee(["language"]);
+  const language = tolgee.getLanguage() ?? "en";
   const { selected, count, toggle, activeServices, clear } = useBrief();
   const { user } = useAuth();
   const [step, setStep] = useState(0);
@@ -230,7 +232,7 @@ export function BookingPage({
                           <svc.icon size={15} />
                         </span>
                         <span className="text-sm font-extrabold text-[#1a1a1a]">
-                          {serviceTranslation(`service_${sid}_label`, svc.label)}
+                          {serviceTranslation(language, `service_${sid}_label`, svc.label)}
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2 pl-1">
@@ -247,7 +249,7 @@ export function BookingPage({
                                 style={{ background: svc.dim, borderColor: `${svc.color}30` }}
                               >
                                 <span className="text-sm font-bold text-[#1a1a1a]/80">
-                                  {serviceTranslation(`mod_${mod.id.replace(/-/g, "_")}_label`, mod.label)}
+                                  {serviceTranslation(language, `mod_${mod.id.replace(/-/g, "_")}_label`, mod.label)}
                                 </span>
                                 <X size={14} className="text-[#1a1a1a]/30 group-hover:text-[#1a1a1a]/70 transition-colors" />
                               </button>
@@ -282,7 +284,7 @@ export function BookingPage({
                           className="text-xs font-bold uppercase tracking-widest"
                           style={{ color: svc.color }}
                         >
-                          {serviceTranslation(`service_${sid}_label`, svc.label)}
+                          {serviceTranslation(language, `service_${sid}_label`, svc.label)}
                         </span>
                       </div>
                       <div className="flex flex-col gap-8">

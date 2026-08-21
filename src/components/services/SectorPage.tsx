@@ -6,15 +6,16 @@ import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
 import { api } from "@/lib/api";
 import type { Service, ServiceModule } from "@/content/services";
-import { useTranslate } from "@tolgee/react";
+import { useTolgee, useTranslate } from "@tolgee/react";
 import { arabicServiceTranslations } from "@/content/translations/ar-services";
 
 function serviceText(
   translate: (key: string, fallback: string) => string,
+  language: string,
   key: string,
   fallback: string,
 ) {
-  if (typeof document !== "undefined" && document.documentElement.lang === "ar") {
+  if (language === "ar") {
     return arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback;
   }
   return translate(key, fallback);
@@ -36,6 +37,8 @@ export function ModuleCard({
   onView: (id: string) => void;
 }) {
   const { t } = useTranslate();
+  const tolgee = useTolgee(["language"]);
+  const language = tolgee.getLanguage() ?? "en";
   const { has, toggle } = useBrief();
   const [open, setOpen] = useState(false);
   const on = has(m.id);
@@ -82,10 +85,10 @@ export function ModuleCard({
         </div>
 
         <h4 className="font-bold text-2xl text-[#1a1a1a] mb-2 leading-[1.3]">
-          {serviceText(t, `mod_${translationId}_label`, m.label)}
+          {serviceText(t, language, `mod_${translationId}_label`, m.label)}
         </h4>
         <p className="text-base leading-[1.65] text-[#1a1a1a]/55 font-medium flex-1">
-          {serviceText(t, `mod_${translationId}_desc`, m.desc)}
+          {serviceText(t, language, `mod_${translationId}_desc`, m.desc)}
         </p>
 
         {/* Status + the expand control */}
@@ -143,7 +146,7 @@ export function ModuleCard({
               />
             </div>
             <p className="text-sm leading-[1.75] text-[#1a1a1a]/65 font-medium">
-              {serviceText(t, `mod_${translationId}_long`, m.long)}
+              {serviceText(t, language, `mod_${translationId}_long`, m.long)}
             </p>
           </div>
         </div>
@@ -168,6 +171,8 @@ export function SectorPage({
   isStaff?: boolean;
 }) {
   const { t } = useTranslate();
+  const tolgee = useTolgee(["language"]);
+  const language = tolgee.getLanguage() ?? "en";
   const { addMany, removeMany, countFor, has } = useBrief();
   const chosen = countFor(service.id);
   
@@ -226,7 +231,7 @@ export function SectorPage({
                     className="text-xs font-bold uppercase tracking-widest"
                     style={{ color: service.color }}
                   >
-                    {serviceText(t, `service_${service.id}_tagline`, service.tagline)}
+                    {serviceText(t, language, `service_${service.id}_tagline`, service.tagline)}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-sm font-bold text-[#1a1a1a]/40 bg-white/50 px-3 py-1.5 rounded-full border border-black/5 shadow-sm">
@@ -236,15 +241,15 @@ export function SectorPage({
               </div>
 
               <h1 className="font-extrabold text-5xl md:text-6xl leading-[1.1] tracking-tight mb-6 text-[#1a1a1a]">
-                {serviceText(t, `service_${service.id}_label`, service.label)}
+                {serviceText(t, language, `service_${service.id}_label`, service.label)}
               </h1>
 
               <p className="text-2xl md:text-3xl leading-[1.8] font-medium text-[#1a1a1a]/85 mb-6">
-                {serviceText(t, `service_${service.id}_promise`, service.promise)}
+                {serviceText(t, language, `service_${service.id}_promise`, service.promise)}
               </p>
 
               <p className="text-xl font-medium leading-[1.7] text-[#1a1a1a]/60 max-w-4xl">
-                {serviceText(t, `service_${service.id}_intro`, service.intro)}
+                {serviceText(t, language, `service_${service.id}_intro`, service.intro)}
               </p>
             </div>
 
@@ -306,11 +311,11 @@ export function SectorPage({
                   <div className="flex items-center gap-3 mb-2.5">
                     <span className="h-px w-7" style={{ background: service.color }} />
                     <h3 className="font-extrabold text-2xl md:text-3xl text-[#1a1a1a] tracking-tight">
-                      {serviceText(t, `group_${service.id}_${idx}_title`, group.title)}
+                      {serviceText(t, language, `group_${service.id}_${idx}_title`, group.title)}
                     </h3>
                   </div>
                   <p className="text-xl text-[#1a1a1a]/55 leading-[1.7] font-medium pl-10">
-                    {serviceText(t, `group_${service.id}_${idx}_blurb`, group.blurb)}
+                    {serviceText(t, language, `group_${service.id}_${idx}_blurb`, group.blurb)}
                   </p>
                 </div>
 
