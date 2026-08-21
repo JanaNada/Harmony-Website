@@ -12,7 +12,6 @@ const serviceCatalogRoutes = require("./routes/serviceCatalogRoutes");
 const staffRoutes = require("./routes/staffRoutes");
 const hiringRequestRoutes = require("./routes/hiringRequestRoutes");
 const metricRoutes = require("./routes/metricRoutes");
-
 const { uploadImage, UPLOAD_DIR } = require("./controllers/uploadController");
 const { authenticate, authorize } = require("./middleware/authMiddleware");
 

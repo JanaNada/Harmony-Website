@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslate } from "@tolgee/react";
 import { useRouter } from "next/navigation";
 import {
   LayoutDashboard, CalendarClock, Building2, MessageSquare, Check, X, LogOut,
@@ -43,6 +44,7 @@ interface Profile {
 }
 
 export default function CompanyDashboard() {
+  const { t } = useTranslate();
   const { user, logout } = useAuth();
   const router = useRouter();
 
@@ -67,7 +69,7 @@ export default function CompanyDashboard() {
       setReschedules(resched.reschedules);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load your dashboard");
+      setError(err instanceof Error ? err.message : t("company_load_error", "Failed to load your dashboard"));
     }
   }, []);
 
@@ -79,7 +81,7 @@ export default function CompanyDashboard() {
       await api.post(`/scheduling/reschedules/${id}/respond`, { decision });
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not send your answer");
+      setError(err instanceof Error ? err.message : t("company_answer_error", "Could not send your answer"));
     } finally {
       setBusyId(null);
     }
@@ -92,7 +94,7 @@ export default function CompanyDashboard() {
 
   const pending = reschedules.filter((r) => r.status === "PENDING");
   const company = profile?.company;
-  const displayName = company?.companyName ?? "Your profile";
+  const displayName = company?.companyName ?? t("company_profile_fallback", "Your profile");
 
   return (
     <div className="flex flex-1 min-h-0 bg-[#FAF7F2] overflow-hidden relative w-full">
@@ -113,18 +115,18 @@ export default function CompanyDashboard() {
               <h2 className="font-extrabold text-base text-gray-900 leading-tight truncate" title={displayName}>
                 {displayName}
               </h2>
-              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Client Portal</p>
+              <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">{t("company_client_portal", "Client Portal")}</p>
             </div>
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-2">Core</span>
-          <NavItem icon={LayoutDashboard} label="Overview" active={activeTab === "overview"} onClick={() => setActiveTab("overview")} color={C_ORANGE} />
+          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-2">{t("company_core", "Core")}</span>
+          <NavItem icon={LayoutDashboard} label={t("company_overview", "Overview")} active={activeTab === "overview"} onClick={() => setActiveTab("overview")} color={C_ORANGE} />
 
-          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Bookings</span>
+          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">{t("company_bookings", "Bookings")}</span>
           <NavItem
             icon={CalendarClock}
-            label={`Appointments${requests.length ? ` (${requests.length})` : ""}`}
+            label={`${t("company_appointments", "Appointments")}${requests.length ? ` (${requests.length})` : ""}`}
             active={activeTab === "appointments"}
             onClick={() => setActiveTab("appointments")}
             color={C_BLUE}
@@ -138,15 +140,19 @@ export default function CompanyDashboard() {
             color={C_BLUE}
           />
 
-          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">Account</span>
-          <NavItem icon={User} label="Profile" active={activeTab === "profile"} onClick={() => setActiveTab("profile")} color={C_PINK} />
-          
-          <button
-            onClick={handleSignOut}
-            className="w-full mt-6 px-4 py-3 rounded-xl transition-all duration-300 font-bold text-sm flex items-center gap-3 text-red-500 hover:bg-red-50"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="flex-1 text-left">Sign Out</span>
+          <span className="block text-xs font-black text-gray-400 uppercase tracking-widest px-4 mb-2 mt-6">{t("company_account", "Account")}</span>
+          <NavItem icon={User} label={t("company_profile", "Profile")} active={activeTab === "profile"} onClick={() => setActiveTab("profile")} color={C_PINK} />
+        </nav>
+
+        <div className="p-4 border-t border-white/40">
+          {user && (
+            <p className="px-4 pb-2 text-xs font-bold text-gray-400 truncate" title={user.email}>
+              {user.email}
+            </p>
+          )}
+          <button onClick={handleSignOut} className="flex items-center w-full px-4 py-3 text-sm font-bold text-red-600 rounded-xl hover:bg-red-50 transition-all">
+            <LogOut className="w-4 h-4 mr-3" />
+            {t("company_sign_out", "Sign Out")}
           </button>
         </nav>
       </aside>
@@ -233,20 +239,21 @@ function StatPill({ title, value, color, onClick, small }: any) {
 }
 
 function RescheduleCard({ r, onRespond, busyId }: any) {
+  const { t } = useTranslate();
   return (
     <div className="bg-white rounded-[2.5rem] p-8 border-2 border-[#F5841F]/30 shadow-lg">
       <p className="text-gray-500 font-bold mb-1">{r.title}</p>
 
       <div className="flex flex-wrap items-center gap-4 my-5">
         <div className="px-5 py-3 rounded-2xl bg-gray-100">
-          <p className="text-[11px] font-black uppercase tracking-wider text-gray-400 mb-0.5">Currently</p>
+          <p className="text-[11px] font-black uppercase tracking-wider text-gray-400 mb-0.5">{t("company_currently", "Currently")}</p>
           <p className="font-black text-gray-500 line-through">
-            {r.currentAt ? formatDateTime(r.currentAt) : "Not set"}
+            {r.currentAt ? formatDateTime(r.currentAt) : t("company_not_set", "Not set")}
           </p>
         </div>
         <ArrowRight className="w-5 h-5 text-gray-300" />
         <div className="px-5 py-3 rounded-2xl bg-[#78BE1F]/10">
-          <p className="text-[11px] font-black uppercase tracking-wider text-[#78BE1F] mb-0.5">Proposed</p>
+          <p className="text-[11px] font-black uppercase tracking-wider text-[#78BE1F] mb-0.5">{t("company_proposed", "Proposed")}</p>
           <p className="font-black text-gray-900">{formatDateTime(r.proposedAt)}</p>
         </div>
       </div>
@@ -261,14 +268,14 @@ function RescheduleCard({ r, onRespond, busyId }: any) {
           disabled={busyId === r.id}
           className="flex items-center gap-2 bg-[#78BE1F] text-white px-6 py-3 rounded-full font-black shadow-lg disabled:opacity-40 hover:scale-105 transition-transform"
         >
-          <Check className="w-4 h-4" /> Approve new time
+          <Check className="w-4 h-4" /> {t("company_approve_time", "Approve new time")}
         </button>
         <button
           onClick={() => onRespond(r.id, "DECLINE")}
           disabled={busyId === r.id}
           className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-gray-500 hover:bg-gray-100 disabled:opacity-40 transition-colors"
         >
-          <X className="w-4 h-4" /> Decline
+          <X className="w-4 h-4" /> {t("company_decline", "Decline")}
         </button>
       </div>
     </div>
@@ -276,6 +283,7 @@ function RescheduleCard({ r, onRespond, busyId }: any) {
 }
 
 function OverviewTab({ profile, pendingReschedules, onGoToAppointments, onRespond, busyId }: any) {
+  const { t } = useTranslate();
   const stats = profile?.stats;
   const name = profile?.company?.contactName?.split(" ")[0];
 
@@ -285,18 +293,18 @@ function OverviewTab({ profile, pendingReschedules, onGoToAppointments, onRespon
         <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight">
           Welcome{name ? "," : ""} <br />
           <span className="text-transparent bg-clip-text" style={{ backgroundImage: GRAD }}>
-            {profile?.company?.companyName ?? "to Harmony"}
+            {profile?.company?.companyName ?? t("company_to_harmony", "to Harmony")}
           </span>
         </h1>
-        <p className="text-gray-500 mt-3 text-lg">Here's where your work with us stands.</p>
+        <p className="text-gray-500 mt-3 text-lg">{t("company_overview_intro", "Here's where your work with us stands.")}</p>
       </div>
 
       <div className="flex flex-wrap gap-8 mb-10">
-        <StatPill title="Appointments" value={String(stats?.total ?? 0)} color={C_BLUE} onClick={onGoToAppointments} />
-        <StatPill title="Waiting on Harmony" value={String(stats?.pending ?? 0)} color={C_ORANGE} onClick={onGoToAppointments} />
+        <StatPill title={t("company_appointments", "Appointments")} value={String(stats?.total ?? 0)} color={C_BLUE} onClick={onGoToAppointments} />
+        <StatPill title={t("company_awaiting_us", "Awaiting Us")} value={String(stats?.pending ?? 0)} color={C_ORANGE} onClick={onGoToAppointments} />
         <StatPill
-          title="Next Meeting"
-          value={stats?.nextMeetingAt ? formatDay(stats.nextMeetingAt) : "None"}
+          title={t("company_next_meeting", "Next Meeting")}
+          value={stats?.nextMeetingAt ? formatDay(stats.nextMeetingAt) : t("company_none", "None")}
           color={C_GREEN}
           small={!!stats?.nextMeetingAt}
           onClick={onGoToAppointments}
@@ -307,7 +315,7 @@ function OverviewTab({ profile, pendingReschedules, onGoToAppointments, onRespon
         <div className="space-y-4">
           <h2 className="text-2xl font-black text-gray-900 flex items-center gap-2">
             <CalendarClock className="w-6 h-6 text-[#F5841F]" />
-            Needs your answer
+            {t("company_needs_answer", "Needs your answer")}
           </h2>
           {pendingReschedules.map((r: any) => (
             <RescheduleCard key={r.id} r={r} onRespond={onRespond} busyId={busyId} />
@@ -319,8 +327,8 @@ function OverviewTab({ profile, pendingReschedules, onGoToAppointments, onRespon
         <div className="bg-white/60 backdrop-blur-2xl rounded-[3rem] p-10 border border-white flex items-center gap-4">
           <CheckCircle2 className="w-8 h-8 text-[#78BE1F] flex-shrink-0" />
           <div>
-            <p className="font-black text-gray-900 text-lg">Nothing needs your attention.</p>
-            <p className="text-gray-500 font-medium">We'll let you know here if a meeting time changes.</p>
+            <p className="font-black text-gray-900 text-lg">{t("company_nothing_attention", "Nothing needs your attention.")}</p>
+            <p className="text-gray-500 font-medium">{t("company_no_changes", "We'll let you know here if a meeting time changes.")}</p>
           </div>
         </div>
       )}
@@ -331,12 +339,13 @@ function OverviewTab({ profile, pendingReschedules, onGoToAppointments, onRespon
 const fixEnquirySpelling = (text: string) => text.replace(/\binquiry\b/gi, "enquiry");
 
 function AppointmentsTab({ requests, pendingReschedules, chatFor, setChatFor, onRespond, busyId }: any) {
+  const { t } = useTranslate();
   return (
     <div className="animate-in fade-in duration-700">
-      <div className="mb-7">
-        <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Appointments</h1>
+      <div className="mb-10">
+        <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">{t("company_appointments", "Appointments")}</h1>
         <p className="text-gray-500 mt-2 text-lg">
-          Everything you've booked with us, and the conversation for each one.
+          {t("company_appointments_intro", "Everything you've booked with us, and the conversation for each one.")}
         </p>
       </div>
 
@@ -351,8 +360,8 @@ function AppointmentsTab({ requests, pendingReschedules, chatFor, setChatFor, on
       {requests.length === 0 ? (
         <div className="text-center py-20 bg-white/50 rounded-[2.5rem] border border-white">
           <CalendarClock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 font-bold text-lg">No appointments yet.</p>
-          <p className="text-gray-400">Book a service and you'll be able to chat with us here.</p>
+          <p className="text-gray-500 font-bold text-lg">{t("company_no_appointments", "No appointments yet.")}</p>
+          <p className="text-gray-400">{t("company_book_to_chat", "Book a service and you'll be able to chat with us here.")}</p>
         </div>
       ) : (
         <div className="space-y-5">
@@ -367,16 +376,33 @@ function AppointmentsTab({ requests, pendingReschedules, chatFor, setChatFor, on
                       color: SERVICE_COLOR[r.serviceType] ?? "#888",
                     }}
                   >
-                    {SERVICE_LABEL[r.serviceType] ?? r.serviceType}
+                    {t(
+                      `service_type_${(r.serviceType ?? "OTHER").toLowerCase()}`,
+                      SERVICE_LABEL[r.serviceType ?? "OTHER"] ?? r.serviceType ?? t("company_unknown", "Unknown"),
+                    )}
                   </span>
-                ) : null}
-                <h3 className="text-2xl font-black text-gray-900 leading-tight">{fixEnquirySpelling(r.title)}</h3>
-                <p className="text-sm font-bold text-gray-400 mt-1">{r.status}</p>
-                {r.meetingAt && (
-                  <p className="flex items-center gap-2 mt-3 text-sm font-bold text-gray-700">
-                    <Clock className="w-4 h-4 text-gray-400" /> {formatDateTime(r.meetingAt)}
+                  <h3 className="text-2xl font-black text-gray-900">{r.title}</h3>
+                  <p className="text-sm font-bold text-gray-400 mt-1">
+                    {t(`request_status_${(r.status ?? "UNKNOWN").toLowerCase()}`, r.status ?? t("company_unknown", "Unknown"))}
                   </p>
-                )}
+                  {r.meetingAt && (
+                    <p className="flex items-center gap-2 mt-3 text-sm font-bold text-gray-700">
+                      <Clock className="w-4 h-4 text-gray-400" /> {formatDateTime(r.meetingAt)}
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setChatFor(chatFor === r.id ? null : r.id)}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all flex-shrink-0 ${
+                    chatFor === r.id
+                      ? "bg-gray-900 text-white"
+                      : "bg-[#E91E8C]/10 text-[#E91E8C] hover:-translate-y-0.5"
+                  }`}
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  {chatFor === r.id ? t("company_hide_chat", "Hide chat") : t("company_chat_harmony", "Chat with Harmony")}
+                </button>
               </div>
 
               <button
@@ -405,6 +431,7 @@ function AppointmentsTab({ requests, pendingReschedules, chatFor, setChatFor, on
 }
 
 function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: () => void }) {
+  const { t } = useTranslate();
   const company = profile?.company;
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ companyName: "", contactName: "", contactPhone: "" });
@@ -429,7 +456,7 @@ function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: ()
       setEditing(false);
       onSaved();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save your profile");
+      setError(err instanceof Error ? err.message : t("company_save_profile_error", "Could not save your profile"));
     } finally {
       setBusy(false);
     }
@@ -438,8 +465,8 @@ function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: ()
   return (
     <div className="animate-in fade-in duration-700">
       <div className="mb-10">
-        <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">Profile</h1>
-        <p className="text-gray-500 mt-2 text-lg">How Harmony reaches you.</p>
+        <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight">{t("company_profile", "Profile")}</h1>
+        <p className="text-gray-500 mt-2 text-lg">{t("company_profile_intro", "How Harmony reaches you.")}</p>
       </div>
 
       {error && (
@@ -452,7 +479,7 @@ function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: ()
         <div className="mb-6 rounded-2xl bg-[#F5841F]/10 border border-[#F5841F]/20 px-5 py-4 flex items-center gap-3">
           <AlertCircle className="w-5 h-5 text-[#F5841F] flex-shrink-0" />
           <p className="font-bold text-gray-700">
-            Tell us who you are so we can reach you about your bookings.
+            {t("company_profile_prompt", "Tell us who you are so we can reach you about your bookings.")}
           </p>
         </div>
       )}
@@ -465,10 +492,10 @@ function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: ()
             </div>
             <div className="min-w-0">
               <h2 className="text-3xl font-black text-gray-900 truncate">
-                {company?.companyName ?? "Your company"}
+                {company?.companyName ?? t("company_your_company", "Your company")}
               </h2>
               <p className="text-gray-500 font-bold">
-                Member since {profile ? new Date(profile.user.createdAt).getFullYear() : "—"}
+                {t("company_member_since", "Member since")} {profile ? new Date(profile.user.createdAt).getFullYear() : "—"}
               </p>
             </div>
           </div>
@@ -478,14 +505,14 @@ function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: ()
               onClick={() => setEditing(true)}
               className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm bg-gray-900 text-white hover:scale-105 transition-transform flex-shrink-0"
             >
-              <Pencil className="w-4 h-4" /> Edit
+              <Pencil className="w-4 h-4" /> {t("company_edit", "Edit")}
             </button>
           )}
         </div>
 
         {editing ? (
           <div className="space-y-5">
-            <Field label="Company name">
+            <Field label={t("company_name", "Company name")}>
               <input
                 value={form.companyName}
                 onChange={(e) => setForm({ ...form, companyName: e.target.value })}
@@ -493,7 +520,7 @@ function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: ()
                 className="w-full bg-gray-50 rounded-2xl px-4 py-3 font-bold text-gray-800 outline-none focus:ring-2 focus:ring-[#3AADE0]/30"
               />
             </Field>
-            <Field label="Contact name">
+            <Field label={t("company_contact_name", "Contact name")}>
               <input
                 value={form.contactName}
                 onChange={(e) => setForm({ ...form, contactName: e.target.value })}
@@ -501,7 +528,7 @@ function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: ()
                 className="w-full bg-gray-50 rounded-2xl px-4 py-3 font-bold text-gray-800 outline-none focus:ring-2 focus:ring-[#3AADE0]/30"
               />
             </Field>
-            <Field label="Phone">
+            <Field label={t("company_phone", "Phone")}>
               <input
                 value={form.contactPhone}
                 onChange={(e) => setForm({ ...form, contactPhone: e.target.value })}
@@ -516,24 +543,24 @@ function ProfileTab({ profile, onSaved }: { profile: Profile | null; onSaved: ()
                 disabled={busy || !form.companyName.trim() || !form.contactName.trim()}
                 className="flex items-center gap-2 bg-[#78BE1F] text-white px-6 py-3 rounded-full font-black shadow-lg disabled:opacity-40 hover:scale-105 transition-transform"
               >
-                <Check className="w-4 h-4" /> {busy ? "Saving…" : "Save"}
+                <Check className="w-4 h-4" /> {busy ? t("company_saving", "Saving...") : t("company_save", "Save")}
               </button>
               {company && (
                 <button
                   onClick={() => setEditing(false)}
                   className="px-6 py-3 rounded-full font-bold text-gray-500 hover:bg-gray-100 transition-colors"
                 >
-                  Cancel
+                  {t("company_cancel", "Cancel")}
                 </button>
               )}
             </div>
           </div>
         ) : (
           <div className="space-y-3">
-            <ReadRow icon={User} label="Contact" value={company?.contactName ?? "Not set"} color={C_ORANGE} />
-            <ReadRow icon={Phone} label="Phone" value={company?.contactPhone ?? "Not set"} color={C_GREEN}
+            <ReadRow icon={User} label={t("company_contact", "Contact")} value={company?.contactName ?? t("company_not_set", "Not set")} color={C_ORANGE} />
+            <ReadRow icon={Phone} label={t("company_phone", "Phone")} value={company?.contactPhone ?? t("company_not_set", "Not set")} color={C_GREEN}
               href={company?.contactPhone ? `tel:${company.contactPhone}` : undefined} />
-            <ReadRow icon={Mail} label="Email" value={profile?.user.email ?? ""} color={C_BLUE}
+            <ReadRow icon={Mail} label={t("company_email", "Email")} value={profile?.user.email ?? ""} color={C_BLUE}
               href={profile ? `mailto:${profile.user.email}` : undefined} />
           </div>
         )}

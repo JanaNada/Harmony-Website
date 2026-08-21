@@ -1,11 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTolgee, useTranslate } from "@tolgee/react";
 import { ChevronDown, Menu, X, User } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { SERVICES } from "@/content/services";
 import { isStaffRole, useAuth } from "@/app/auth";
+import { api } from "@/lib/api";
+import { Sparkles } from "lucide-react";
 import type { Page } from "@/app/routes";
+import LanguageToggle from "@/components/LanguageToggle";
+import { arabicServiceTranslations } from "@/content/translations/ar-services";
 import { api, getServicePageKey } from "@/lib/api";
 import * as LucideIcons from "lucide-react";
 
@@ -18,8 +23,43 @@ const C_PINK = "#E91E8C";
  */
 export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { t } = useTranslate();
+  const tolgee = useTolgee(["language"]);
+  const language = tolgee.getLanguage() ?? "en";
+  const serviceText = (key: string, fallback: string) =>
+    language === "ar"
+      ? arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback
+      : t(key, fallback);
   const { user, loading } = useAuth();
-  const [catalogServices, setCatalogServices] = useState<any[]>([]);
+  
+  const [hiddenServices, setHiddenServices] = useState<string[]>([]);
+  const [customServices, setCustomServices] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCatalog = () => {
+      Promise.all([
+        api.get<{ hidden: string[] }>("/catalog/hidden").catch(() => ({ hidden: [] })),
+        api.get<{ services: any[] }>("/catalog").catch(() => ({ services: [] }))
+      ]).then(([hiddenRes, catalogRes]) => {
+        setHiddenServices(hiddenRes.hidden || []);
+        
+        const titleMap: Record<string, string> = {
+          "Business Development": "business",
+          "Events": "events",
+          "Marketing": "marketing",
+          "Recruitment & Training": "recruitment",
+          "Technology": "technology"
+        };
+
+        const custom = (catalogRes.services || []).filter(s => !titleMap[s.title]);
+        setCustomServices(custom);
+      });
+    };
+
+    fetchCatalog();
+    window.addEventListener("catalogChanged", fetchCatalog);
+    return () => window.removeEventListener("catalogChanged", fetchCatalog);
+  }, []);
 
   useEffect(() => {
     api.get<{ services: any[] }>("/catalog").then((res) => {
@@ -44,10 +84,10 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
   };
 
   const tabs: { label: string; page: Page }[] = [
-    { label: "About Us", page: "about" },
-    { label: "Mission & Vision", page: "mission" },
-    { label: "Service", page: "services" },
-    { label: "Portfolio", page: "stories" },
+    { label: t("nav_about", "About Us"), page: "about" },
+    { label: t("nav_mission", "Mission & Vision"), page: "mission" },
+    { label: t("nav_services", "Services"), page: "services" },
+    { label: t("nav_portfolio", "Portfolio"), page: "stories" },
   ];
 
   const isActive = (page: Page) => current === page && current !== "contact";
@@ -154,9 +194,11 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
             className="hidden md:inline-flex text-lg font-bold text-white px-7 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)] flex-shrink-0"
             style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
           >
-            Book Appointment
+            {t("nav_book", "Book Appointment")}
           </button>
         )}
+
+        <LanguageToggle />
 
         {/* Signed out this signs you in; signed in it takes you to your own
             area - the staff portal for staff, the client profile for companies. */}
@@ -166,7 +208,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
             className="text-lg font-bold text-[#1a1a1a] px-5 py-2.5 rounded-full hover:bg-black/5 transition-all inline-flex items-center gap-2 flex-shrink-0"
           >
             {user && <User size={17} />}
-            {user ? "Profile" : "Sign In"}
+            {user ? t("nav_profile", "Profile") : t("nav_signin", "Sign In")}
           </button>
         )}
 
@@ -212,7 +254,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
               className="mt-4 text-lg font-bold text-white py-3.5 rounded-full shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)]"
               style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
             >
-              Book Appointment
+              {t("nav_book", "Book Appointment")}
             </button>
           )}
           {!loading && (
@@ -221,9 +263,10 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
               className="text-lg font-bold text-[#1a1a1a] py-3 rounded-full border border-black/10 inline-flex items-center justify-center gap-2"
             >
               {user && <User size={17} />}
-              {user ? "Profile" : "Sign In"}
+              {user ? t("nav_profile", "Profile") : t("nav_signin", "Sign In")}
             </button>
           )}
+          <LanguageToggle />
         </div>
       )}
     </header>

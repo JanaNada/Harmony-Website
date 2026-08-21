@@ -1,9 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Plus, Trash2, Check, X, ChevronDown, ChevronRight, Power, Palette } from "lucide-react";
 import { Plus, Check, ChevronDown, ChevronRight, Power, Palette, Pencil, ArrowUp, ArrowDown, X } from "lucide-react";
 import { api } from "@/lib/api";
 import { ImagePicker } from "./ImagePicker";
+import { SERVICES, SERVICE_LABEL } from "@/content/services";
+import { api } from "@/lib/api";
 
 export interface Subservice {
   id: number;
@@ -82,6 +85,7 @@ export function ServiceBuilder() {
     try {
       await fn();
       await load();
+      window.dispatchEvent(new Event("catalogChanged"));
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -153,6 +157,15 @@ export function ServiceBuilder() {
     setEditingSubserviceId(null);
     setSubEditDraft(EMPTY_SUB_DRAFT);
   });
+
+  const toggleHidden = (serviceId: string, isHidden: boolean) =>
+    run(async () => {
+      if (isHidden) {
+        await api.del(`/catalog/hidden/${serviceId}`);
+      } else {
+        await api.post(`/catalog/hidden/${serviceId}`);
+      }
+    });
 
   return (
     <div className="animate-in fade-in duration-700 w-full">
@@ -376,6 +389,7 @@ export function ServiceBuilder() {
               </div>
             );
           })}
+          </div>
         </div>
       </div>
     </div>

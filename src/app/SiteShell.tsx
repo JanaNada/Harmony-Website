@@ -2,12 +2,14 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { AuthProvider } from "./auth";
+import { isStaffRole, useAuth } from "./auth";
 import { BriefProvider } from "@/state/BriefContext";
 import { BriefBar } from "@/components/brief/BriefBar";
 import { ChatNavigator } from "@/components/chat/ChatNavigator";
 import { SiteNav } from "@/components/SiteNav";
+import { ContactButton } from "@/components/ContactButton";
 import { type Page, pageToPath, pathToPage } from "./routes";
-
+import LanguageToggle from "@/components/LanguageToggle";
 /**
  * Everything that must outlive a page change.
  *
@@ -16,9 +18,10 @@ import { type Page, pageToPath, pathToPage } from "./routes";
  * down and rebuilt on every navigation — which was quietly emptying the
  * visitor's brief and closing the guide whenever they moved around the site.
  */
-export function SiteShell({ children }: { children: React.ReactNode }) {
+function SiteLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const page = pathToPage(pathname);
   const go = (p: Page) => router.push(pageToPath(p));
@@ -27,7 +30,6 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const isPortal = page === "admin" || page === "dashboard";
 
   return (
-    <AuthProvider>
       <BriefProvider>
         <div
           className="h-screen overflow-hidden flex flex-col"
@@ -37,15 +39,30 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
 
           {children}
 
-          {!isPortal && <ChatNavigator go={go} />}
+          {!isPortal && (
+            <>
+              <ChatNavigator go={go} />
+              <ContactButton />
+            </>
+          )}
 
           {/* The running selection follows the visitor everywhere except
               checkout and sign-in, where it would sit on top of the form. */}
-          {!isPortal && page !== "booking" && page !== "login" && (
+          {!isPortal && page !== "booking" && page !== "login" && !isStaffRole(user?.role) && (
             <BriefBar onBook={() => go("booking")} />
           )}
         </div>
       </BriefProvider>
+  );
+}
+
+/**
+ * Everything that must outlive a page change.
+ */
+export function SiteShell({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+      <SiteLayout>{children}</SiteLayout>
     </AuthProvider>
   );
 }

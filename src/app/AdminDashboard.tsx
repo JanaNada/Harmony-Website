@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -14,8 +14,9 @@ import {
 } from "@/lib/api";
 import {
   LayoutDashboard, Settings, Users, Calendar, TrendingUp,
-  ShieldCheck, CheckCircle2, Phone, Mail, LogOut,
-  ArrowRight, KanbanSquare, SlidersHorizontal, Clock, Headset, Eye, BarChart3,
+  ShieldCheck, CheckCircle2, Phone, Mail, LogOut, ClipboardList,
+  ArrowRight, KanbanSquare, SlidersHorizontal, Clock, Headset,
+  Eye, BarChart3
 } from "lucide-react";
 
 const C_ORANGE = "#F5841F";
@@ -254,6 +255,13 @@ function OverviewTab({ setActiveTab, pendingCount, companyCount, meetingCount, o
               <BarChart3 className="text-[#3AADE0]" /> Service Traffic
             </h3>
 
+        {/* Right Column (Service Traffic) */}
+        <div className="lg:w-[380px] flex-shrink-0">
+          <div className="bg-white/60 backdrop-blur-2xl rounded-[3rem] p-8 md:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] sticky top-8">
+            <h3 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
+              <BarChart3 className="text-[#3AADE0]" /> Service Traffic
+            </h3>
+
             {Object.keys(metrics).length === 0 ? (
               <p className="text-gray-400 font-bold">No views recorded yet.</p>
             ) : (
@@ -289,6 +297,7 @@ function OverviewTab({ setActiveTab, pendingCount, companyCount, meetingCount, o
             )}
           </div>
         </div>
+
       </div>
     </div>
   );

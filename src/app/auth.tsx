@@ -19,6 +19,12 @@ type AuthValue = {
   /** True until the first /me check finishes, so guards don't flash. */
   loading: boolean;
   login: (email: string, password: string) => Promise<LoginResult>;
+  register: (details: {
+    companyName: string;
+    contactName: string;
+    email: string;
+    password: string;
+  }) => Promise<LoginResult>;
   logout: () => Promise<void>;
 };
 
@@ -69,6 +75,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const register = useCallback(async (details: {
+    companyName: string;
+    contactName: string;
+    email: string;
+    password: string;
+  }): Promise<LoginResult> => {
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(details),
+      });
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.success) {
+        return { ok: false, message: data?.message ?? "Unable to create your account. Please try again." };
+      }
+
+      setUser(data.user);
+      return { ok: true, role: data.user.role };
+    } catch {
+      return { ok: false, message: "Can't reach the server. Is the API running?" };
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
@@ -78,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

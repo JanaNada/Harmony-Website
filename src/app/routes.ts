@@ -52,7 +52,7 @@ export const pageToPath = (page: Page) => {
   return PAGE_TO_PATH[page as Exclude<Page, CatalogPage>];
 };
 
-export function pathToPage(pathname: string): Page {
+export function pathToPage(pathname: string): Page | string {
   const path = normalise(pathname);
   if (path === "/") return HOME;
   const catalogMatch = path.match(/^\/services\/catalog\/(\d+)$/);

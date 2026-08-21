@@ -4,10 +4,12 @@ import * as LucideIcons from "lucide-react";
 import { ArrowRight, ChevronRight, ChevronDown, Check, Box } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
+import { useTolgee, useTranslate } from "@tolgee/react";
 import { useAuth, isStaffRole } from "@/app/auth";
 import {
   C_ORANGE, C_PINK, C_BLUE, C_GREEN,
 } from "@/content/services";
+import { arabicServiceTranslations } from "@/content/translations/ar-services";
 import { type CatalogService, getServicePageKey } from "@/lib/api";
 
 const GRAD_FRIEND = `linear-gradient(90deg, ${C_ORANGE}, ${C_PINK}, ${C_BLUE}, ${C_GREEN})`;
@@ -15,12 +17,23 @@ const GRAD_FRIEND = `linear-gradient(90deg, ${C_ORANGE}, ${C_PINK}, ${C_BLUE}, $
 export function ServicesOverview({
   onOpen,
   onBook,
+  hiddenServices,
+  isStaff,
   catalogServices,
 }: {
   onOpen: (pageKey: string) => void;
   onBook: () => void;
+  hiddenServices: string[];
+  isStaff?: boolean;
   catalogServices: CatalogService[];
 }) {
+  const { t } = useTranslate();
+  const tolgee = useTolgee(["language"]);
+  const language = tolgee.getLanguage() ?? "en";
+  const serviceText = (key: string, fallback: string) =>
+    language === "ar"
+      ? arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback
+      : t(key, fallback);
   const { countFor } = useBrief();
   const { user } = useAuth();
   const isStaff = isStaffRole(user?.role);
@@ -66,27 +79,29 @@ export function ServicesOverview({
               <div className="inline-flex items-center gap-3 mb-4">
                 <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
                 <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/50">
-                  Division
+                  {t('division_label', 'Division')}
                 </span>
                 <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
               </div>
 
               <h2 className="font-extrabold text-5xl md:text-6xl text-[#1a1a1a] mb-5 leading-[1.1] tracking-tight">
-                {tech.title}
+                {t(`service_${tech.id}_label`, tech.label)}
               </h2>
 
               <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/70 font-medium">
-                {tech.description}
+                {t(`service_${tech.id}_intro`, tech.intro)}
               </p>
 
-              <button
-                onClick={() => onOpen(getServicePageKey(tech))}
-                className="mt-8 inline-flex items-center gap-2 text-lg font-bold text-white px-6 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)] group"
-                style={{ background: tech.accentColor || C_ORANGE }}
-              >
-                Explore {tech.title}
-                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-              </button>
+              {!hiddenServices.includes("technology") && (
+                <button
+                  onClick={() => onOpen("technology")}
+                  className="mt-8 inline-flex items-center gap-2 text-lg font-bold text-white px-6 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)] group"
+                  style={{ background: C_ORANGE }}
+                >
+                  {t('explore_fb_tech', 'Explore F&B Technology')}
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              )}
             </div>
           </div>
 
@@ -99,7 +114,7 @@ export function ServicesOverview({
           >
             <div className="flex flex-col items-center gap-2">
               <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/60">
-                Explore More Services
+                {t('explore_more_services', 'Explore More Services')}
               </span>
               <ChevronDown size={24} className="text-[#F5841F]" />
             </div>
@@ -109,20 +124,20 @@ export function ServicesOverview({
 
         {/* --- 2. THE 4 PILLARS OF EXPERTISE --- */}
         <div id="services-grid" className="pt-16 pb-12">
-          <div className="w-full w-full max-w-[1600px] mx-auto px-6 lg:px-12 text-center mb-12">
+          <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 text-center mb-12">
             <div className="inline-flex items-center gap-3 mb-6">
               <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
               <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/50">
-                WHAT WE DO
+                {t('what_we_do', 'WHAT WE DO')}
               </span>
               <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
             </div>
             <h1 className="font-extrabold text-4xl md:text-5xl leading-[1.15] tracking-tight mb-4 text-[#1a1a1a]">
-              Pillars of Expertise
+              {t('four_pillars_title', 'Four Pillars of Expertise')}
             </h1>
           </div>
 
-          <div className="w-full w-full max-w-[1600px] mx-auto px-6 lg:px-12">
+          <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-8">
               {pillars.map((s) => {
                 const picked = countFor(s.id);
@@ -159,7 +174,7 @@ export function ServicesOverview({
                           style={{ background: color }}
                         >
                           <Check size={12} strokeWidth={3} />
-                          {picked} added
+                          {picked} {t('items_added', 'added')}
                         </span>
                       )}
                     </div>
@@ -177,16 +192,16 @@ export function ServicesOverview({
                             className="text-xs font-bold uppercase tracking-widest mb-1"
                             style={{ color: color }}
                           >
-                            {tagline}
+                            {serviceText(`service_${s.id}_tagline`, s.tagline)}
                           </p>
                           <h3 className="text-2xl font-bold leading-[1.3] text-[#1a1a1a]">
-                            {label}
+                            {serviceText(`service_${s.id}_label`, s.label)}
                           </h3>
                         </div>
                       </div>
 
                       <p className="text-lg text-[#1a1a1a]/70 leading-[1.7] mb-8 flex-1 font-medium">
-                        {promise}
+                        {serviceText(`service_${s.id}_promise`, s.promise)}
                       </p>
 
                       <button
@@ -194,7 +209,7 @@ export function ServicesOverview({
                         className="inline-flex items-center gap-2 text-lg font-bold hover:gap-3 transition-all mt-auto"
                         style={{ color: color }}
                       >
-                        Request Service <ChevronRight size={18} />
+                        {t('request_service', 'Request Service')} <ChevronRight size={18} />
                       </button>
                     </div>
                   </div>
@@ -207,34 +222,33 @@ export function ServicesOverview({
         {/* --- 3. THE BRIDGE / INTRO TEXT --- */}
         <div className="max-w-[900px] mx-auto px-6 mt-8 mb-12 text-center">
           <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/80 font-medium">
-            Nothing here is a fixed package. Open any service, add the specific pieces that
-            apply to you — one, several, or all of them — and book a single appointment
-            that covers everything you picked.
+            {t('services_overview_bridge_desc', "Nothing here is a fixed package. Open any service, add the specific pieces that apply to you — one, several, or all of them — and book a single appointment that covers everything you picked.")}
           </p>
         </div>
 
 
         {/* --- 4. BOTTOM CALL-TO-ACTION --- */}
-        <div className="w-full py-16 md:py-24 px-4 md:px-8 relative overflow-hidden">
-          <div className="absolute top-[-50%] left-[0%] w-[500px] h-[500px] bg-[#F5841F]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
-          <div className="absolute bottom-[-50%] right-[0%] w-[500px] h-[500px] bg-[#E91E8C]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
+        {!isStaff && (
+          <div className="w-full py-16 md:py-24 px-4 md:px-8 relative overflow-hidden">
+            <div className="absolute top-[-50%] left-[0%] w-[500px] h-[500px] bg-[#F5841F]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
+            <div className="absolute bottom-[-50%] right-[0%] w-[500px] h-[500px] bg-[#E91E8C]/15 blur-[150px] rounded-full pointer-events-none mix-blend-multiply" />
 
-          <div className="relative z-10 w-full text-center bg-white/60 backdrop-blur-xl p-10 md:p-16 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)] border border-white">
-            <h2 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-8 tracking-tight leading-[1.15]">
-              Ready to unlock your full potential?
-            </h2>
+            <div className="relative z-10 w-full text-center bg-white/60 backdrop-blur-xl p-10 md:p-16 rounded-[48px] shadow-[0_30px_80px_-20px_rgba(0,0,0,0.05)] border border-white">
+              <h2 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-8 tracking-tight leading-[1.15]">
+                {t('ready_to_unlock', 'Ready to unlock your full potential?')}
+              </h2>
             {!isStaff && (
               <button
                 onClick={onBook}
                 className="inline-flex items-center gap-3 text-lg font-bold text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(245,132,31,0.5)] group"
                 style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
               >
-                Book an Appointment
+                {t('book_an_appointment', 'Book an appointment')}
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
