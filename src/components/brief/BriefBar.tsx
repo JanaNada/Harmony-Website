@@ -12,25 +12,30 @@ function serviceTranslation(language: string, key: string, fallback: string) {
     ? arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback
     : fallback;
 }
+import { useAuth, isStaffRole } from "@/app/auth";
+import { findModule, findService, SERVICE_BY_ID } from "@/content/services";
 
 /* Sticky bar: the visitor's selection follows them across the whole site.
    Hidden when empty so the site stays calm until they've chosen something. */
 
 export function BriefBar({ onBook }: { onBook: () => void }) {
   const { selected, count, toggle, clear, activeServices, countFor } = useBrief();
+ const { user } = useAuth();
+  const isStaff = isStaffRole(user?.role);
   const { t } = useTranslate();
   const tolgee = useTolgee(["language"]);
   const language = tolgee.getLanguage() ?? "en";
-  const [open, setOpen] = useState(false);
 
   if (count === 0) return null;
 
   // The bar wears the colours of whatever they've actually picked.
-  const colors = activeServices.map((sid) => SERVICE_BY_ID[sid].color);
+  const colors = activeServices.map((sid) => findService(sid)?.color).filter(Boolean) as string[];
   const gradient =
     colors.length === 1
       ? `linear-gradient(120deg, ${colors[0]}, ${colors[0]}CC)`
-      : `linear-gradient(120deg, ${colors.join(", ")})`;
+      : colors.length > 1
+      ? `linear-gradient(120deg, ${colors.join(", ")})`
+      : `linear-gradient(120deg, #F5841F, #F5841F)`;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[60] pointer-events-none">
@@ -52,7 +57,8 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
 
             <div className="flex flex-col gap-5">
               {activeServices.map((sid) => {
-                const svc = SERVICE_BY_ID[sid];
+                const svc = findService(sid);
+                if (!svc) return null;
                 return (
                   <div key={sid}>
                     <div className="flex items-center gap-2 mb-2.5">
@@ -125,13 +131,15 @@ export function BriefBar({ onBook }: { onBook: () => void }) {
             </span>
           </button>
 
-          <button
-            onClick={onBook}
-            className="text-sm font-extrabold text-[#1a1a1a] bg-white px-6 md:px-8 py-3.5 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_10px_25px_-8px_rgba(0,0,0,0.35)] inline-flex items-center gap-2 flex-shrink-0 group"
-          >
-            {t("brief_book", "Book appointment")}
-            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </button>
+          {!isStaff && (
+            <button
+              onClick={onBook}
+              className="text-sm font-extrabold text-[#1a1a1a] bg-white px-6 md:px-8 py-3.5 rounded-full transition-transform duration-300 hover:scale-[1.04] shadow-[0_10px_25px_-8px_rgba(0,0,0,0.35)] inline-flex items-center gap-2 flex-shrink-0 group"
+            >
+              {t("brief_book", "Book appointment")}
+              <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          )}
         </div>
       </div>
     </div>

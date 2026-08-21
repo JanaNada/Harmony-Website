@@ -46,6 +46,9 @@ next-env.d.ts
 /.claude
 
 /src/generated/prisma
+
+cline-rules.md
+
 mysql-installer-community-*.msi
 scratch/
 backend/scratch/

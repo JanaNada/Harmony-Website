@@ -1,14 +1,16 @@
 "use client";
 
-import { ArrowRight, ChevronRight, ChevronDown, Check } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import { ArrowRight, ChevronRight, ChevronDown, Check, Box } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
 import { useTolgee, useTranslate } from "@tolgee/react";
+import { useAuth, isStaffRole } from "@/app/auth";
 import {
-  SERVICES, SERVICE_BY_ID, C_ORANGE, C_PINK, C_BLUE, C_GREEN,
-  type ServiceId,
+  C_ORANGE, C_PINK, C_BLUE, C_GREEN,
 } from "@/content/services";
 import { arabicServiceTranslations } from "@/content/translations/ar-services";
+import { type CatalogService, getServicePageKey } from "@/lib/api";
 
 const GRAD_FRIEND = `linear-gradient(90deg, ${C_ORANGE}, ${C_PINK}, ${C_BLUE}, ${C_GREEN})`;
 
@@ -17,11 +19,13 @@ export function ServicesOverview({
   onBook,
   hiddenServices,
   isStaff,
+  catalogServices,
 }: {
-  onOpen: (id: ServiceId) => void;
+  onOpen: (pageKey: string) => void;
   onBook: () => void;
   hiddenServices: string[];
   isStaff?: boolean;
+  catalogServices: CatalogService[];
 }) {
   const { t } = useTranslate();
   const tolgee = useTolgee(["language"]);
@@ -31,8 +35,21 @@ export function ServicesOverview({
       ? arabicServiceTranslations[key as keyof typeof arabicServiceTranslations] ?? fallback
       : t(key, fallback);
   const { countFor } = useBrief();
-  const tech = SERVICE_BY_ID.technology;
-  const pillars = SERVICES.filter((s) => s.id !== "technology" && !hiddenServices.includes(s.id));
+  const { user } = useAuth();
+  const isStaff = isStaffRole(user?.role);
+
+  // Find F&B Technology (Smartphone or matching title)
+  const tech = catalogServices.find(
+    (s) => s.title.toLowerCase() === "f&b technology" || s.icon === "Smartphone"
+  );
+  
+  // Pillars are all active services except F&B Technology
+  const pillars = tech 
+    ? catalogServices.filter((s) => s.id !== tech.id) 
+    : catalogServices;
+  
+  // Show hero if tech exists
+  const showTechHero = !!tech;
 
   return (
     <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative scroll-smooth">
@@ -44,15 +61,15 @@ export function ServicesOverview({
       </div>
 
       <div className="relative z-10">
-        {/* --- 1. FEATURED DIVISION: F&B TECHNOLOGY --- */}
+        {showTechHero && tech && (
         <div className="min-h-[70vh] pt-12 pb-8 flex flex-col justify-center px-6 w-full relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 items-center flex-1">
             <div className="order-2 lg:order-1 lg:col-span-5 relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-[#F5841F]/30 to-[#E91E8C]/20 blur-[40px] rounded-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
               <div className="relative w-full aspect-[4/3] rounded-[32px] overflow-hidden shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-white/60 bg-white">
                 <ImageWithFallback
-                  src={tech.image}
-                  alt={tech.label}
+                  src={tech.imageUrl || "/imports/image-11.png"}
+                  alt={tech.title}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
                 />
               </div>
@@ -103,6 +120,7 @@ export function ServicesOverview({
             </div>
           </div>
         </div>
+        )}
 
         {/* --- 2. THE 4 PILLARS OF EXPERTISE --- */}
         <div id="services-grid" className="pt-16 pb-12">
@@ -123,24 +141,37 @@ export function ServicesOverview({
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-8">
               {pillars.map((s) => {
                 const picked = countFor(s.id);
+                const label = s.title;
+                const tagline = s.tagline;
+                const color = s.accentColor || C_ORANGE;
+                const dim = `${color}15`;
+                const image = s.imageUrl || "/imports/image-11.png";
+                const promise = s.description;
+                
+                let IconComponent = Box;
+                const iconName = s.icon;
+                if (iconName && (LucideIcons as any)[iconName]) {
+                  IconComponent = (LucideIcons as any)[iconName];
+                }
+
                 return (
                   <div
                     key={s.id}
                     className="group flex flex-col bg-white rounded-[32px] overflow-hidden shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-500 hover:-translate-y-2"
                   >
-                    <div className="h-1.5 w-full" style={{ background: s.color }} />
+                    <div className="h-1.5 w-full" style={{ background: color }} />
 
                     <div className="relative h-56 overflow-hidden bg-[#FAF7F2]">
                       <img
-                        src={s.image}
-                        alt={s.label}
+                        src={image}
+                        alt={label}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent opacity-80" />
                       {picked > 0 && (
                         <span
                           className="absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white text-[11.5px] font-extrabold shadow-lg"
-                          style={{ background: s.color }}
+                          style={{ background: color }}
                         >
                           <Check size={12} strokeWidth={3} />
                           {picked} {t('items_added', 'added')}
@@ -152,14 +183,14 @@ export function ServicesOverview({
                       <div className="flex items-center gap-8 mb-6">
                         <div
                           className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-sm transition-transform duration-500 group-hover:scale-110"
-                          style={{ background: s.dim }}
+                          style={{ background: dim }}
                         >
-                          <s.icon size={22} style={{ color: s.color }} />
+                          <IconComponent size={22} style={{ color: color }} />
                         </div>
                         <div>
                           <p
                             className="text-xs font-bold uppercase tracking-widest mb-1"
-                            style={{ color: s.color }}
+                            style={{ color: color }}
                           >
                             {serviceText(`service_${s.id}_tagline`, s.tagline)}
                           </p>
@@ -174,9 +205,9 @@ export function ServicesOverview({
                       </p>
 
                       <button
-                        onClick={() => onOpen(s.id)}
+                        onClick={() => onOpen(getServicePageKey(s))}
                         className="inline-flex items-center gap-2 text-lg font-bold hover:gap-3 transition-all mt-auto"
-                        style={{ color: s.color }}
+                        style={{ color: color }}
                       >
                         {t('request_service', 'Request Service')} <ChevronRight size={18} />
                       </button>
@@ -195,6 +226,7 @@ export function ServicesOverview({
           </p>
         </div>
 
+
         {/* --- 4. BOTTOM CALL-TO-ACTION --- */}
         {!isStaff && (
           <div className="w-full py-16 md:py-24 px-4 md:px-8 relative overflow-hidden">
@@ -205,6 +237,7 @@ export function ServicesOverview({
               <h2 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-8 tracking-tight leading-[1.15]">
                 {t('ready_to_unlock', 'Ready to unlock your full potential?')}
               </h2>
+            {!isStaff && (
               <button
                 onClick={onBook}
                 className="inline-flex items-center gap-3 text-lg font-bold text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(245,132,31,0.5)] group"

@@ -44,10 +44,12 @@ import {
   Briefcase,
 } from 'lucide-react';
 
-import { SERVICES, SERVICE_BY_ID, type ServiceId } from "@/content/services";
+import { SERVICES, SERVICE_BY_ID, setDynamicServicesCatalog, findService, type ServiceId } from "@/content/services";
 import { type Page, isKnownPage, pageToPath, pathToPage } from "./routes";
 import { isStaffRole, useAuth } from "./auth";
 import { BookingPage } from "@/components/brief/BookingPage";
+import { CatalogServicePage } from "@/components/services/CatalogServicePage";
+import { api, type CatalogService } from "@/lib/api";
 import { ServicesOverview } from "@/components/services/ServicesOverview";
 import { SectorPage } from "@/components/services/SectorPage";
 import { MarketingStory } from "@/components/services/MarketingStory";
@@ -116,6 +118,10 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
   const [contactName, setContactName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [contactName, setContactName] = useState("");
+  const [contactPhone, setContactPhone] = useState("");
+  const [userType, setUserType] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -123,27 +129,49 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
     e.preventDefault();
     if (busy) return;
 
+ setBusy(true);
     setError(null);
 
-    setBusy(true);
-    const result = mode === "signup"
-      ? await register({
+    try {
+      if (mode === "signup") {
+        if (!companyName.trim() || !contactName.trim() || !contactPhone.trim() || !email.trim() || !password.trim()) {
+          setError(t('signup_fields_required_err', "Company name, contact name, contact phone, email and password are required."));
+          setBusy(false);
+          return;
+        }
+
+        await api.post<{ success: boolean; message?: string }>("/auth/register", {
           companyName: companyName.trim(),
           contactName: contactName.trim(),
+          contactPhone: contactPhone.trim(),
           email: email.trim(),
           password: password.trim(),
-        })
-      : await login(email.trim(), password.trim());
-    setBusy(false);
+        });
 
-    if (!result.ok) {
-      setError(result.message ?? t('signin_failed_err', "Sign in failed."));
-      return;
+        const loginResult = await login(email.trim(), password.trim());
+        if (!loginResult.ok) {
+          setError(loginResult.message ?? t('reg_login_failed_err', "Registration succeeded but login failed."));
+          setBusy(false);
+          return;
+        }
+      } else {
+        const result = await login(email.trim(), password.trim());
+        if (!result.ok) {
+          setError(result.message ?? t('signin_failed_err', "Sign in failed."));
+          setBusy(false);
+          return;
+        }
+      }
+
+      const returnTo = typeof window !== "undefined" ? sessionStorage.getItem("returnTo") : null;
+      if (returnTo) sessionStorage.removeItem("returnTo");
+      go(isKnownPage(returnTo) ? (returnTo as Page) : "about");
+      
+    } catch (err: any) {
+      setError(err?.message ?? t('api_error_err', "An error occurred. Is the API running?"));
+    } finally {
+      setBusy(false);
     }
-
-    const returnTo = typeof window !== "undefined" ? sessionStorage.getItem("returnTo") : null;
-    if (returnTo) sessionStorage.removeItem("returnTo");
-    go(isKnownPage(returnTo) ? (returnTo as Page) : "about");
   };
 
   return (
@@ -168,9 +196,24 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
 
         <div className="bg-white/80 backdrop-blur-2xl p-8 md:p-10 rounded-[40px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.08)] border border-white">
           <form onSubmit={handleSignIn} className="space-y-8">
+            
+            {/* Sign Up Only: Company Name */}
             {mode === "signup" && (
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>{t('form_fullname', 'Full Name')}</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>{t('form_company_name', 'Company Name')}</label>
+                <div className="relative">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Building size={16} /></div>
+                  <input type="text" placeholder={t('placeholder_company', 'Acme Restaurant')} required
+                    value={companyName} onChange={(e) => setCompanyName(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
+                </div>
+              </div>
+            )}
+
+            {/* Sign Up Only: Contact Name */}
+            {mode === "signup" && (
+              <div>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>{t('form_contact_name', 'Contact Name')}</label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><User size={16} /></div>
                   <input type="text" placeholder={t('placeholder_name', 'Ahmed Hassan')} required
@@ -180,13 +223,14 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
               </div>
             )}
 
+            {/* Sign Up Only: Contact Phone */}
             {mode === "signup" && (
               <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>{t('form_company_label', 'Company / Brand')}</label>
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>{t('form_contact_phone', 'Contact Phone')}</label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Building2 size={16} /></div>
-                  <input type="text" placeholder={t('placeholder_brand', 'Your brand name')} required
-                    value={companyName} onChange={(e) => setCompanyName(e.target.value)}
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Phone size={16} /></div>
+                  <input type="tel" placeholder={t('placeholder_phone', '+20 100 000 0000')} required
+                    value={contactPhone} onChange={(e) => setContactPhone(e.target.value)}
                     className="w-full pl-11 pr-4 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all placeholder-gray-300 text-gray-800 focus:border-[#F5841F] bg-white/50" />
                 </div>
               </div>
@@ -219,8 +263,8 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-1.5" style={{fontFamily:"'Montserrat',sans-serif"}}>{t('form_iam', 'I am a...')}</label>
                 <div className="relative">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Briefcase size={16} /></div>
-                  <select required className="w-full pl-11 pr-10 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all text-gray-700 focus:border-[#F5841F] bg-white/50 appearance-none cursor-pointer">
-                    <option value="" disabled selected>{t('select_objective', 'Select your objective')}</option>
+                  <select required value={userType} onChange={(e) => setUserType(e.target.value)} className="w-full pl-11 pr-10 py-3 rounded-xl text-base border border-gray-200 outline-none transition-all text-gray-700 focus:border-[#F5841F] bg-white/50 appearance-none cursor-pointer">
+                    <option value="" disabled>{t('select_objective', 'Select your objective')}</option>
                     <option value="restaurant">{t('opt_restaurant', 'Restaurant / F&B Owner')}</option>
                     <option value="recruiter">{t('opt_recruiter', 'Recruiter / Seeking Talent')}</option>
                     <option value="event">{t('opt_event', 'Client (Planning an Event)')}</option>
@@ -339,6 +383,15 @@ const C_FRIEND = {
 };
 const GRAD_FRIEND = `linear-gradient(90deg,${C_FRIEND.management},${C_FRIEND.events},${C_FRIEND.marketing},${C_FRIEND.recruitment})`;
 
+const TIMELINE_FRIEND = [
+  { year:"2012", label:"Founded",          desc:"Harmony Club House established in Cairo with a bold vision to redefine F&B consulting.", color:C_FRIEND.management },
+  { year:"2015", label:"First Expansion",  desc:"Expanded operations across MENA, partnering with Kempinski, Marriott, and Baron Hotels.", color:C_FRIEND.events },
+  { year:"2017", label:"Events Division",  desc:"Launched dedicated events arm, delivering 50+ large-scale corporate and private events.", color:C_FRIEND.marketing },
+  { year:"2019", label:"Digital & Marketing",desc:"Introduced full-stack marketing services as brands demanded stronger digital presence.", color:C_FRIEND.recruitment },
+  { year:"2021", label:"2,500 Trained",    desc:"Milestone: trained over 2,500 hospitality professionals across the region.", color:C_FRIEND.management },
+  { year:"2024", label:"4 Continents",     desc:"Active across MENA, Europe, Asia, and the Americas - 30+ projects and growing.", color:C_FRIEND.events },
+];
+
 function TimelineSection() {
   const { t } = useTranslate();
   const TIMELINE_FRIEND = [
@@ -364,6 +417,7 @@ function TimelineSection() {
           </h2>
         </div>
 
+        {/* Desktop flowing SVG timeline */}
         <div className="hidden md:block relative" style={{height:"400px", marginTop: "120px"}}>
           <svg viewBox="0 0 1100 200" className="absolute inset-0 w-full" preserveAspectRatio="none" aria-hidden="true">
             <defs>
@@ -883,12 +937,22 @@ function ContactPage() {
   );
 }
 
+// --- Root App ------------------------
+
+
 const FOOTER_SOCIAL_ICONS = [
   { Icon: Instagram, label: "Instagram", color: C_PINK },
   { Icon: Facebook, label: "Facebook", color: C_BLUE },
   { Icon: Linkedin, label: "LinkedIn", color: C_BLUE },
   { Icon: Twitter, label: "Twitter / X", color: C_BLUE },
   { Icon: Youtube, label: "YouTube", color: C_ORANGE },
+];
+
+const FOOTER_SERVICES = [
+  { id: "management", color: "#F5841F", label: "Management", features: ["Pre-opening planning & setup", "Operations audit & restructuring", "Menu engineering", "P&L optimization"] },
+  { id: "events", color: "#E91E8C", label: "Events & Catering", features: ["Venue scouting & negotiation", "Bespoke catering design", "AV & decor coordination", "Guest management"] },
+  { id: "marketing", color: "#3AADE0", label: "Marketing", features: ["Brand identity & positioning", "Social media strategy", "Influencer & PR campaigns", "Photography direction"] },
+  { id: "recruitment", color: "#78BE1F", label: "Recruitment", features: ["Executive placement", "Chef & culinary sourcing", "FOH & BOH recruitment", "Event & seasonal staffing"] }
 ];
 
 function Footer() {
@@ -982,6 +1046,9 @@ const SERVICE_IDS = SERVICES.map((s) => s.id);
 const isServicePage = (p: Page | string): p is ServiceId =>
   ["business", "events", "marketing", "recruitment", "technology"].includes(p as string);
 
+const isCatalogPage = (p: Page): p is `catalog:${number}` => /^catalog:\d+$/.test(p);
+
+/** Full-screen status message, used while the session is being resolved. */
 function SessionNotice({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex-1 flex items-center justify-center bg-[#FAF7F2]">
@@ -990,6 +1057,11 @@ function SessionNotice({ children }: { children: React.ReactNode }) {
   );
 }
 
+/**
+ * The dashboard is only rendered for a signed-in ADMIN. Anyone else is sent to
+ * the sign-in page. The server enforces this too — every /api/admin route sits
+ * behind the JWT cookie — so this guard is about UX, not about being the lock.
+ */
 function AdminRoute() {
   const { t } = useTranslate();
   const { user, loading } = useAuth();
@@ -1023,7 +1095,9 @@ function CompanyRoute() {
 export default function App() {
   const router = useRouter();
   const pathname = usePathname();
-  const { user } = useAuth();
+  const [catalogServices, setCatalogServices] = useState<CatalogService[]>([]);
+
+  // The URL is the source of truth, so Back/Forward and refresh all work.
   const page = pathToPage(pathname);
   const [hiddenServices, setHiddenServices] = useState<string[]>([]);
   const [customServices, setCustomServices] = useState<any[]>([]);
@@ -1056,6 +1130,53 @@ export default function App() {
 
   const go = (p: Page) => router.push(pageToPath(p));
 
+  const fetchCatalog = () => {
+    api
+      .get<{ services: CatalogService[] }>("/catalog")
+      .then((d) => {
+        setDynamicServicesCatalog(d.services);
+        setCatalogServices(d.services);
+      })
+      .catch(() => {
+        setCatalogServices([]);
+      });
+  };
+
+  useEffect(() => { fetchCatalog(); }, []);
+
+  // Active DB services — single source of truth for public service pages
+  const activeCatalogServices = catalogServices.filter((s) => s.isActive);
+
+  const dbServiceForPage =
+  isServicePage(page)
+    ? activeCatalogServices.find(
+        (s) => s.title.toLowerCase() === SERVICE_BY_ID[page].label.toLowerCase()
+      )
+    : null;
+
+  const resolvedService = isServicePage(page)
+    ? (dbServiceForPage ? findService(dbServiceForPage.id) : null)
+    : isCatalogPage(page)
+    ? (() => {
+        const s = catalogServices.find((s) => s.id === Number(page.slice("catalog:".length)));
+        return s && s.isActive ? findService(s.id) : null;
+      })()
+    : null;
+
+  const openCatalogBooking = (service: CatalogService) => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem(
+        "bookingCatalogService",
+        JSON.stringify({
+          id: service.id,
+          title: service.title,
+          subservices: service.subservices.filter((s) => s.isActive).map((s) => s.title),
+        })
+      );
+    }
+    go("booking");
+  };
+
   return (
     <>
       {page === "home" && (
@@ -1075,41 +1196,34 @@ export default function App() {
         </div>
       )}
       {page === "services" && (
-        <ServicesOverview onOpen={(id) => go(id)} onBook={() => go("booking")} hiddenServices={hiddenServices} isStaff={isStaffRole(user?.role)} />
+        <ServicesOverview
+          onOpen={(pageKey) => go(pageKey as Page)}
+          catalogServices={activeCatalogServices.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))}
+          onBook={() => go("booking")}
+        />
       )}
       {isServicePage(page) && (
-        <SectorPage
-          key={page}
-          service={SERVICE_BY_ID[page]}
-          onBook={() => go("booking")}
-          hiddenServices={hiddenServices}
-          isStaff={isStaffRole(user?.role)}
-          story={page === "marketing" ? <MarketingStory /> : undefined}
-        />
+        resolvedService ? (
+          <SectorPage
+            key={page}
+            service={resolvedService as any}
+            onBook={() => go("booking")}
+            story={page === "marketing" ? <MarketingStory /> : undefined}
+          />
+        ) : (
+          <SessionNotice>Service not found.</SessionNotice>
+        )
       )}
-      {!isServicePage(page) && customServices.find(s => s.id.toString() === page) && (
-        <SectorPage
-          key={page}
-          service={{
-            id: page as string,
-            label: customServices.find(s => s.id.toString() === page).title,
-            desc: customServices.find(s => s.id.toString() === page).tagline || "",
-            long: "",
-            image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2670&auto=format&fit=crop",
-            icon: require("lucide-react").Sparkles,
-            color: customServices.find(s => s.id.toString() === page).accentColor || "#F5841F",
-            dim: (customServices.find(s => s.id.toString() === page).accentColor || "#F5841F") + "15",
-            modules: customServices.find(s => s.id.toString() === page).subservices.map((sub: any) => ({
-              id: sub.id.toString(),
-              label: sub.title,
-              desc: sub.desc || "",
-              price: sub.price || ""
-            }))
-          }}
-          onBook={() => go("booking")}
-          hiddenServices={hiddenServices}
-          isStaff={isStaffRole(user?.role)}
-        />
+      {isCatalogPage(page) && (
+        resolvedService ? (
+          <SectorPage
+            key={page}
+            service={resolvedService as any}
+            onBook={() => go("booking")}
+          />
+        ) : (
+          <SessionNotice>Service not found.</SessionNotice>
+        )
       )}
       {page === "booking" && (
         <BookingPage onBrowse={() => go("services")} onSignIn={() => go("login")} />

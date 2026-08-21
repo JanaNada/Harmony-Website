@@ -18,7 +18,7 @@ export interface ClientRow {
   createdAt: string;
   requestCount: number;
   openCount: number;
-  nextMeetingAt: string | null;
+  bookedMeetingAt: string | null;
   services: string[];
 }
 
@@ -38,8 +38,8 @@ export function ClientsTab({ onOpenCompany }: { onOpenCompany: (id: number) => v
 
   const load = useCallback(async () => {
     try {
-      const data = await api.get<{ companies: ClientRow[] }>("/scheduling/companies");
-      setClients(data.companies);
+      const clientData = await api.get<{ companies: ClientRow[] }>("/scheduling/companies");
+      setClients(clientData.companies);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load clients");
@@ -52,7 +52,7 @@ export function ClientsTab({ onOpenCompany }: { onOpenCompany: (id: number) => v
     const q = query.trim().toLowerCase();
     return clients.filter((c) => {
       if (filter === "open" && c.openCount === 0) return false;
-      if (filter === "upcoming" && !c.nextMeetingAt) return false;
+      if (filter === "upcoming" && !c.bookedMeetingAt) return false;
       if (!q) return true;
       // Search everything staff would actually type.
       return [c.companyName, c.contactName, c.email, c.contactPhone ?? ""]
@@ -94,7 +94,7 @@ export function ClientsTab({ onOpenCompany }: { onOpenCompany: (id: number) => v
         {([
           ["all", `Everyone (${clients.length})`],
           ["open", `Waiting on us (${clients.filter((c) => c.openCount > 0).length})`],
-          ["upcoming", `Meeting booked (${clients.filter((c) => c.nextMeetingAt).length})`],
+          ["upcoming", `Meeting booked (${clients.filter((c) => c.bookedMeetingAt).length})`],
         ] as const).map(([key, label]) => (
           <button
             key={key}
@@ -193,10 +193,10 @@ export function ClientsTab({ onOpenCompany }: { onOpenCompany: (id: number) => v
               )}
 
               <div className="flex items-center gap-2 p-3 rounded-xl bg-gray-50 mb-5">
-                {c.nextMeetingAt ? (
+                {c.bookedMeetingAt ? (
                   <>
                     <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="text-sm font-bold text-gray-900">{formatDateTime(c.nextMeetingAt)}</span>
+                    <span className="text-sm font-bold text-gray-900">{formatDateTime(c.bookedMeetingAt)}</span>
                   </>
                 ) : (
                   <>

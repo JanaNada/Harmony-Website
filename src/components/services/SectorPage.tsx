@@ -8,6 +8,9 @@ import { api } from "@/lib/api";
 import type { Service, ServiceModule } from "@/content/services";
 import { useTolgee, useTranslate } from "@tolgee/react";
 import { arabicServiceTranslations } from "@/content/translations/ar-services";
+import { useAuth, isStaffRole } from "@/app/auth";
+
+
 
 function serviceText(
   translate: (key: string, fallback: string) => string,
@@ -27,12 +30,15 @@ export function ModuleCard({
   module: m,
   color,
   dim,
+  disabled,
   metrics,
   onView,
 }: {
   module: ServiceModule;
   color: string;
   dim: string;
+  /** When true, the card can be inspected but not added/removed from the brief. */
+  disabled?: boolean;
   metrics: Record<string, number>;
   onView: (id: string) => void;
 }) {
@@ -47,16 +53,24 @@ export function ModuleCard({
   return (
     <div
       role="button"
-      tabIndex={0}
-      onClick={() => toggle(m.id)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          toggle(m.id);
-        }
-      }}
+      tabIndex={disabled ? -1 : 0}
+      onClick={disabled ? undefined : () => toggle(m.id)}
+      onKeyDown={
+        disabled
+          ? undefined
+          : (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggle(m.id);
+              }
+            }
+      }
       aria-pressed={on}
-      className={`group relative text-left rounded-[26px] border transition-all duration-300 flex flex-col cursor-pointer overflow-hidden ${
+      className={`group relative text-left rounded-[26px] border transition-all duration-300 flex flex-col overflow-hidden ${
+        disabled
+          ? "cursor-not-allowed opacity-75"
+          : "cursor-pointer"
+      } ${
         on
           ? "bg-white shadow-[0_18px_40px_-18px_rgba(0,0,0,0.16)] -translate-y-0.5"
           : "bg-white/60 border-white/70 hover:bg-white hover:shadow-[0_14px_30px_-16px_rgba(0,0,0,0.12)] hover:-translate-y-0.5"
@@ -174,6 +188,8 @@ export function SectorPage({
   const tolgee = useTolgee(["language"]);
   const language = tolgee.getLanguage() ?? "en";
   const { addMany, removeMany, countFor, has } = useBrief();
+  const { user } = useAuth();
+  const isStaff = isStaffRole(user?.role);
   const chosen = countFor(service.id);
   
   const visibleGroups = service.groups.map(g => ({
@@ -183,6 +199,27 @@ export function SectorPage({
 
   const allIds = visibleGroups.flatMap((g) => g.modules.map((m) => m.id));
   const allOn = allIds.length > 0 && allIds.every((id) => has(id));
+
+  const [metrics, setMetrics] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    api.get<{ metrics: Record<string, number> }>("/metrics/views")
+      .then((d) => setMetrics(d.metrics || {}))
+      .catch(console.error);
+  }, []);
+
+  const handleView = (id: string) => {
+    const viewKey = `viewed_${id}`;
+    if (!sessionStorage.getItem(viewKey)) {
+      sessionStorage.setItem(viewKey, "true");
+      setMetrics((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+      api.post(`/metrics/views/${id}`).catch(console.error);
+    }
+  };
+
+  useEffect(() => {
+    handleView(service.id);
+  }, [service.id]);
 
   const [metrics, setMetrics] = useState<Record<string, number>>({});
 
@@ -290,6 +327,7 @@ export function SectorPage({
               </p>
             </div>
 
+            {!isStaff && (
             <button
               type="button"
               onClick={() => (allOn ? removeMany(allIds) : addMany(allIds))}
@@ -302,6 +340,7 @@ export function SectorPage({
             >
               {allOn ? t('deselect_everything', 'Deselect everything') : t('want_full_service', 'I want the full service')}
             </button>
+          )}
           </div>
 
           <div className="flex flex-col gap-14 md:gap-16">
@@ -321,7 +360,7 @@ export function SectorPage({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-5 items-start">
                   {group.modules.map((m) => (
-                    <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} metrics={metrics} onView={handleView} />
+                    <ModuleCard key={m.id} module={m} color={service.color} dim={service.dim} disabled={isStaff} metrics={metrics} onView={handleView} />
                   ))}
                 </div>
               </div>
@@ -329,7 +368,7 @@ export function SectorPage({
           </div>
         </div>
 
-        {!isStaff && (
+       {!isStaff && (
           <div className="w-full px-4 md:px-8 mt-20 md:mt-24 mb-24 md:mb-32">
             <div className="w-full rounded-[40px] p-10 md:p-14 text-center relative overflow-hidden border border-white/60 bg-white/70 backdrop-blur-xl shadow-[0_25px_60px_-25px_rgba(0,0,0,0.1)]">
               <div

@@ -28,7 +28,7 @@ const getCompanyDashboard = async (req, res) => {
       `
         SELECT
           COUNT(*) AS totalRequests,
-          SUM(status = 'PENDING') AS pendingRequests,
+          SUM(status IN ('PENDING', 'IN_REVIEW')) AS pendingRequests,
           SUM(status = 'IN_REVIEW') AS inReviewRequests,
           SUM(status = 'APPROVED') AS approvedRequests,
           SUM(status = 'REJECTED') AS rejectedRequests,
@@ -96,7 +96,7 @@ const getMyProfile = async (req, res) => {
       const [[requestStats]] = await db.query(
         `SELECT
            COUNT(*) AS total,
-           SUM(status = 'PENDING') AS pending,
+           SUM(status IN ('PENDING', 'IN_REVIEW')) AS pending,
            SUM(status = 'APPROVED') AS approved,
            SUM(status = 'COMPLETED') AS completed
          FROM service_requests WHERE company_id = ?`,
@@ -107,7 +107,7 @@ const getMyProfile = async (req, res) => {
         `SELECT MIN(s.starts_at) AS next_at
            FROM service_requests r
            JOIN availability_slots s ON s.id = r.slot_id
-          WHERE r.company_id = ? AND s.starts_at >= NOW()`,
+          WHERE r.company_id = ? AND s.status = 'BOOKED' AND s.starts_at >= NOW()`,
         [company.id]
       );
 

@@ -9,7 +9,6 @@ const {
   getOverviewStats,
   createSlots,
   deleteSlot,
-  listPendingRequests,
   getCompanyProfile,
   proposeReschedule,
   listMyReschedules,
@@ -29,7 +28,6 @@ router.post("/slots", authenticate, authorize("ADMIN"), createSlots);
 router.delete("/slots/:id", authenticate, authorize("ADMIN"), deleteSlot);
 
 router.get("/stats", authenticate, authorize("ADMIN", "COORDINATOR"), getOverviewStats);
-router.get("/pending", authenticate, authorize("ADMIN", "COORDINATOR"), listPendingRequests);
 // Listed before /companies/:id so "companies" isn't read as an id.
 router.get("/companies", authenticate, authorize("ADMIN", "COORDINATOR"), listCompanies);
 router.get("/companies/:id", authenticate, authorize("ADMIN", "COORDINATOR"), getCompanyProfile);

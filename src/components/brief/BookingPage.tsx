@@ -7,15 +7,29 @@ import {
 } from "lucide-react";
 import { useBrief } from "@/state/BriefContext";
 import { useAuth } from "@/app/auth";
-import { api, formatDay, formatTime, SERVICE_TYPE_BY_ID, type Slot } from "@/lib/api";
+import { api, formatDay, formatTime, SERVICE_TYPE_BY_ID, getServiceType, type Slot } from "@/lib/api";
 import {
-  findModule, SERVICE_BY_ID,
+  findModule, findService, SERVICE_BY_ID,
   C_ORANGE, C_PINK, C_GREEN,
   type GapQuestion,
 } from "@/content/services";
 import { arabicServiceTranslations } from "@/content/translations/ar-services";
 
 type Answers = Record<string, string>;
+interface CompanyProfilePrefill {
+  user: { email: string };
+  company: {
+    companyName: string;
+    contactName: string;
+    contactPhone: string | null;
+  } | null;
+}
+
+interface CatalogBookingLead {
+  id: number;
+  title: string;
+  subservices?: string[];
+}
 
 function serviceTranslation(language: string, key: string, fallback: string) {
   return language === "ar"
@@ -51,19 +65,56 @@ export function BookingPage({
   const [slotId, setSlotId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [catalogLead, setCatalogLead] = useState<CatalogBookingLead | null>(null);
 
   /* Which service the request is filed under. The brief can span several, so
      the first one picked leads and the rest ride along in the description. */
   const primaryService = activeServices[0];
-  const serviceType = primaryService ? SERVICE_TYPE_BY_ID[primaryService] : "OTHER";
+  const serviceType = primaryService ? getServiceType(primaryService) : "OTHER";
 
   useEffect(() => {
-    const query = primaryService ? `?service=${SERVICE_TYPE_BY_ID[primaryService]}` : "";
+    const query = primaryService ? `?service=${getServiceType(primaryService)}` : "";
     api
       .get<{ slots: Slot[] }>(`/scheduling/slots${query}`)
       .then((d) => setSlots(d.slots.filter((s) => s.status === "OPEN" && new Date(s.startsAt) > new Date())))
       .catch(() => setSlots([]));
   }, [primaryService]);
+  useEffect(() => {
+    if (!user || user.role !== "COMPANY") return;
+
+    let cancelled = false;
+    api
+      .get<CompanyProfilePrefill>("/company-dashboard/profile")
+      .then((data) => {
+        if (cancelled) return;
+        setContact((prev) => ({
+          ...prev,
+          name: prev.name || data.company?.contactName || "",
+          email: prev.email || data.user?.email || user.email || "",
+          phone: prev.phone || data.company?.contactPhone || "",
+          company: prev.company || data.company?.companyName || "",
+        }));
+      })
+      .catch(() => {
+        // Keep the form usable even if prefill fails.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = sessionStorage.getItem("bookingCatalogService");
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw) as CatalogBookingLead;
+      if (parsed?.title) setCatalogLead(parsed);
+    } catch {
+      setCatalogLead(null);
+    }
+  }, []);
 
   /** Free slots grouped by day, so the picker reads like a calendar. */
   const slotsByDay = useMemo(() => {
@@ -96,16 +147,24 @@ export function BookingPage({
     const extras = Object.entries(answers).map(([k, v]) => `${k}: ${v}`).join("\n");
 
     try {
+      const catalogTitle = catalogLead ? `${catalogLead.title} enquiry` : "General enquiry";
+      const catalogLine = catalogLead
+        ? `Requested service: ${catalogLead.title}${catalogLead.subservices?.length ? ` (${catalogLead.subservices.join(", ")})` : ""}`
+        : null;
+
       await api.post("/service-requests", {
         serviceType,
-        title: picks ? picks.slice(0, 240) : "General enquiry",
+        title: picks ? picks.slice(0, 240) : catalogTitle.slice(0, 240),
         description:
-          [contact.note, picks && `Selected: ${picks}`, extras].filter(Boolean).join("\n\n") ||
+          [contact.note, picks && `Selected: ${picks}`, !picks && catalogLine, extras].filter(Boolean).join("\n\n") ||
           "No further detail provided.",
         slotId: slotId ?? undefined,
         location: answers.city || undefined,
       });
 
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("bookingCatalogService");
+      }
       setSent(true);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : t("booking_send_error", "Could not send your request."));
@@ -125,7 +184,7 @@ export function BookingPage({
   const lastStep = steps.length - 1;
 
   const requiredMissing = questionServices
-    .flatMap((sid) => SERVICE_BY_ID[sid].questions.filter((q) => q.required))
+    .flatMap((sid) => findService(sid)?.questions.filter((q) => q.required) ?? [])
     .some((q) => !answers[q.id]);
 
   const canSubmit = contact.name.trim() && contact.email.trim() && !requiredMissing;
@@ -224,7 +283,8 @@ export function BookingPage({
 
               <div className="flex flex-col gap-8">
                 {activeServices.map((sid) => {
-                  const svc = SERVICE_BY_ID[sid];
+                  const svc = findService(sid);
+                  if (!svc) return null;
                   return (
                     <div key={sid}>
                       <div className="flex items-center gap-2.5 mb-3">
@@ -275,7 +335,8 @@ export function BookingPage({
 
               <div className="flex flex-col gap-10">
                 {questionServices.map((sid) => {
-                  const svc = SERVICE_BY_ID[sid];
+                  const svc = findService(sid);
+                  if (!svc) return null;
                   return (
                     <div key={sid}>
                       <div className="flex items-center gap-2.5 mb-6">
@@ -534,7 +595,7 @@ function Question({
 
       {q.type === "multichoice" && (
         <div className="flex flex-wrap gap-2.5">
-          {q.options?.map((o, index) => {
+          {q.options?.map((o) => {
             const current = value ? value.split(", ") : [];
             const on = current.includes(o);
             return (

@@ -6,8 +6,28 @@ export const SERVICE_TYPE_BY_ID: Record<ServiceId, string> = {
   events: "EVENTS",
   marketing: "MARKETING",
   recruitment: "RECRUITMENT",
-  technology: "TECHNOLOGY",
+  technology: "FNB",
 };
+
+export function getServiceType(serviceId: string | number | undefined | null): string {
+  if (!serviceId) return "OTHER";
+  if (serviceId === "business" || serviceId === 1 || String(serviceId).toLowerCase() === "business development") return "MANAGEMENT";
+  if (serviceId === "events" || serviceId === 2 || String(serviceId).toLowerCase() === "events") return "EVENTS";
+  if (serviceId === "marketing" || serviceId === 3 || String(serviceId).toLowerCase() === "marketing") return "MARKETING";
+  if (serviceId === "recruitment" || serviceId === 4 || String(serviceId).toLowerCase() === "recruitment" || String(serviceId).toLowerCase() === "recruitment & training") return "RECRUITMENT";
+  if (serviceId === "technology" || serviceId === 5 || String(serviceId).toLowerCase() === "f&b technology" || String(serviceId).toLowerCase() === "technology") return "FNB";
+  return "OTHER";
+}
+
+export function getServicePageKey(s: { title: string; id: number }): string {
+  const title = s.title.toLowerCase();
+  if (title === "business development") return "business";
+  if (title === "events") return "events";
+  if (title === "marketing") return "marketing";
+  if (title === "recruitment & training" || title === "recruitment") return "recruitment";
+  if (title === "f&b technology" || title === "technology") return "technology";
+  return `catalog:${s.id}`;
+}
 
 export const SERVICE_LABEL: Record<string, string> = {
   MANAGEMENT: "Business Development",
@@ -29,6 +49,23 @@ export const SERVICE_COLOR: Record<string, string> = {
   FNB: "#F5841F",
   CATERING: "#E91E8C",
   OTHER: "#8A8A8A",
+};
+
+/** Human-readable labels and colours for request statuses. */
+export const STATUS_LABEL: Record<string, string> = {
+  PENDING: "Pending",
+  IN_REVIEW: "In Review",
+  APPROVED: "Approved",
+  REJECTED: "Rejected",
+  COMPLETED: "Completed",
+};
+
+export const STATUS_COLOR: Record<string, string> = {
+  PENDING: "#F5841F",
+  IN_REVIEW: "#3AADE0",
+  APPROVED: "#78BE1F",
+  REJECTED: "#E91E8C",
+  COMPLETED: "#6B7280",
 };
 
 export class ApiError extends Error {
@@ -64,6 +101,41 @@ export const api = {
 };
 
 // ─── Shapes returned by the API ─────────────────────────────────────────────
+
+export interface CatalogSubservice {
+  id: number;
+  serviceId: number;
+  sectionId: number | null;
+  title: string;
+  shortDescription: string | null;
+  description: string | null;
+  imageUrl: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  sectionTitle?: string | null;
+}
+
+export interface CatalogSection {
+  id: number;
+  serviceId: number;
+  title: string;
+  sortOrder: number;
+  subservices: CatalogSubservice[];
+}
+
+export interface CatalogService {
+  id: number;
+  title: string;
+  tagline: string | null;
+  description: string | null;
+  imageUrl: string | null;
+  icon: string | null;
+  accentColor: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  sections: CatalogSection[];
+  subservices: CatalogSubservice[];
+}
 
 export type SlotStatus = "OPEN" | "REQUESTED" | "BOOKED" | "CLOSED";
 
