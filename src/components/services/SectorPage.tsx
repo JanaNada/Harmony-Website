@@ -176,7 +176,6 @@ export function SectorPage({
   onBook,
   story,
   hiddenServices = [],
-  isStaff,
 }: {
   service: Service;
   onBook: () => void;
@@ -199,27 +198,6 @@ export function SectorPage({
 
   const allIds = visibleGroups.flatMap((g) => g.modules.map((m) => m.id));
   const allOn = allIds.length > 0 && allIds.every((id) => has(id));
-
-  const [metrics, setMetrics] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    api.get<{ metrics: Record<string, number> }>("/metrics/views")
-      .then((d) => setMetrics(d.metrics || {}))
-      .catch(console.error);
-  }, []);
-
-  const handleView = (id: string) => {
-    const viewKey = `viewed_${id}`;
-    if (!sessionStorage.getItem(viewKey)) {
-      sessionStorage.setItem(viewKey, "true");
-      setMetrics((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
-      api.post(`/metrics/views/${id}`).catch(console.error);
-    }
-  };
-
-  useEffect(() => {
-    handleView(service.id);
-  }, [service.id]);
 
   const [metrics, setMetrics] = useState<Record<string, number>>({});
 

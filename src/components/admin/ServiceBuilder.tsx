@@ -1,12 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Plus, Trash2, Check, X, ChevronDown, ChevronRight, Power, Palette } from "lucide-react";
-import { Plus, Check, ChevronDown, ChevronRight, Power, Palette, Pencil, ArrowUp, ArrowDown, X } from "lucide-react";
+import { Plus, Check, X, ChevronDown, ChevronRight, Power, Palette, Pencil, ArrowUp, ArrowDown } from "lucide-react";
 import { api } from "@/lib/api";
 import { ImagePicker } from "./ImagePicker";
-import { SERVICES, SERVICE_LABEL } from "@/content/services";
-import { api } from "@/lib/api";
 
 export interface Subservice {
   id: number;
@@ -392,6 +389,5 @@ export function ServiceBuilder() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

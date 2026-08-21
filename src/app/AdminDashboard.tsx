@@ -248,13 +248,6 @@ function OverviewTab({ setActiveTab, pendingCount, companyCount, meetingCount, o
             )}
           </div>
         </div>
-            {/* Right Column (Service Traffic) */}
-        <div className="lg:w-[380px] flex-shrink-0">
-          <div className="bg-white/60 backdrop-blur-2xl rounded-[3rem] p-8 md:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] sticky top-8">
-            <h3 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
-              <BarChart3 className="text-[#3AADE0]" /> Service Traffic
-            </h3>
-
         {/* Right Column (Service Traffic) */}
         <div className="lg:w-[380px] flex-shrink-0">
           <div className="bg-white/60 backdrop-blur-2xl rounded-[3rem] p-8 md:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] sticky top-8">

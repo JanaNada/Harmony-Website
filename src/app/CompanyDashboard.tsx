@@ -154,7 +154,7 @@ export default function CompanyDashboard() {
             <LogOut className="w-4 h-4 mr-3" />
             {t("company_sign_out", "Sign Out")}
           </button>
-        </nav>
+        </div>
       </aside>
 
       {/* Main Content */}
@@ -368,8 +368,7 @@ function AppointmentsTab({ requests, pendingReschedules, chatFor, setChatFor, on
           {requests.map((r: MyRequest) => (
             <div key={r.id} className="relative bg-white/70 backdrop-blur-xl rounded-[2.5rem] p-5 md:p-6 border border-white shadow-lg">
               <div className="min-w-0 pr-0 md:pr-56">
-                {(SERVICE_LABEL[r.serviceType] ?? r.serviceType) ? (
-                  <span
+                <span
                     className="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider mb-1"
                     style={{
                       background: `${SERVICE_COLOR[r.serviceType] ?? "#888"}18`,
@@ -403,26 +402,13 @@ function AppointmentsTab({ requests, pendingReschedules, chatFor, setChatFor, on
                   <MessageSquare className="w-4 h-4" />
                   {chatFor === r.id ? t("company_hide_chat", "Hide chat") : t("company_chat_harmony", "Chat with Harmony")}
                 </button>
+
+                {chatFor === r.id && (
+                  <div className="mt-6 h-[420px]">
+                    <ChatPanel requestId={r.id} title={r.title} />
+                  </div>
+                )}
               </div>
-
-              <button
-                onClick={() => setChatFor(chatFor === r.id ? null : r.id)}
-                className={`absolute top-5 right-5 md:top-6 md:right-6 flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm transition-all ${
-                  chatFor === r.id
-                    ? "bg-gray-900 text-white"
-                    : "bg-[#E91E8C]/10 text-[#E91E8C] hover:-translate-y-0.5"
-                }`}
-              >
-                <MessageSquare className="w-4 h-4" />
-                {chatFor === r.id ? "Hide chat" : "Chat with Harmony"}
-              </button>
-
-              {chatFor === r.id && (
-                <div className="mt-6 h-[420px]">
-                  <ChatPanel requestId={r.id} title={`Chat about "${fixEnquirySpelling(r.title)}"`} />
-                </div>
-              )}
-            </div>
           ))}
         </div>
       )}
