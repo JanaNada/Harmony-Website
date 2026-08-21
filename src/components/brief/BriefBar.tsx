@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ArrowRight, X, ChevronUp, ChevronDown } from "lucide-react";
 import { useTolgee, useTranslate } from "@tolgee/react";
 import { useBrief } from "@/state/BriefContext";
-import { findModule, SERVICE_BY_ID } from "@/content/services";
+import { findModule, findService, SERVICE_BY_ID } from "@/content/services";
 import { arabicServiceTranslations } from "@/content/translations/ar-services";
 
 function serviceTranslation(language: string, key: string, fallback: string) {
@@ -13,18 +13,18 @@ function serviceTranslation(language: string, key: string, fallback: string) {
     : fallback;
 }
 import { useAuth, isStaffRole } from "@/app/auth";
-import { findModule, findService, SERVICE_BY_ID } from "@/content/services";
 
 /* Sticky bar: the visitor's selection follows them across the whole site.
    Hidden when empty so the site stays calm until they've chosen something. */
 
 export function BriefBar({ onBook }: { onBook: () => void }) {
   const { selected, count, toggle, clear, activeServices, countFor } = useBrief();
- const { user } = useAuth();
+  const { user } = useAuth();
   const isStaff = isStaffRole(user?.role);
   const { t } = useTranslate();
   const tolgee = useTolgee(["language"]);
   const language = tolgee.getLanguage() ?? "en";
+  const [open, setOpen] = useState(false);
 
   if (count === 0) return null;
 

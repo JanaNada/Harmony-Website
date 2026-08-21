@@ -18,7 +18,6 @@ export function ServicesOverview({
   onOpen,
   onBook,
   hiddenServices,
-  isStaff,
   catalogServices,
 }: {
   onOpen: (pageKey: string) => void;
@@ -237,7 +236,6 @@ export function ServicesOverview({
               <h2 className="font-extrabold text-4xl md:text-5xl text-[#1a1a1a] mb-8 tracking-tight leading-[1.15]">
                 {t('ready_to_unlock', 'Ready to unlock your full potential?')}
               </h2>
-            {!isStaff && (
               <button
                 onClick={onBook}
                 className="inline-flex items-center gap-3 text-lg font-bold text-white px-10 py-5 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_15px_30px_-10px_rgba(245,132,31,0.5)] group"

@@ -6,12 +6,11 @@ import { ChevronDown, Menu, X, User } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { SERVICES } from "@/content/services";
 import { isStaffRole, useAuth } from "@/app/auth";
-import { api } from "@/lib/api";
+import { api, getServicePageKey, type CatalogService } from "@/lib/api";
 import { Sparkles } from "lucide-react";
 import type { Page } from "@/app/routes";
 import LanguageToggle from "@/components/LanguageToggle";
 import { arabicServiceTranslations } from "@/content/translations/ar-services";
-import { api, getServicePageKey } from "@/lib/api";
 import * as LucideIcons from "lucide-react";
 
 const C_ORANGE = "#F5841F";
@@ -23,6 +22,7 @@ const C_PINK = "#E91E8C";
  */
 export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
   const { t } = useTranslate();
   const tolgee = useTolgee(["language"]);
   const language = tolgee.getLanguage() ?? "en";
@@ -34,6 +34,16 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
   
   const [hiddenServices, setHiddenServices] = useState<string[]>([]);
   const [customServices, setCustomServices] = useState<any[]>([]);
+  const [catalogServices, setCatalogServices] = useState<CatalogService[]>([]);
+  const navigationServices = catalogServices.length > 0
+    ? catalogServices
+    : SERVICES.map((service, index) => ({
+        id: index + 1,
+        title: service.label,
+        tagline: service.tagline,
+        icon: "",
+        accentColor: service.color,
+      }));
 
   useEffect(() => {
     const fetchCatalog = () => {
@@ -108,37 +118,45 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
         </button>
 
         {/* Tab links - desktop */}
-        <nav className="hidden md:flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+        <nav className="hidden md:flex min-w-0 flex-1 items-center justify-center gap-1">
           {tabs.map(({ label, page }) =>
             page === "services" ? (
               // Services opens a menu so all of them are one click away
-              <div key={label} className="relative group/svc">
+              <div
+                key={label}
+                className="relative"
+                onMouseEnter={() => setServicesOpen(true)}
+                onMouseLeave={() => setServicesOpen(false)}
+              >
                 <button
                   onClick={() => go("services")}
-                  className={`relative text-[14.5px] font-bold px-4 py-2.5 rounded-full transition-all duration-300 inline-flex items-center gap-1.5 ${
+                  className={`relative whitespace-nowrap text-[14.5px] font-bold px-3 py-2.5 rounded-full transition-all duration-300 inline-flex items-center gap-1.5 ${
                     isActive(page) || SERVICES.some((s) => s.id === current)
                       ? "text-[#1a1a1a] bg-black/[0.04]"
                       : "text-[#1a1a1a]/50 hover:text-[#1a1a1a] hover:bg-black/[0.02]"
                   }`}
                 >
                   {label}
-                  <ChevronDown size={13} className="transition-transform duration-300 group-hover/svc:rotate-180" />
+                  <ChevronDown size={13} className={`transition-transform duration-300 ${servicesOpen ? "rotate-180" : ""}`} />
                 </button>
 
-                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover/svc:opacity-100 group-hover/svc:visible transition-all duration-200 z-50">
+                <div className={`absolute top-full left-1/2 -translate-x-1/2 pt-1 transition-all duration-200 z-[100] ${servicesOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
                   <div className="bg-white rounded-[22px] shadow-[0_25px_50px_-15px_rgba(0,0,0,0.18)] border border-black/[0.05] p-2.5 w-[290px]">
-                    {catalogServices.map((es) => {
+                    {navigationServices.map((es) => {
                       let IconComponent = LucideIcons.Box as any;
-                      if (es.icon && (LucideIcons as any)[es.icon]) {
-                        IconComponent = (LucideIcons as any)[es.icon];
+                      const iconName = typeof es.icon === "string" ? es.icon : "";
+                      if (iconName && (LucideIcons as any)[iconName]) {
+                        IconComponent = (LucideIcons as any)[iconName];
                       }
                       const color = es.accentColor || C_ORANGE;
                       const dim = `${color}15`;
                       const targetPage = getServicePageKey(es);
+                      const label = serviceText(`service_${targetPage}_label`, es.title);
+                      const tagline = serviceText(`service_${targetPage}_tagline`, es.tagline || "");
                       return (
                         <button
                           key={es.id}
-                          onClick={() => go(targetPage as any)}
+                          onClick={() => { setServicesOpen(false); go(targetPage as any); }}
                           className="w-full text-left flex items-start gap-3 p-3 rounded-2xl hover:bg-black/[0.03] transition-colors group/item"
                         >
                           <span
@@ -149,10 +167,10 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
                           </span>
                           <span className="min-w-0">
                             <span className="block text-lg font-extrabold text-[#1a1a1a] leading-tight mb-0.5">
-                              {es.title}
+                              {label}
                             </span>
                             <span className="block text-[11.5px] font-semibold text-[#1a1a1a]/45 leading-snug">
-                              {es.tagline || ""}
+                              {tagline}
                             </span>
                           </span>
                         </button>
@@ -165,7 +183,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
               <button
                 key={label}
                 onClick={() => go(page)}
-                className={`relative text-[14.5px] font-bold px-4 py-2.5 rounded-full transition-all duration-300 ${
+                className={`relative whitespace-nowrap text-[14.5px] font-bold px-3 py-2.5 rounded-full transition-all duration-300 ${
                   isActive(page)
                     ? "text-[#1a1a1a] bg-black/[0.04]"
                     : "text-[#1a1a1a]/50 hover:text-[#1a1a1a] hover:bg-black/[0.02]"
@@ -183,15 +201,13 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
           )}
         </nav>
 
-        <div className="hidden md:block flex-1" />
-
         <div className="flex-1 md:hidden" />
 
         {/* Primary CTA - the whole site points here. Hidden for staff. */}
         {!isStaff && (
           <button
             onClick={() => go("booking")}
-            className="hidden md:inline-flex text-lg font-bold text-white px-7 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)] flex-shrink-0"
+            className="hidden md:inline-flex whitespace-nowrap text-base font-bold text-white px-5 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(233,30,140,0.5)] flex-shrink-0"
             style={{ background: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}
           >
             {t("nav_book", "Book Appointment")}
@@ -205,7 +221,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
         {!loading && (
           <button
             onClick={goToAccount}
-            className="text-lg font-bold text-[#1a1a1a] px-5 py-2.5 rounded-full hover:bg-black/5 transition-all inline-flex items-center gap-2 flex-shrink-0"
+            className="whitespace-nowrap text-base font-bold text-[#1a1a1a] px-3 py-2.5 rounded-full hover:bg-black/5 transition-all inline-flex items-center gap-2 flex-shrink-0"
           >
             {user && <User size={17} />}
             {user ? t("nav_profile", "Profile") : t("nav_signin", "Sign In")}
@@ -236,6 +252,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
           <div className="pl-3 flex flex-col gap-3 border-l-2 border-black/[0.06]">
             {catalogServices.map((es) => {
               const targetPage = getServicePageKey(es);
+              const label = serviceText(`service_${targetPage}_label`, es.title);
               return (
                 <button
                   key={`mob-catalog-${es.id}`}
@@ -243,7 +260,7 @@ export function SiteNav({ current, go }: { current: Page; go: (p: Page) => void 
                   className="text-left text-[14.5px] font-bold text-[#1a1a1a]/55 hover:text-[#1a1a1a] transition-colors inline-flex items-center gap-2.5"
                 >
                   <span className="w-1.5 h-1.5 rounded-full" style={{ background: es.accentColor || C_ORANGE }} />
-                  {es.title}
+                  {label}
                 </button>
               );
             })}

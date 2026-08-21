@@ -5,27 +5,21 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslate } from "@tolgee/react";
 import { motion } from "motion/react";
 import { ImageWithFallback } from "@/components";
-import { api } from "@/lib/api";
 import AdminDashboard from "./AdminDashboard";
 import CompanyDashboard from "./CompanyDashboard";
 import {
-  Instagram,
-  Facebook,
-  Linkedin,
-  Twitter,
-  Youtube,
   ArrowRight,
   CheckCircle2,
   ChevronDown,
-  Globe,
-  Rocket,
   Clock,
-  Phone,
+  Facebook,
+  Globe,
+  Instagram,
+  Linkedin,
   MapPin,
   Menu,
-  X,
-  Settings,
-  Users,
+  Phone,
+  Rocket,
   ShieldCheck,
   Lightbulb,
   Handshake,
@@ -34,9 +28,13 @@ import {
   BarChart,
   GraduationCap,
   Megaphone,
+  Settings,
   Building2,
   Building,
   Heart,
+  Twitter,
+  Users,
+  Youtube,
   Zap,
   Mail,
   Lock,
@@ -45,10 +43,9 @@ import {
 } from 'lucide-react';
 
 import { SERVICES, SERVICE_BY_ID, setDynamicServicesCatalog, findService, type ServiceId } from "@/content/services";
-import { type Page, isKnownPage, pageToPath, pathToPage } from "./routes";
+import { type CatalogPage, type Page, isKnownPage, pageToPath, pathToPage } from "./routes";
 import { isStaffRole, useAuth } from "./auth";
 import { BookingPage } from "@/components/brief/BookingPage";
-import { CatalogServicePage } from "@/components/services/CatalogServicePage";
 import { api, type CatalogService } from "@/lib/api";
 import { ServicesOverview } from "@/components/services/ServicesOverview";
 import { SectorPage } from "@/components/services/SectorPage";
@@ -118,8 +115,6 @@ function LoginPage({ go }: { go: (p: Page) => void }) {
   const [contactName, setContactName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [contactName, setContactName] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [userType, setUserType] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -1046,7 +1041,7 @@ const SERVICE_IDS = SERVICES.map((s) => s.id);
 const isServicePage = (p: Page | string): p is ServiceId =>
   ["business", "events", "marketing", "recruitment", "technology"].includes(p as string);
 
-const isCatalogPage = (p: Page): p is `catalog:${number}` => /^catalog:\d+$/.test(p);
+const isCatalogPage = (p: Page | string): p is CatalogPage => /^catalog:\d+$/.test(p);
 
 /** Full-screen status message, used while the session is being resolved. */
 function SessionNotice({ children }: { children: React.ReactNode }) {
@@ -1098,7 +1093,7 @@ export default function App() {
   const [catalogServices, setCatalogServices] = useState<CatalogService[]>([]);
 
   // The URL is the source of truth, so Back/Forward and refresh all work.
-  const page = pathToPage(pathname);
+  const page = pathToPage(pathname) as Page;
   const [hiddenServices, setHiddenServices] = useState<string[]>([]);
   const [customServices, setCustomServices] = useState<any[]>([]);
   
@@ -1155,7 +1150,7 @@ export default function App() {
     : null;
 
   const resolvedService = isServicePage(page)
-    ? (dbServiceForPage ? findService(dbServiceForPage.id) : null)
+    ? (dbServiceForPage ? findService(dbServiceForPage.id) : findService(page))
     : isCatalogPage(page)
     ? (() => {
         const s = catalogServices.find((s) => s.id === Number(page.slice("catalog:".length)));
@@ -1179,25 +1174,10 @@ export default function App() {
 
   return (
     <>
-      {page === "home" && (
-        <div className="flex-1 overflow-y-auto bg-[#FAF7F2]">
-          <div className="min-h-screen pt-24 pb-16 px-6 relative flex flex-col justify-center items-center">
-            <div className="absolute inset-0 w-full h-full pointer-events-none z-0">
-              <div className="absolute top-[20%] left-[10%] w-[40vw] h-[40vw] bg-[#E91E8C]/15 blur-[120px] rounded-full mix-blend-multiply" />
-              <div className="absolute bottom-[10%] right-[10%] w-[50vw] h-[50vw] bg-[#F5841F]/15 blur-[150px] rounded-full mix-blend-multiply" />
-            </div>
-            <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center">
-              <div className="mb-10 text-center w-full max-w-2xl">
-                <img src={welcomeImg} alt="Welcome to Harmony" className="w-full h-auto drop-shadow-2xl hover:scale-105 transition-transform duration-700" />
-              </div>
-              <HeroCircle go={go} hidden={hiddenServices} />
-            </div>
-          </div>
-        </div>
-      )}
       {page === "services" && (
         <ServicesOverview
           onOpen={(pageKey) => go(pageKey as Page)}
+          hiddenServices={hiddenServices}
           catalogServices={activeCatalogServices.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))}
           onBook={() => go("booking")}
         />
