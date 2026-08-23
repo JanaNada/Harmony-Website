@@ -487,20 +487,26 @@ function TimelineSection() {
 }
 
 const PARTNERS_FRIEND = [
-  { name:"Baron Hotels & Resorts", cat:"Hospitality", domain:"baronhotels.com" },
+  { name:"Baron Hotels & Resorts", cat:"Hospitality", domain:"baronhotels.com", logo:"/baron.png" },
   { name:"Kempinski",             cat:"Hospitality", domain:"kempinski.com" },
-  { name:"Marriott",              cat:"Hospitality", domain:"marriott.com" },
-  { name:"Dunkin'",               cat:"F&B",         domain:"dunkindonuts.com" },
-  { name:"Hardee's",              cat:"F&B",         domain:"hardees.com" },
-  { name:"Krispy Kreme",          cat:"F&B",         domain:"krispykreme.com", logo:"/krispy_kreme_logo.jpg" },
-  { name:"Mori Sushi",            cat:"F&B",         domain:"mori-intl.net" },
+  { name:"Marriott",              cat:"Hospitality", domain:"marriott.com", logo:"/marriott.png" },
+  { name:"Americana Foods",       cat:"F&B",         domain:"americanafoods.com", logo:"/Americana%20Foods.jpg" },
   { name:"Tamara",                cat:"F&B",         domain:"tamarabistro.com", logo:"/tamara_logo.jpg" },
   { name:"Grand Cafe",            cat:"F&B",         domain:"grandcafe-eg.com", logo:"/grand_cafe_logo.jpg" },
   { name:"Butcher's Burger",      cat:"F&B",         domain:"butchersburger.com" },
   { name:"TBS",                   cat:"Retail",      domain:"tbsfresh.com", logo:"/tbs_logo.jpg" },
-  { name:"Vodafone",              cat:"Corporate",   domain:"vodafone.com.eg" },
-  { name:"BLOM Bank",             cat:"Finance",     domain:"blombank.com" },
-  { name:"GUC Cairo",             cat:"Education",   domain:"guc.edu.eg" },
+  { name:"GUC",             cat:"Education",   domain:"guc.edu.eg", logo:"/guc.jpg" },
+  { name: "Wadi Degla", cat: "Hospitality", domain: "wadidegla.com", logo: "/wadi-degla-logo.png" },
+  { name: "Hilton", cat: "Hospitality", domain: "hilton.com", logo: "/hilton-logo.png" },
+  { name: "Renaissance", cat: "Hospitality", domain: "renaissancehotels.com", logo: "/renaissance-logo.png" },
+  { name: "Cilantro", cat: "F&B", domain: "cilantro-eg.com", logo: "/cilantro-logo.png" },
+  { name: "Spinneys", cat: "Retail", domain: "spinneys.com", logo: "/spinneys.png" },
+  { name: "Ministry of Higher Education and Scientific Research", cat: "Education", domain: "mohe.gov.eg", logo: "/mohe.jpg" },
+  { name: "Crowne Plaza", cat: "Hospitality", domain: "ihg.com/crowneplaza", logo: "/crown-plaza-logo.png" },
+  { name: "Mince", cat: "F&B", domain: "mince-eg.com", logo: "/mince.jpg" },
+  { name: "Sedra", cat: "F&B", domain: "sedra-eg.com", logo: "/sedra.jpg" },
+  { name: "Selena Bay", cat: "F&B", domain: "selenabay.com", logo: "/selena_bay.jpg" },
+  {name: "Marzipan", cat: "F&B", domain: "marzipan-eg.com", logo: "/marzipan.jpg"},
 ];
 const CAT_COLOR_FRIEND: Record<string,string> = {
   Hospitality:C_FRIEND.management, "F&B":C_FRIEND.events, Retail:C_FRIEND.marketing, Corporate:C_FRIEND.recruitment, Finance:C_FRIEND.recruitment, Education:C_FRIEND.marketing,
@@ -528,33 +534,23 @@ function PartnersSection() {
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {cats.map(c=>(
-            <button key={c} onClick={()=>setCat(c)}
-              className="px-4 py-1.5 rounded-full text-xs font-bold transition-all"
-              style={{background:cat===c?"#1a1a1a":"#efefef", color:cat===c?"white":"#666"}}>
-              {c}
-            </button>
-          ))}
-        </div>
-
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {shown.map(({name,cat:c, domain, logo})=>(
             <div key={name}
-              className="group relative overflow-hidden bg-white rounded-2xl px-4 py-5 text-center border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-default"
+              className="group relative overflow-hidden bg-white rounded-2xl px-3 py-4 text-center border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-default"
             >
-              <div className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-100 transition-opacity duration-300" 
-                   style={{ backgroundImage: logo ? `url(${logo})` : `url(https://unavatar.io/${domain}?fallback=false), url(https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=256)`, backgroundSize: '50%', backgroundPosition: 'center' }} />
-              <div className="relative z-10 bg-white/70 backdrop-blur-sm py-2 px-1 rounded-xl mt-8">
-                <div className="w-8 h-0.5 rounded-full mx-auto mb-3 transition-all duration-300"
-                  style={{background:"#d1d5db"}}
-                  onMouseEnter={e=>(e.currentTarget.style.background=CAT_COLOR_FRIEND[c]||C_FRIEND.management)}
-                  onMouseLeave={e=>(e.currentTarget.style.background="#d1d5db")}
+              <div className="relative z-10 flex h-24 items-center justify-center rounded-xl bg-white/60 backdrop-blur-[1px] mb-2">
+                <div
+                  className="w-full h-full bg-contain bg-center bg-no-repeat"
+                  style={{
+                    backgroundImage: logo ? `url(${logo})` : `url(https://unavatar.io/${domain}?fallback=false), url(https://t3.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=256)`,
+                    backgroundSize: '60%',
+                    backgroundPosition: 'center'
+                  }}
                 />
-                <div className="text-2xl font-extrabold text-gray-900 leading-tight transition-all duration-300">
-                  {name}
-                </div>
-                <div className="text-xs mt-1.5 font-bold text-gray-800 uppercase tracking-wider transition-all duration-300">{c}</div>
+              </div>
+              <div className="relative z-10 text-[10px] font-semibold text-gray-700 uppercase tracking-[0.08em] leading-tight">
+                {name}
               </div>
             </div>
           ))}
@@ -589,18 +585,40 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
         <div className="absolute bottom-[-10%] left-[20%] w-[50vw] h-[50vw] bg-[#E91E8C]/15 blur-[120px] rounded-full mix-blend-multiply" />
       </div>
 
-      <div className="relative z-10 pb-32 pt-24 w-full px-0">
+      <div className="relative z-10 pb-32 pt-16 w-full px-0">
+        
+        {/* ── Full-Width Brand Header with Thick Shimmering Color Stream Line ── */}
+        <div className="w-full mb-16 px-6 md:px-12 max-w-[1600px] mx-auto">
+          <div className="flex flex-col items-start mb-6">
+            <h1 className="font-extrabold text-4xl sm:text-6xl md:text-7xl tracking-[-0.02em] text-[#1a1a1a] leading-none mb-4 uppercase">
+              HARMONY <span className="font-light tracking-[0.2em] text-[#1a1a1a]/80">CLUB HOUSE</span>
+            </h1>
+            
+            {/* Thick, Full-Width Animated Brand-Colored Line */}
+            <div className="w-full h-[20px] rounded-full overflow-hidden bg-black/5 relative shadow-sm">
+              <div 
+                className="absolute inset-0 animate-[shimmer_5s_linear_infinite]"
+                style={{
+                  backgroundImage: "linear-gradient(90deg, #F5841F, #E91E8C, #3AADE0, #78BE1F, #F5841F)",
+                  backgroundSize: "200% 100%",
+                  backgroundPosition: "0% 50%",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="w-full mb-24 md:mb-32 relative px-6 md:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12 items-center">
             
             <div className="lg:col-span-7 space-y-10 relative z-20">
               <div>
-                <h1 className="font-extrabold text-5xl md:text-6xl leading-[1.1] tracking-tight text-[#1a1a1a]">
+                <h2 className="font-extrabold text-5xl md:text-6xl leading-[1.1] tracking-tight text-[#1a1a1a]">
                   {t('about_headline_1', "We don't just consult,")}<br/>
                   <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}>
                     {t('about_headline_2', "We partner.")}
                   </span>
-                </h1>
+                </h2>
               </div>
               
               <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/70 font-medium max-w-4xl">
@@ -668,11 +686,6 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="absolute -bottom-12 -right-4 md:right-4 text-right">
-                 <div className="italic font-bold text-3xl md:text-3xl text-[#1a1a1a]/40">{t('bridge_1', 'Bridging Challenges.')}</div>
-                 <div className="italic font-bold text-3xl md:text-3xl text-[#E91E8C]">{t('bridge_2', 'Building Success.')}</div>
               </div>
             </div>
 
