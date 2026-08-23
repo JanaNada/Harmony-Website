@@ -585,18 +585,40 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
         <div className="absolute bottom-[-10%] left-[20%] w-[50vw] h-[50vw] bg-[#E91E8C]/15 blur-[120px] rounded-full mix-blend-multiply" />
       </div>
 
-      <div className="relative z-10 pb-32 pt-24 w-full px-0">
+      <div className="relative z-10 pb-32 pt-16 w-full px-0">
+        
+        {/* ── Full-Width Brand Header with Thick Shimmering Color Stream Line ── */}
+        <div className="w-full mb-16 px-6 md:px-12 max-w-[1600px] mx-auto">
+          <div className="flex flex-col items-start mb-6">
+            <h1 className="font-extrabold text-4xl sm:text-6xl md:text-7xl tracking-[-0.02em] text-[#1a1a1a] leading-none mb-4 uppercase">
+              HARMONY <span className="font-light tracking-[0.2em] text-[#1a1a1a]/80">CLUB HOUSE</span>
+            </h1>
+            
+            {/* Thick, Full-Width Animated Brand-Colored Line */}
+            <div className="w-full h-[20px] rounded-full overflow-hidden bg-black/5 relative shadow-sm">
+              <div 
+                className="absolute inset-0 animate-[shimmer_5s_linear_infinite]"
+                style={{
+                  backgroundImage: "linear-gradient(90deg, #F5841F, #E91E8C, #3AADE0, #78BE1F, #F5841F)",
+                  backgroundSize: "200% 100%",
+                  backgroundPosition: "0% 50%",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="w-full mb-24 md:mb-32 relative px-6 md:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12 items-center">
             
             <div className="lg:col-span-7 space-y-10 relative z-20">
               <div>
-                <h1 className="font-extrabold text-5xl md:text-6xl leading-[1.1] tracking-tight text-[#1a1a1a]">
+                <h2 className="font-extrabold text-5xl md:text-6xl leading-[1.1] tracking-tight text-[#1a1a1a]">
                   {t('about_headline_1', "We don't just consult,")}<br/>
                   <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, ${C_ORANGE}, ${C_PINK})` }}>
                     {t('about_headline_2', "We partner.")}
                   </span>
-                </h1>
+                </h2>
               </div>
               
               <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/70 font-medium max-w-4xl">
@@ -665,11 +687,6 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
                   </div>
                 </div>
               </div>
-
-              {/* <div className="absolute -bottom-12 -right-4 md:right-4 text-right">
-                 <div className="italic font-bold text-3xl md:text-3xl text-[#1a1a1a]/40">{t('bridge_1', 'Bridging Challenges.')}</div>
-                 <div className="italic font-bold text-3xl md:text-3xl text-[#E91E8C]">{t('bridge_2', 'Building Success.')}</div>
-              </div> */}
             </div>
 
           </div>
