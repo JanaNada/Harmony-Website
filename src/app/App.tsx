@@ -487,7 +487,7 @@ function TimelineSection() {
 }
 
 const PARTNERS_FRIEND = [
-  { name:"Baron Hotels & Resorts", cat:"Hospitality", domain:"baronhotels.com" },
+  { name:"Baron Hotels & Resorts", cat:"Hospitality", domain:"baronhotels.com", logo:"/baron.png" },
   { name:"Kempinski",             cat:"Hospitality", domain:"kempinski.com" },
   { name:"Marriott",              cat:"Hospitality", domain:"marriott.com", logo:"/marriott.png" },
   { name:"Americana Foods",       cat:"F&B",         domain:"americanafoods.com", logo:"/Americana%20Foods.jpg" },
