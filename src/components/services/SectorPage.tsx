@@ -286,6 +286,52 @@ export function SectorPage({
 
         {story && <div className="w-full max-w-[1600px] mx-auto mb-24 md:mb-32">{story}</div>}
 
+        {service.id === "events" && (
+          <div className="w-full max-w-[1600px] mx-auto mb-24 md:mb-32">
+            <div className="mb-12">
+              <h2 className="font-extrabold text-4xl md:text-5xl tracking-tight text-[#1a1a1a] mb-4 leading-[1.15]">
+                {t('featured_events', 'Featured Events & Projects')}
+              </h2>
+              <p className="text-xl text-[#1a1a1a]/55 leading-[1.7] font-medium max-w-4xl">
+                {t('featured_events_sub', 'A look at some of our largest setups, from corporate galas to massive private events. (Note: These photos and videos will be manageable via the Admin Dashboard in the final release).')}
+              </p>
+            </div>
+            
+            {/* YouTube Embed Placeholder */}
+            <div className="w-full aspect-video rounded-[32px] overflow-hidden mb-12 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] bg-black/5 flex items-center justify-center border border-white/60">
+              {/* Replace with actual iframe in the future when admin adds the URL */}
+              <iframe 
+                width="100%" 
+                height="100%" 
+                src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                title="Harmony Event Showcase" 
+                frameBorder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowFullScreen
+              ></iframe>
+            </div>
+
+            {/* 3 Major Events Grid Placeholder */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { title: "Marriott Corporate Gala", desc: "A 1000+ guest setup including full catering, stage design, and sound production.", img: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&q=80" },
+                { title: "Kempinski Annual Summit", desc: "Three-day corporate retreat with custom stage fabrication and guest management.", img: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=600&q=80" },
+                { title: "Six Senses Private Activation", desc: "Bespoke experiential touchpoints, custom centerpieces, and curated entertainment.", img: "https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?w=600&q=80" }
+              ].map((ev, i) => (
+                <div key={i} className="group overflow-hidden rounded-[24px] bg-white shadow-md border border-gray-100 transition-all duration-300 hover:-translate-y-1">
+                  <div className="aspect-[4/3] overflow-hidden relative">
+                    <img src={ev.img} alt={ev.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  </div>
+                  <div className="p-6">
+                    <h4 className="font-bold text-xl text-[#1a1a1a] mb-2 leading-[1.3]">{ev.title}</h4>
+                    <p className="text-[#1a1a1a]/60 font-medium leading-[1.6]">{ev.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div 
           onClick={() => document.getElementById('modules-grid')?.scrollIntoView({ behavior: 'smooth' })}
           className="w-full flex flex-col items-center justify-center mt-12 opacity-60 hover:opacity-100 transition-opacity cursor-pointer"

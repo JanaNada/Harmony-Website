@@ -1,16 +1,18 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import * as LucideIcons from "lucide-react";
 import { ArrowRight, ChevronRight, ChevronDown, Check, Box } from "lucide-react";
 import { ImageWithFallback } from "@/components";
 import { useBrief } from "@/state/BriefContext";
 import { useTolgee, useTranslate } from "@tolgee/react";
 import { useAuth, isStaffRole } from "@/app/auth";
+import { motion } from "motion/react";
 import {
   C_ORANGE, C_PINK, C_BLUE, C_GREEN,
 } from "@/content/services";
 import { arabicServiceTranslations } from "@/content/translations/ar-services";
-import { type CatalogService, getServicePageKey } from "@/lib/api";
+import { type CatalogService } from "@/lib/api";
 
 const GRAD_FRIEND = `linear-gradient(90deg, ${C_ORANGE}, ${C_PINK}, ${C_BLUE}, ${C_GREEN})`;
 
@@ -37,21 +39,9 @@ export function ServicesOverview({
   const { user } = useAuth();
   const isStaff = isStaffRole(user?.role);
 
-  // Find F&B Technology (Smartphone or matching title)
-  const tech = catalogServices.find(
-    (s) => s.title.toLowerCase() === "f&b technology" || s.icon === "Smartphone"
-  );
-  
-  // Pillars are all active services except F&B Technology
-  const pillars = tech 
-    ? catalogServices.filter((s) => s.id !== tech.id) 
-    : catalogServices;
-  
-  // Show hero if tech exists
-  const showTechHero = !!tech;
-
   return (
     <div className="flex-1 overflow-y-auto bg-[#FAF7F2] text-[#1a1a1a] relative scroll-smooth">
+      {/* Intro removed */}
       {/* Soft Colorful Ambient Backgrounds */}
       <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] bg-[#F5841F]/15 blur-[120px] rounded-full mix-blend-multiply" />
@@ -60,68 +50,6 @@ export function ServicesOverview({
       </div>
 
       <div className="relative z-10">
-        {showTechHero && tech && (
-        <div className="min-h-[70vh] pt-12 pb-8 flex flex-col justify-center px-6 w-full relative">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-12 items-center flex-1">
-            <div className="order-2 lg:order-1 lg:col-span-5 relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#F5841F]/30 to-[#E91E8C]/20 blur-[40px] rounded-[40px] opacity-40 group-hover:opacity-60 transition-opacity duration-700" />
-              <div className="relative w-full aspect-[4/3] rounded-[32px] overflow-hidden shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] border border-white/60 bg-white">
-                <ImageWithFallback
-                  src={tech.imageUrl || "/imports/image-11.png"}
-                  alt={tech.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-                />
-              </div>
-            </div>
-
-            <div className="order-1 lg:order-2 lg:col-span-7">
-              <div className="inline-flex items-center gap-3 mb-4">
-                <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
-                <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/50">
-                  {t('division_label', 'Division')}
-                </span>
-                <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
-              </div>
-
-              <h2 className="font-extrabold text-5xl md:text-6xl text-[#1a1a1a] mb-5 leading-[1.1] tracking-tight">
-                {t(`service_${tech.id}_label`, tech.label)}
-              </h2>
-
-              <p className="text-xl md:text-2xl leading-[1.8] text-[#1a1a1a]/70 font-medium">
-                {t(`service_${tech.id}_intro`, tech.intro)}
-              </p>
-
-              {!hiddenServices.includes("technology") && (
-                <button
-                  onClick={() => onOpen("technology")}
-                  className="mt-8 inline-flex items-center gap-2 text-lg font-bold text-white px-6 py-3 rounded-full transition-all duration-300 hover:scale-[1.05] shadow-[0_10px_20px_-10px_rgba(245,132,31,0.5)] group"
-                  style={{ background: C_ORANGE }}
-                >
-                  {t('explore_fb_tech', 'Explore F&B Technology')}
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Scroll Down Indicator */}
-          <div
-            className="w-full flex justify-center mt-12 cursor-pointer opacity-70 hover:opacity-100 transition-opacity animate-bounce"
-            onClick={() =>
-              document.getElementById("services-grid")?.scrollIntoView({ behavior: "smooth" })
-            }
-          >
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/60">
-                {t('explore_more_services', 'Explore More Services')}
-              </span>
-              <ChevronDown size={24} className="text-[#F5841F]" />
-            </div>
-          </div>
-        </div>
-        )}
-
-        {/* --- 2. THE 4 PILLARS OF EXPERTISE --- */}
         <div id="services-grid" className="pt-16 pb-12">
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 text-center mb-12">
             <div className="inline-flex items-center gap-3 mb-6">
@@ -132,13 +60,13 @@ export function ServicesOverview({
               <div className="h-px w-8 md:w-12" style={{ background: GRAD_FRIEND }} />
             </div>
             <h1 className="font-extrabold text-4xl md:text-5xl leading-[1.15] tracking-tight mb-4 text-[#1a1a1a]">
-              {t('four_pillars_title', 'Four Pillars of Expertise')}
+              {t('our_services', 'Our Services')}
             </h1>
           </div>
 
           <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-8">
-              {pillars.map((s) => {
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8 md:gap-8">
+              {catalogServices.map((s) => {
                 const picked = countFor(s.id);
                 const label = s.title;
                 const tagline = s.tagline;

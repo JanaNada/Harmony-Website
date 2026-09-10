@@ -590,21 +590,18 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
         {/* ── Full-Width Brand Header with Thick Shimmering Color Stream Line ── */}
         <div className="w-full mb-16 px-6 md:px-12 max-w-[1600px] mx-auto">
           <div className="flex flex-col items-start mb-6">
-            <h1 className="font-extrabold text-4xl sm:text-6xl md:text-7xl tracking-[-0.02em] text-[#1a1a1a] leading-none mb-4 uppercase">
-              HARMONY <span className="font-light tracking-[0.2em] text-[#1a1a1a]/80">CLUB HOUSE</span>
+            <h1 
+              className="font-extrabold text-4xl sm:text-6xl md:text-7xl tracking-[-0.02em] leading-none mb-4 uppercase animate-[shimmer_5s_linear_infinite]"
+              style={{
+                backgroundImage: "linear-gradient(90deg, #F5841F, #E91E8C, #3AADE0, #78BE1F, #F5841F)",
+                backgroundSize: "200% auto",
+                color: "transparent",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text"
+              }}
+            >
+              HARMONY <span className="font-light tracking-[0.2em] text-transparent">CLUB HOUSE</span>
             </h1>
-            
-            {/* Thick, Full-Width Animated Brand-Colored Line */}
-            <div className="w-full h-[20px] rounded-full overflow-hidden bg-black/5 relative shadow-sm">
-              <div 
-                className="absolute inset-0 animate-[shimmer_5s_linear_infinite]"
-                style={{
-                  backgroundImage: "linear-gradient(90deg, #F5841F, #E91E8C, #3AADE0, #78BE1F, #F5841F)",
-                  backgroundSize: "200% 100%",
-                  backgroundPosition: "0% 50%",
-                }}
-              />
-            </div>
           </div>
         </div>
 
@@ -753,6 +750,38 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
                   </div>
                   <h3 className="font-bold text-2xl leading-[1.3] text-[#1a1a1a] mb-3">{v.title}</h3>
                   <p className="text-lg leading-[1.7] text-[#1a1a1a]/60">{v.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 mb-24 md:mb-32">
+          <div className="text-center mb-14 md:mb-16">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
+              <span className="text-xs font-bold uppercase tracking-widest text-gray-400">{t('our_team_tag', 'Our Team')}</span>
+              <div className="h-px w-8" style={{background:GRAD_FRIEND}}/>
+            </div>
+            <h2 className="font-extrabold text-4xl md:text-5xl leading-[1.15] tracking-tight text-[#1a1a1a]">
+              {t('meet_our', 'Meet Our ')} <span className="text-transparent bg-clip-text" style={{ backgroundImage: `linear-gradient(135deg, #78BE1F, #3AADE0)` }}>{t('experts', 'Experts')}</span>
+            </h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {[
+              { name: "Mr. Waheed Labib", role: "Consultant Human Resource and Development", img: "/team/mohamed.png", color: C_GREEN },
+              { name: "Mr. Ayman Markos", role: "Operation and Development Consultant", img: "/team/ayman.png", color: C_BLUE },
+              { name: "Mr. Mohamed Abdon", role: "HR Training and Development Manager", img: "/team/waheed.png", color: C_ORANGE }
+            ].map((member, i) => (
+              <div key={i} className="group relative overflow-hidden rounded-[32px] bg-white shadow-[0_10px_30px_-15px_rgba(0,0,0,0.08)] border border-gray-100 transition-all duration-500 hover:-translate-y-2">
+                <div className="aspect-[4/5] overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
+                  <img src={member.img} alt={member.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                  <div className="absolute bottom-6 left-6 right-6 z-20 transform transition-transform duration-300 group-hover:translate-y-[-8px]">
+                    <h3 className="font-bold text-2xl text-white mb-1">{member.name}</h3>
+                    <p className="text-white/80 font-medium text-sm">{member.role}</p>
+                  </div>
                 </div>
               </div>
             ))}
