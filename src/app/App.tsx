@@ -588,7 +588,7 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
       <div className="relative z-10 pb-32 pt-16 w-full px-0">
         
         {/* ── Full-Width Brand Header with Thick Shimmering Color Stream Line ── */}
-        <div className="w-full mb-16 px-6 md:px-12 max-w-[1600px] mx-auto">
+        <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 mb-16">
           <div className="flex flex-col items-start mb-6">
             <h1 
               className="font-extrabold text-4xl sm:text-6xl md:text-7xl tracking-[-0.02em] leading-none mb-4 uppercase animate-[shimmer_5s_linear_infinite]"
@@ -605,7 +605,7 @@ function AboutPage({ go }: { go: (p: Page) => void }) {
           </div>
         </div>
 
-        <div className="w-full mb-24 md:mb-32 relative px-6 md:px-12">
+        <div className="w-full max-w-[1600px] mx-auto px-6 lg:px-12 mb-24 md:mb-32 relative">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12 items-center">
             
             <div className="lg:col-span-7 space-y-10 relative z-20">

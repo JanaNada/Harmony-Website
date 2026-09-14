@@ -119,16 +119,16 @@ export function ServicesOverview({
                             className="text-xs font-bold uppercase tracking-widest mb-1"
                             style={{ color: color }}
                           >
-                            {serviceText(`service_${s.id}_tagline`, s.tagline)}
+                            {serviceText(`service_${s.id}_tagline`, tagline)}
                           </p>
                           <h3 className="text-2xl font-bold leading-[1.3] text-[#1a1a1a]">
-                            {serviceText(`service_${s.id}_label`, s.label)}
+                            {serviceText(`service_${s.id}_label`, label)}
                           </h3>
                         </div>
                       </div>
 
                       <p className="text-lg text-[#1a1a1a]/70 leading-[1.7] mb-8 flex-1 font-medium">
-                        {serviceText(`service_${s.id}_promise`, s.promise)}
+                        {serviceText(`service_${s.id}_promise`, promise)}
                       </p>
 
                       <button
